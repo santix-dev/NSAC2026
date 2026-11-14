@@ -2,7 +2,18 @@
 
 import { useEffect, useRef, useState } from "react";
 import { CloudSun, Pause, Play, Trees } from "lucide-react";
-import { fetchGoesTimes, GOES_PRODUCTS, goesLocalLabel, type GoesProduct } from "@/lib/goes";
+import {
+  fetchGoesMonth,
+  fetchGoesTimes,
+  GOES_HISTORY_NOTE,
+  GOES_PRODUCTS,
+  goesLocalLabel,
+  goesTileExists,
+  type GoesProduct,
+} from "@/lib/goes";
+import { MONTHS_LONG } from "@/lib/regions";
+import { arDay } from "@/lib/goes";
+import { eventFrameUrl, eventProductKey, eventsFor, eventsNear, loadGoesEvents, type GoesEvent } from "@/lib/goesEvents";
 import dynamic from "next/dynamic";
 import { ChevronDown, Flame, Layers, Loader2, Navigation, Radio, Route, Satellite, ShieldAlert, Wind } from "lucide-react";
 import type { MapLayers } from "@/types/fire";
@@ -27,11 +38,15 @@ interface Props extends Omit<MapViewProps, "show" | "goes"> {
   emptyMessage?: string | null;
   spreadSummary?: string;
   liveSummary?: string;
+  /** Fecha elegida en la app: con mes, la imagen GOES sigue ese mes; sin mes, últimas 6 h. */
+  goesDate: { year: number; month: number | null; preferredDay?: string; center: [number, number] };
+  /** Saltar a otra fecha (para los incendios históricos con imagen) */
+  onGoToDate?: (year: number, month: number) => void;
 }
 
 const LAYER_DEFS: { key: keyof MapLayers; label: string; hint: string; Icon: typeof Flame }[] = [
   { key: "live", label: "Focos en tiempo casi real", hint: "NOAA-20/21 + MODIS · últimas 72 h", Icon: Satellite },
-  { key: "goes", label: "Imagen GOES-19", hint: "Humo y nubes · cada 10 min (NASA GIBS)", Icon: CloudSun },
+  { key: "goes", label: "Imagen satelital (humo)", hint: "GOES-19 reciente · incendios históricos GOES-16/MODIS", Icon: CloudSun },
   { key: "park", label: "Áreas protegidas", hint: "PN Los Alerces, su Reserva y PN Lago Puelo", Icon: Trees },
   { key: "hotspots", label: "Focos armonizados", hint: "MODIS + VIIRS · celda 1 km", Icon: Flame },
   { key: "spread", label: "Avance de incendios", hint: "Dirección de cada evento", Icon: Route },
@@ -51,37 +66,116 @@ export default function MapSelector(props: Props) {
   }, []);
   const toward = wind ? (wind.fromDeg + 180) % 360 : 0;
 
-  // ---- GOES-19: horarios disponibles y animación
+  // ---- GOES-19: horarios disponibles y animación (sigue el año/mes elegido)
   const [goesProduct, setGoesProduct] = useState<GoesProduct>("GeoColor");
+  const [goesDays, setGoesDays] = useState<Map<string, string[]>>(new Map());
+  const [goesDay, setGoesDay] = useState<string | null>(null);
   const [goesTimes, setGoesTimes] = useState<string[]>([]);
   const [goesIndex, setGoesIndex] = useState(0);
   const [goesOpacity, setGoesOpacity] = useState(0.8);
   const [goesPlaying, setGoesPlaying] = useState(false);
   const [goesError, setGoesError] = useState<string | null>(null);
+  /** Incendio histórico exportado con Earth Engine que cubre la fecha elegida */
+  const [goesEvent, setGoesEvent] = useState<GoesEvent | null>(null);
+  const [eventUrls, setEventUrls] = useState<Map<string, string>>(new Map());
+  const [nearEvents, setNearEvents] = useState<GoesEvent[]>([]);
+  const { year: gYear, month: gMonth, preferredDay, center } = props.goesDate;
+  const historic = gMonth != null;
+
+  // Lista de horarios: últimas 6 h, o los días del mes elegido
   useEffect(() => {
     if (!layers.goes) return;
     let cancelled = false;
-    const load = () =>
-      fetchGoesTimes(goesProduct)
-        .then((t) => {
+    const load = async () => {
+      setGoesPlaying(false);
+      try {
+        if (!historic) {
+          const t = await fetchGoesTimes(goesProduct);
           if (cancelled) return;
+          setGoesEvent(null);
+          setEventUrls(new Map());
+          setGoesDays(new Map());
+          setGoesDay(null);
           setGoesTimes(t);
           setGoesIndex(Math.max(0, t.length - 1));
-          setGoesError(t.length ? null : "GIBS no tiene imágenes recientes");
-        })
-        .catch((e: Error) => !cancelled && setGoesError(`No se pudo consultar GIBS (${e.message})`));
+          setGoesError(t.length ? null : "Sin imagen GOES reciente en NASA GIBS");
+          return;
+        }
+        // 1) incendio histórico exportado (Earth Engine) para ese mes y zona
+        const events = await loadGoesEvents();
+        if (cancelled) return;
+        setNearEvents(eventsNear(events, center));
+        const ev = eventsFor(events, gYear, gMonth!, center)[0];
+        let days: Map<string, string[]>;
+        if (ev) {
+          const frames = ev.frames[eventProductKey(goesProduct)] ?? ev.frames.natural ?? [];
+          days = new Map();
+          const urls = new Map<string, string>();
+          for (const f of frames) {
+            const d = arDay(f.time);
+            if (!days.has(d)) days.set(d, []);
+            days.get(d)!.push(f.time);
+            urls.set(f.time, eventFrameUrl(ev, f));
+          }
+          setGoesEvent(ev);
+          setEventUrls(urls);
+        } else {
+          // 2) archivo de NASA GIBS (~90 días)
+          setGoesEvent(null);
+          setEventUrls(new Map());
+          days = await fetchGoesMonth(goesProduct, gYear, gMonth!);
+          if (cancelled) return;
+        }
+        setGoesDays(days);
+        const keys = [...days.keys()];
+        if (!keys.length) {
+          setGoesDay(null);
+          setGoesTimes([]);
+          setGoesError(`Sin imagen GOES para esta fecha (${MONTHS_LONG[gMonth! - 1].toLowerCase()} ${gYear}).`);
+          return;
+        }
+        setGoesDay(preferredDay && days.has(preferredDay) ? preferredDay : keys[keys.length - 1]);
+      } catch (e) {
+        if (!cancelled) setGoesError(`No se pudo consultar NASA GIBS (${(e as Error).message})`);
+      }
+    };
     void load();
-    const id = setInterval(load, 10 * 60_000);
+    const id = historic ? undefined : setInterval(load, 10 * 60_000);
     return () => {
       cancelled = true;
-      clearInterval(id);
+      if (id) clearInterval(id);
     };
-  }, [layers.goes, goesProduct]);
+  }, [layers.goes, goesProduct, historic, gYear, gMonth, preferredDay, center]);
+
+  // Día elegido → horarios de ese día; se arranca a media tarde (mejor luz para ver humo)
+  useEffect(() => {
+    if (!historic || !goesDay) return;
+    const t = goesDays.get(goesDay) ?? [];
+    let cancelled = false;
+    const noon = t.findIndex((x) => new Date(x).getUTCHours() >= 18);
+    const idx = noon >= 0 ? noon : Math.max(0, t.length - 1);
+    const timer = setTimeout(() => {
+      setGoesTimes(t);
+      setGoesIndex(idx);
+      setGoesError(null);
+    }, 0);
+    // Los metadatos de GIBS listan horarios ya purgados: se verifica un mosaico real
+    if (t[idx] && !goesEvent)
+      void goesTileExists(goesProduct, t[idx], center[0], center[1]).then((ok) => {
+        if (!cancelled && !ok) setGoesError("Sin imagen GOES para esta fecha (ya no está en el archivo de NASA GIBS).");
+      });
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [historic, goesDay, goesDays, goesProduct, center, goesEvent]);
+
   useEffect(() => {
     if (!goesPlaying || goesTimes.length < 2) return;
     const id = setInterval(() => setGoesIndex((i) => (i + 1) % goesTimes.length), 900);
     return () => clearInterval(id);
   }, [goesPlaying, goesTimes.length]);
+
 
   return (
     <section ref={ref} className="relative h-full w-full bg-slate-900" aria-label="Mapa">
@@ -93,7 +187,19 @@ export default function MapSelector(props: Props) {
         iot={props.iot}
         wind={wind}
         liveFires={props.liveFires}
-        goes={layers.goes ? { product: goesProduct, times: goesTimes, index: goesIndex, opacity: goesOpacity } : null}
+        goes={
+          layers.goes && !goesError
+            ? {
+                product: goesProduct,
+                times: goesTimes,
+                index: goesIndex,
+                opacity: goesOpacity,
+                images: goesEvent
+                  ? { bounds: goesEvent.bounds, urls: goesTimes.map((t) => eventUrls.get(t) ?? "") }
+                  : undefined,
+              }
+            : null
+        }
         show={layers}
       />
 
@@ -194,6 +300,21 @@ export default function MapSelector(props: Props) {
             </span>
           </div>
           <div className="mt-1.5 flex flex-wrap items-center gap-2">
+            {historic && goesDays.size > 0 && (
+              <select
+                value={goesDay ?? ""}
+                onChange={(e) => setGoesDay(e.target.value)}
+                className="rounded border border-slate-700 bg-slate-900 px-1.5 py-0.5 text-[11px] text-slate-200"
+                aria-label="Día de la imagen"
+              >
+                {[...goesDays.keys()].map((d) => (
+                  <option key={d} value={d}>
+                    {Number(d.slice(8, 10))} {MONTHS_LONG[Number(d.slice(5, 7)) - 1].slice(0, 3).toLowerCase()}
+                    {d === preferredDay ? " · día pico" : ""}
+                  </option>
+                ))}
+              </select>
+            )}
             <select
               value={goesProduct}
               onChange={(e) => setGoesProduct(e.target.value as GoesProduct)}
@@ -218,11 +339,44 @@ export default function MapSelector(props: Props) {
                 className="w-16 accent-sky-400"
               />
             </label>
-            <span className="ml-auto text-[10px] text-slate-500">GOES-19 ABI · NOAA / NASA GIBS · hora AR</span>
+            <span className="ml-auto text-[10px] text-slate-500">
+              {goesEvent ? "Earth Engine (NOAA / NASA)" : "GOES-19 ABI · NASA GIBS"} · hora AR
+            </span>
           </div>
           <p className="mt-1 text-[10px] text-slate-500">
-            {goesError ?? `${GOES_PRODUCTS[goesProduct].hint}. Últimas 6 h cada 30 min (${goesTimes.length} imágenes); píxel ~1–2 km.`}
+            {goesError ? (
+              <span className="text-amber-300">
+                {goesError} <span className="text-slate-500">{GOES_HISTORY_NOTE}</span>
+              </span>
+            ) : goesEvent ? (
+              `${goesEvent.name} · ${goesEvent.sensors.join(", ")} vía Earth Engine${
+                goesProduct === "FireTemp" && !goesEvent.frames.firetemp ? " (solo color natural: no había GOES en esa fecha)" : ""
+              }. ${goesTimes.length} imágenes del día.`
+            ) : historic ? (
+              `${GOES_PRODUCTS[goesProduct].hint}. ${MONTHS_LONG[gMonth! - 1]} ${gYear}: ${goesDays.size} días con imagen; ${goesTimes.length} imágenes del día (cada 30 min).`
+            ) : (
+              `${GOES_PRODUCTS[goesProduct].hint}. Últimas 6 h cada 30 min (${goesTimes.length} imágenes). Elegí un mes arriba para ver fechas pasadas.`
+            )}
           </p>
+          {goesError && nearEvents.length > 0 && props.onGoToDate && (
+            <div className="mt-1.5 flex flex-wrap items-center gap-1">
+              <span className="text-[10px] text-slate-400">Incendios con imagen histórica:</span>
+              {nearEvents.map((ev) => {
+                const d = ev.days[0];
+                return (
+                  <button
+                    key={ev.id}
+                    type="button"
+                    onClick={() => props.onGoToDate!(Number(d.slice(0, 4)), Number(d.slice(5, 7)))}
+                    className="rounded border border-sky-800/70 bg-sky-500/10 px-1.5 py-0.5 text-[10px] text-sky-200 hover:bg-sky-500/20"
+                    title={ev.name}
+                  >
+                    {MONTHS_LONG[Number(d.slice(5, 7)) - 1].slice(0, 3).toLowerCase()} {d.slice(0, 4)}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 

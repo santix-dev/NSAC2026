@@ -389,6 +389,22 @@ export default function Dashboard() {
   }, [yearCells, baselineH, selectedMonth, mapRows]);
 
   const bearing = dominantBearing(spread);
+  /** Día con más actividad del mes filtrado: la imagen GOES arranca ahí */
+  const peakDay = useMemo(() => {
+    if (!selectedMonth) return undefined;
+    const byDay = new Map<string, number>();
+    for (const r of mapRows) byDay.set(r.acq_date, (byDay.get(r.acq_date) ?? 0) + r.harmonized_weight);
+    let best: string | undefined;
+    let v = 0;
+    byDay.forEach((w, d) => {
+      if (w > v) {
+        v = w;
+        best = d;
+      }
+    });
+    return best;
+  }, [selectedMonth, mapRows]);
+  const goesCenter = useMemo(() => bboxCenter(bbox), [bbox]);
   const liveSummaryText = useMemo(() => {
     if (!liveFires?.ok) return undefined;
     const s = summarizeLive(liveFires.fires);
@@ -579,6 +595,11 @@ export default function Dashboard() {
             emptyMessage={emptyMessage}
             liveFires={liveFires?.fires ?? []}
             liveSummary={liveSummaryText}
+            goesDate={{ year: selectedYear, month: selectedMonth, preferredDay: peakDay, center: goesCenter }}
+            onGoToDate={(y, m) => {
+              setSelectedYear(y);
+              setSelectedMonth(m);
+            }}
           />
         </main>
       </div>

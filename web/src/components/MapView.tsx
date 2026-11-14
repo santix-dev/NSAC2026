@@ -7,6 +7,7 @@ import type { FeatureCollection } from "geojson";
 import {
   CircleMarker,
   GeoJSON,
+  ImageOverlay,
   Pane,
   LayersControl,
   MapContainer,
@@ -34,6 +35,8 @@ export interface GoesOverlay {
   times: string[];
   index: number;
   opacity: number;
+  /** Incendio histórico exportado con Earth Engine: imágenes estáticas en lugar de mosaicos GIBS */
+  images?: { bounds: [[number, number], [number, number]]; urls: string[] };
 }
 
 export interface WindOverlay {
@@ -200,7 +203,17 @@ export default function MapView({ bbox, hotspots, spread, susceptibility, iot, w
 
       {show.goes && goes && goes.times.length > 0 && (
         <Pane name="goes" style={{ zIndex: 350 }}>
-          {goes.times.map((t, i) => (
+          {goes.images
+            ? goes.images.urls.map((u, i) => (
+                <ImageOverlay
+                  key={u}
+                  url={u}
+                  bounds={goes.images!.bounds}
+                  opacity={i === goes.index ? goes.opacity : 0}
+                  attribution="NOAA GOES / NASA MODIS vía Google Earth Engine"
+                />
+              ))
+            : goes.times.map((t, i) => (
             <TileLayer
               key={`${goes.product}-${t}`}
               url={goesTileUrl(goes.product, t)}
@@ -208,7 +221,7 @@ export default function MapView({ bbox, hotspots, spread, susceptibility, iot, w
               opacity={i === goes.index ? goes.opacity : 0}
               attribution="GOES-19 ABI · NOAA / NASA GIBS"
             />
-          ))}
+              ))}
         </Pane>
       )}
 

@@ -22,3 +22,19 @@ python etl/harmonize.py                                   # celdas-día (si no e
 python etl/env/build_aux.py                               # -> etl/aux_data/terrain_cells.csv + env_cell_month.csv
 python etl/harmonize.py                                   # re-procesa: env_source = 'AUX'
 ```
+
+## Imágenes satelitales de incendios históricos (GOES-16/19 y MODIS)
+
+NASA GIBS solo guarda ~90 días de GOES-Este, así que para los incendios clave se exportan imágenes
+offline con Earth Engine (eventos en `etl/env/goes_events.json`, editable):
+
+```bash
+python etl/env/goes_events.py --project ispstars          # ~8 eventos, unos minutos; reanudable
+python etl/env/goes_events.py --project ispstars --only cordoba-2020 --force
+```
+
+- Desde jul-2017: GOES-16 (hasta 07-04-2025) o GOES-19 ABI, 1 imagen por hora de 8 a 20 h (hora AR),
+  en color natural (verde sintético) y "Fire Temperature RGB".
+- Antes (Cholila 2015, Córdoba 2013): MODIS Terra y Aqua, 2 imágenes por día.
+- Salida: `web/public/goes/<evento>/*.jpg` + `web/public/goes/events.json`. Se sube con git y la web
+  la muestra al elegir ese año y mes (capa "Imagen satelital (humo)").
