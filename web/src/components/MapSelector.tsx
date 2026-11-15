@@ -31,7 +31,8 @@ import {
 import { ChevronLeft, ChevronRight, Crosshair } from "lucide-react";
 import dynamic from "next/dynamic";
 import { ChevronDown, Flame, Layers, Loader2, Navigation, Radio, Route, Satellite, ShieldAlert, Wind } from "lucide-react";
-import type { MapLayers } from "@/types/fire";
+import type { MapLayers, SeriesMode } from "@/types/fire";
+import SeriesToggle from "./SeriesToggle";
 import type { MapViewProps } from "./MapView";
 import { RISK_COLORS, YLORRD } from "@/lib/colors";
 import { compassLabel } from "@/lib/spread";
@@ -55,6 +56,10 @@ interface Props extends Omit<MapViewProps, "show" | "goes"> {
   liveSummary?: string;
   /** Fecha elegida en la app: con mes, la imagen GOES sigue ese mes; sin mes, últimas 6 h. */
   goesDate: { year: number; month: number | null; preferredDay?: string; center: [number, number] };
+  /** Serie de focos que se dibuja: armonizada, solo MODIS, solo VIIRS o cruda */
+  mode: SeriesMode;
+  onModeChange: (m: SeriesMode) => void;
+  sensorSeries: boolean;
   /** Saltar a otra fecha (para los incendios históricos con imagen) */
   onGoToDate?: (year: number, month: number) => void;
 }
@@ -269,6 +274,18 @@ export default function MapSelector(props: Props) {
             {props.truncated && " (límite 10.000)"}
           </p>
           {props.spreadSummary && layers.spread && <p className="text-[11px] text-slate-500">{props.spreadSummary}</p>}
+          {layers.hotspots && (
+            <div className="mt-1.5">
+              <SeriesToggle mode={props.mode} onChange={props.onModeChange} compact />
+              <p className="mt-0.5 text-[10px] text-slate-500">
+                {props.mode === "modis"
+                  ? "Mapa: celdas con detección MODIS (1 km)."
+                  : props.mode === "viirs"
+                    ? "Mapa: celdas con detección VIIRS (375 m), desde nov-2012."
+                    : "Mapa: todas las celdas (MODIS, VIIRS o ambos)."}
+              </p>
+            </div>
+          )}
           {props.liveSummary && layers.live && <p className="text-[11px] text-rose-300">{props.liveSummary}</p>}
         </div>
         {layers.wind && wind && (

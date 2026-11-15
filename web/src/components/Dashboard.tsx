@@ -29,7 +29,7 @@ import {
 import { bboxCenter, CUSTOM_REGION, DEFAULT_REGION, FALLBACK_REGIONS, inBBox, IOT_STATIONS, MONTHS_LONG } from "@/lib/regions";
 import { fetchLiveReadings, type LiveReadingsResult } from "@/lib/iot";
 import { fetchLiveFires, summarizeLive, type LiveFiresResult } from "@/lib/firmsLive";
-import { anomalyPct, monthlyBaseline, quantile } from "@/lib/stats";
+import { anomalyPct, hasSensorSeries, monthlyBaseline, quantile } from "@/lib/stats";
 import { computeSpreadVectors, dominantBearing, compassLabel } from "@/lib/spread";
 import { buildSusceptibilityFromGrid } from "@/lib/susceptibility";
 import { THRESHOLDS, type AreaConditions } from "@/lib/prevention";
@@ -233,9 +233,19 @@ export default function Dashboard() {
   const rows = useMemo(() => hotspots?.rows ?? [], [hotspots]);
   const vegRows = useMemo(() => rows.filter((r) => r.thermal_type === "VEGETATION"), [rows]);
   /** Lo que se dibuja en el mapa: todo el año o solo el mes filtrado */
-  const mapRows = useMemo(
+  const monthRows = useMemo(
     () => (selectedMonth ? rows.filter((r) => Number(r.acq_date.slice(5, 7)) === selectedMonth) : rows),
     [rows, selectedMonth],
+  );
+  /** Lo que se dibuja en el mapa también sigue la serie elegida: solo MODIS, solo VIIRS o todas */
+  const mapRows = useMemo(
+    () =>
+      mode === "modis"
+        ? monthRows.filter((r) => r.sensor_source !== "VIIRS")
+        : mode === "viirs"
+          ? monthRows.filter((r) => r.sensor_source !== "MODIS")
+          : monthRows,
+    [monthRows, mode],
   );
   const spread = useMemo(() => computeSpreadVectors(mapRows), [mapRows]);
   const susceptibility = useMemo(
@@ -357,7 +367,7 @@ export default function Dashboard() {
     if (selectedMonth) {
       const cell = yearCells.find((c) => c.month === selectedMonth);
       const byDay = new Map<string, number>();
-      for (const r of mapRows) if (r.thermal_type === "VEGETATION") byDay.set(r.acq_date, (byDay.get(r.acq_date) ?? 0) + r.harmonized_weight);
+      for (const r of monthRows) if (r.thermal_type === "VEGETATION") byDay.set(r.acq_date, (byDay.get(r.acq_date) ?? 0) + r.harmonized_weight);
       let peakDay = "—";
       let peakValue = 0;
       byDay.forEach((v, d) => {
@@ -370,6 +380,8 @@ export default function Dashboard() {
       return {
         total,
         rawTotal: cell?.raw_events ?? 0,
+        modis: cell?.modis_cells ?? null,
+        viirs: cell?.viirs_cells ?? null,
         peakMonthLabel: peakDay,
         peakValue,
         anomaly: anomalyPct(total, baselineH[selectedMonth - 1]?.p50 ?? 0),
@@ -382,18 +394,20 @@ export default function Dashboard() {
     return {
       total,
       rawTotal,
+      modis: yearCells.some((c) => c.modis_cells != null) ? yearCells.reduce((s, c) => s + (c.modis_cells ?? 0), 0) : null,
+      viirs: yearCells.some((c) => c.viirs_cells != null) ? yearCells.reduce((s, c) => s + (c.viirs_cells ?? 0), 0) : null,
       peakMonthLabel: peak && peak.harmonized_events > 0 ? MONTHS_LONG[peak.month - 1] : "—",
       peakValue: peak?.harmonized_events ?? 0,
       anomaly: anomalyPct(total, p50Total),
     };
-  }, [yearCells, baselineH, selectedMonth, mapRows]);
+  }, [yearCells, baselineH, selectedMonth, monthRows]);
 
   const bearing = dominantBearing(spread);
   /** Día con más actividad del mes filtrado: la imagen GOES arranca ahí */
   const peakDay = useMemo(() => {
     if (!selectedMonth) return undefined;
     const byDay = new Map<string, number>();
-    for (const r of mapRows) byDay.set(r.acq_date, (byDay.get(r.acq_date) ?? 0) + r.harmonized_weight);
+    for (const r of monthRows) byDay.set(r.acq_date, (byDay.get(r.acq_date) ?? 0) + r.harmonized_weight);
     let best: string | undefined;
     let v = 0;
     byDay.forEach((w, d) => {
@@ -403,7 +417,7 @@ export default function Dashboard() {
       }
     });
     return best;
-  }, [selectedMonth, mapRows]);
+  }, [selectedMonth, monthRows]);
   const goesCenter = useMemo(() => bboxCenter(bbox), [bbox]);
   const liveSummaryText = useMemo(() => {
     if (!liveFires?.ok) return undefined;
@@ -595,6 +609,9 @@ export default function Dashboard() {
             emptyMessage={emptyMessage}
             liveFires={liveFires?.fires ?? []}
             liveSummary={liveSummaryText}
+            mode={mode}
+            onModeChange={setMode}
+            sensorSeries={hasSensorSeries(cells)}
             goesDate={{ year: selectedYear, month: selectedMonth, preferredDay: peakDay, center: goesCenter }}
             onGoToDate={(y, m) => {
               setSelectedYear(y);

@@ -15,7 +15,15 @@ interface Props {
   regionLabel: string;
   scenarioLabel: string;
   conditions: AreaConditions | null;
-  kpi: { total: number; rawTotal: number; peakMonthLabel: string; peakValue: number; anomaly: number };
+  kpi: {
+    total: number;
+    rawTotal: number;
+    modis: number | null;
+    viirs: number | null;
+    peakMonthLabel: string;
+    peakValue: number;
+    anomaly: number;
+  };
   selectedYear: number;
   month: number | null;
   alpha: number | null;
@@ -72,6 +80,8 @@ export default function SummaryPanel(p: Props) {
         month={p.month}
         total={p.kpi.total}
         rawTotal={p.kpi.rawTotal}
+        modis={p.kpi.modis}
+        viirs={p.kpi.viirs}
         peakMonthLabel={p.kpi.peakMonthLabel}
         peakValue={p.kpi.peakValue}
         anomaly={p.kpi.anomaly}

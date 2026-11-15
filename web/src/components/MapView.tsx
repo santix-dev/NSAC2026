@@ -354,7 +354,10 @@ export default function MapView({ bbox, hotspots, spread, susceptibility, iot, w
                   {h.acq_date} · celda {h.grid_cell_id}
                 </strong>
                 <Coords lat={h.lat} lon={h.lon} note="Centro de la celda 0,01° (~1 km) de la grilla armonizada" />
-                <Row k="Sensor" v={h.sensor_source} />
+                <Row
+                  k="Sensor"
+                  v={h.sensor_source === "BOTH" ? "MODIS y VIIRS" : h.sensor_source === "VIIRS" ? "Solo VIIRS (peso α)" : "Solo MODIS"}
+                />
                 <Row k="Peso armonizado" v={h.harmonized_weight.toFixed(3)} />
                 <Row k="Detecciones crudas" v={String(h.raw_detections_count)} />
                 <Row k="FRP máx" v={h.max_frp != null ? `${h.max_frp.toFixed(1)} MW` : "—"} />

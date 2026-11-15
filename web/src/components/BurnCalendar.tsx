@@ -5,7 +5,8 @@ import { CalendarDays, Cloud, Mountain } from "lucide-react";
 import type { CalendarCell, Palette, SeriesMode } from "@/types/fire";
 import { gradientCss, paletteColor, textOn } from "@/lib/colors";
 import { MONTHS_LONG, MONTHS_SHORT, YEARS } from "@/lib/regions";
-import { cellValue, formatNumber } from "@/lib/stats";
+import { cellValue, formatNumber, hasSensorSeries, hasViirs, SERIES_INFO } from "@/lib/stats";
+import SeriesToggle from "./SeriesToggle";
 
 export const CLOUD_FLAG_PCT = 60;
 
@@ -52,6 +53,7 @@ export default function BurnCalendar(props: Props) {
 
   // Escala raíz cuadrada: preserva contraste entre años normales y años extremos
   const scale = (v: number) => (max > 0 ? Math.sqrt(v / max) : 0);
+  const sensorSeries = hasSensorSeries(props.cells);
   const seg = (active: boolean) =>
     `rounded px-2 py-0.5 text-[11px] transition ${active ? "bg-slate-700 text-slate-50" : "text-slate-400 hover:text-slate-200"}`;
 
@@ -71,14 +73,7 @@ export default function BurnCalendar(props: Props) {
             </button>
           </div>
         </div>
-        <div className="flex rounded-md border border-slate-800 bg-slate-950 p-0.5" role="group" aria-label="Serie">
-          <button type="button" className={`flex-1 ${seg(mode === "harmonized")}`} aria-pressed={mode === "harmonized"} onClick={() => props.onModeChange("harmonized")}>
-            Armonizada (α Córdoba)
-          </button>
-          <button type="button" className={`flex-1 ${seg(mode === "raw")}`} aria-pressed={mode === "raw"} onClick={() => props.onModeChange("raw")}>
-            Cruda (sin armonizar)
-          </button>
-        </div>
+        <SeriesToggle mode={mode} onChange={props.onModeChange} disabled={sensorSeries ? [] : ["modis", "viirs"]} />
         <label className="flex cursor-pointer items-center gap-2 text-[11px] text-slate-300">
           <input
             type="checkbox"
@@ -90,9 +85,8 @@ export default function BurnCalendar(props: Props) {
           Ocultar fuentes fijas (volcanes / industria)
         </label>
         <p className="text-[10.5px] leading-snug text-slate-500">
-          {mode === "harmonized"
-            ? `Σ peso armonizado por mes · α = ${props.alpha?.toFixed(3) ?? "—"}.`
-            : "Σ detecciones crudas: observá el salto artificial desde 2012."}{" "}
+          {SERIES_INFO[mode].desc}
+          {mode === "harmonized" ? ` α = ${props.alpha?.toFixed(3) ?? "—"}.` : ""}{" "}
           Tocá una celda para ver ese mes en el mapa.
         </p>
       </div>
@@ -131,9 +125,9 @@ export default function BurnCalendar(props: Props) {
                   </td>
                   {row.map((c) => {
                     const v = cellValue(c, mode);
-                    if (!c.has_coverage) {
+                    if (!c.has_coverage || (mode === "viirs" && !hasViirs(year, c.month))) {
                       return (
-                        <td key={c.month} className="h-[13px] rounded-[2px] bg-[repeating-linear-gradient(45deg,#0f172a,#0f172a_2px,#1e293b_2px,#1e293b_4px)]" title="Sin cobertura de datos" />
+                        <td key={c.month} className="h-[13px] rounded-[2px] bg-[repeating-linear-gradient(45deg,#0f172a,#0f172a_2px,#1e293b_2px,#1e293b_4px)]" title={c.has_coverage ? "Sin VIIRS (empieza en nov-2012)" : "Sin cobertura de datos"} />
                       );
                     }
                     const bg = paletteColor(palette, scale(v));
@@ -149,8 +143,8 @@ export default function BurnCalendar(props: Props) {
                           }`}
                           style={{ background: bg }}
                           title={`${MONTHS_LONG[c.month - 1]} ${year}: ${formatNumber(v, mode === "harmonized" ? 1 : 0)} ${
-                            mode === "harmonized" ? "eventos armonizados" : "detecciones crudas"
-                          } · ${c.active_cells} celdas-día · nubosidad ${c.avg_cloud_cover?.toFixed(0) ?? "—"} %${
+                            SERIES_INFO[mode].unit
+                          }${c.modis_cells != null ? ` (MODIS ${c.modis_cells} · VIIRS ${c.viirs_cells} · ambos ${c.both_cells} celdas-día)` : ""} · ${c.active_cells} celdas-día · nubosidad ${c.avg_cloud_cover?.toFixed(0) ?? "—"} %${
                             c.cloud_origin === "region" ? " (promedio regional MODIS)" : ""
                           }${cloudy ? " — baja visibilidad óptica: posible subdetección de focos" : ""}`}
                           aria-label={`${MONTHS_LONG[c.month - 1]} ${year}: ${compact(v)}`}

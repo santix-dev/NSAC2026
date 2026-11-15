@@ -32,7 +32,7 @@ export function readUrlState(): UrlState {
   const s = p.get("s") as Section | null;
   if (s && SECTIONS.includes(s)) out.section = s;
   const m = p.get("serie");
-  if (m === "raw" || m === "harmonized") out.mode = m;
+  if (m === "raw" || m === "harmonized" || m === "modis" || m === "viirs") out.mode = m;
   return out;
 }
 
@@ -46,7 +46,7 @@ export function writeUrlState(s: UrlState): void {
   if (s.year) p.set("y", String(s.year));
   if (s.month) p.set("m", String(s.month));
   if (s.section && s.section !== "resumen") p.set("s", s.section);
-  if (s.mode === "raw") p.set("serie", "raw");
+  if (s.mode && s.mode !== "harmonized") p.set("serie", s.mode);
   const url = `${window.location.pathname}?${p.toString()}`;
   if (url !== `${window.location.pathname}${window.location.search}`) window.history.replaceState(null, "", url);
 }

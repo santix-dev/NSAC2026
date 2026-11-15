@@ -23,7 +23,11 @@ export type EnvSource = "AUX" | "PARAMETRIC" | "MIXED";
 /** supabase = base en vivo · snapshot = copia estática de los mismos datos reales (respaldo) */
 export type DataSource = "supabase" | "snapshot";
 export type Palette = "viridis" | "ylorrd";
-export type SeriesMode = "harmonized" | "raw";
+/**
+ * Serie que se muestra: armonizada (α), cada sensor por separado (celdas-día con detección de
+ * ese sensor, la unidad con la que se calibra α) o cruda (detecciones sumadas de ambos).
+ */
+export type SeriesMode = "harmonized" | "modis" | "viirs" | "raw";
 
 /** Fila de harmonized_hotspots (celda 0.01° × día) — ver etl/harmonize.py */
 export interface HotspotRecord {
@@ -93,6 +97,10 @@ export interface CalendarCell {
   avg_wind_speed: number | null;
   avg_wind_direction: number | null;
   avg_ndvi: number | null;
+  /** Celdas-día con detección MODIS (MODIS o BOTH) / VIIRS (VIIRS o BOTH) / ambos; null si la base aún no los devuelve */
+  modis_cells: number | null;
+  viirs_cells: number | null;
+  both_cells: number | null;
 }
 
 export interface CalendarResult {

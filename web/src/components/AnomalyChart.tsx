@@ -16,8 +16,8 @@ import {
   YAxis,
 } from "recharts";
 import type { CalendarCell, MonthlyBaseline, SeriesMode } from "@/types/fire";
-import { BASELINE_END, BASELINE_START, MONTHS_SHORT } from "@/lib/regions";
-import { anomalyPct, cellValue, formatNumber, formatSigned } from "@/lib/stats";
+import { MONTHS_SHORT } from "@/lib/regions";
+import { anomalyPct, baselineYears, cellValue, formatNumber, formatSigned, SERIES_INFO } from "@/lib/stats";
 
 interface Props {
   yearCells: CalendarCell[];
@@ -58,8 +58,8 @@ export default function AnomalyChart({ yearCells, baseline, mode, selectedYear, 
           <BarChart3 className="h-4 w-4 text-orange-400" aria-hidden /> {selectedYear} vs. Mediana Histórica — {regionLabel}
         </h2>
         <p className="mt-0.5 text-[11px] text-slate-400">
-          Línea base {BASELINE_START}–{BASELINE_END} · barras rojas: mes &gt; P75 (Período Crítico de Alerta) ·{" "}
-          {mode === "harmonized" ? "serie armonizada" : "serie cruda"}
+          Línea base {baselineYears(mode)[0]}–{baselineYears(mode)[1]} · barras rojas: mes &gt; P75 (Período Crítico de Alerta) · serie{" "}
+          {SERIES_INFO[mode].label.toLowerCase()} ({SERIES_INFO[mode].unit})
         </p>
         <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 font-mono text-[11px] text-slate-300">
           <span>

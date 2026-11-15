@@ -10,6 +10,8 @@ interface Props {
   month?: number | null;
   total: number;
   rawTotal: number;
+  modis?: number | null;
+  viirs?: number | null;
   peakMonthLabel: string;
   peakValue: number;
   anomaly: number;
@@ -38,7 +40,11 @@ export default function KpiCards(p: Props) {
         icon={<Activity className="h-3.5 w-3.5" aria-hidden />}
         label={`Eventos armonizados ${period}`}
         value={formatNumber(p.total, 1)}
-        sub={`${formatNumber(p.rawTotal)} detecciones crudas`}
+        sub={
+          p.modis != null && p.viirs != null
+            ? `MODIS ${formatNumber(p.modis)} · VIIRS ${formatNumber(p.viirs)} celdas-día · ${formatNumber(p.rawTotal)} detecciones`
+            : `${formatNumber(p.rawTotal)} detecciones crudas`
+        }
       />
       <Card
         icon={<CalendarRange className="h-3.5 w-3.5" aria-hidden />}
