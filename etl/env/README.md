@@ -44,3 +44,20 @@ python etl/env/fire_imagery.py --project ispstars --only cholila-2015 --force
 Eventos en `etl/env/fire_events.json` (un incendio por evento; editable). Salida:
 `web/public/goes/<evento>/*.jpg` + `web/public/goes/events.json`. La web los muestra al elegir ese
 año y mes con la capa "Imagen satelital (humo)", y acerca el mapa al incendio.
+
+### Antes / Después / Recuperación y severidad (dNBR)
+
+Para cada incendio, `fire_imagery.py` además elige escenas Landsat 8/9 o Sentinel-2 despejadas
+(nubes ≤ 12 %, nieve ≤ 15 %, cobertura ≥ 90 % del recuadro):
+
+- **Antes**: la más cercana al inicio, entre 75 y 2 días antes.
+- **Después**: la primera despejada entre 3 y 60 días después del último día con focos.
+- **Recuperación**: la más cercana a ~6 meses después (ventana de 4 a 10 meses).
+- **Severidad**: dNBR = NBR(antes) − NBR(después), NBR = (NIR − SWIR2)/(NIR + SWIR2), clases USGS
+  (Key & Benson 2006) y hectáreas por clase dentro del recuadro.
+
+Para agregarlo a los incendios ya exportados sin volver a buscar las imágenes del fuego:
+
+```bash
+python etl/env/fire_imagery.py --project ispstars --stages-only
+```

@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-15T09:06:16+00:00",
+ "generated_at": "2026-11-15T15:29:25+00:00",
  "source": "Google Earth Engine: USGS Landsat 8/9 C2 TOA, ESA Sentinel-2 L1C, NASA MODIS MOD09GA/MYD09GA",
  "events": [
   {
@@ -211,7 +211,176 @@
       }
      }
     }
-   ]
+   ],
+   "timeline": {
+    "fire_start": "2015-02-17",
+    "fire_end": "2015-03-03",
+    "stages": {
+     "pre": {
+      "label": "Antes del incendio",
+      "time": "2015-01-21T14:29:00Z",
+      "day": "2015-01-21",
+      "sensor": "Landsat 8",
+      "resolution": "30 m",
+      "cloud": 0.12,
+      "snow": 0.09,
+      "days_from_fire": -27,
+      "products": {
+       "natural": {
+        "file": "pre_landsat8_20150121T1429Z_natural.jpg",
+        "bounds": [
+         [
+          -42.615,
+          -72.105
+         ],
+         [
+          -42.005,
+          -71.355
+         ]
+        ]
+       },
+       "swir": {
+        "file": "pre_landsat8_20150121T1429Z_swir.jpg",
+        "bounds": [
+         [
+          -42.615,
+          -72.105
+         ],
+         [
+          -42.005,
+          -71.355
+         ]
+        ]
+       }
+      }
+     },
+     "post": {
+      "label": "Después (incendio apagado)",
+      "time": "2015-03-26T14:29:00Z",
+      "day": "2015-03-26",
+      "sensor": "Landsat 8",
+      "resolution": "30 m",
+      "cloud": 0.07,
+      "snow": 0.14,
+      "days_from_fire": 23,
+      "products": {
+       "natural": {
+        "file": "post_landsat8_20150326T1429Z_natural.jpg",
+        "bounds": [
+         [
+          -42.615,
+          -72.105
+         ],
+         [
+          -42.005,
+          -71.355
+         ]
+        ]
+       },
+       "swir": {
+        "file": "post_landsat8_20150326T1429Z_swir.jpg",
+        "bounds": [
+         [
+          -42.615,
+          -72.105
+         ],
+         [
+          -42.005,
+          -71.355
+         ]
+        ]
+       }
+      }
+     },
+     "recovery": {
+      "label": "Recuperación (meses después)",
+      "time": "2015-12-07T14:30:00Z",
+      "day": "2015-12-07",
+      "sensor": "Landsat 8",
+      "resolution": "30 m",
+      "cloud": 0.3,
+      "snow": 0.12,
+      "days_from_fire": 279,
+      "products": {
+       "natural": {
+        "file": "recovery_landsat8_20151207T1430Z_natural.jpg",
+        "bounds": [
+         [
+          -42.615,
+          -72.105
+         ],
+         [
+          -42.005,
+          -71.355
+         ]
+        ]
+       },
+       "swir": {
+        "file": "recovery_landsat8_20151207T1430Z_swir.jpg",
+        "bounds": [
+         [
+          -42.615,
+          -72.105
+         ],
+         [
+          -42.005,
+          -71.355
+         ]
+        ]
+       }
+      }
+     }
+    },
+    "severity": {
+     "file": "severity_dnbr.png",
+     "bounds": [
+      [
+       -42.615,
+       -72.105
+      ],
+      [
+       -42.005,
+       -71.355
+      ]
+     ],
+     "pre": "2015-01-21",
+     "post": "2015-03-26",
+     "sensors": [
+      "Landsat 8"
+     ],
+     "classes": [
+      {
+       "name": "Baja",
+       "min": 0.1,
+       "max": 0.27,
+       "color": "#fde725",
+       "ha": 37062
+      },
+      {
+       "name": "Moderada-baja",
+       "min": 0.27,
+       "max": 0.44,
+       "color": "#fca636",
+       "ha": 8408
+      },
+      {
+       "name": "Moderada-alta",
+       "min": 0.44,
+       "max": 0.66,
+       "color": "#e45a31",
+       "ha": 9005
+      },
+      {
+       "name": "Alta",
+       "min": 0.66,
+       "max": null,
+       "color": "#9c179e",
+       "ha": 15197
+      }
+     ],
+     "burned_ha": 69672
+    }
+   }
   },
   {
    "id": "comarca-2021",
@@ -458,7 +627,176 @@
       }
      }
     }
-   ]
+   ],
+   "timeline": {
+    "fire_start": "2021-03-07",
+    "fire_end": "2021-03-16",
+    "stages": {
+     "pre": {
+      "label": "Antes del incendio",
+      "time": "2021-02-24T14:44:00Z",
+      "day": "2021-02-24",
+      "sensor": "Sentinel-2",
+      "resolution": "10–20 m",
+      "cloud": 0,
+      "snow": 0.01,
+      "days_from_fire": -11,
+      "products": {
+       "natural": {
+        "file": "pre_sentinel2_20210224T1444Z_natural.jpg",
+        "bounds": [
+         [
+          -42.235,
+          -71.595
+         ],
+         [
+          -41.835,
+          -71.055
+         ]
+        ]
+       },
+       "swir": {
+        "file": "pre_sentinel2_20210224T1444Z_swir.jpg",
+        "bounds": [
+         [
+          -42.235,
+          -71.595
+         ],
+         [
+          -41.835,
+          -71.055
+         ]
+        ]
+       }
+      }
+     },
+     "post": {
+      "label": "Después (incendio apagado)",
+      "time": "2021-03-21T14:44:00Z",
+      "day": "2021-03-21",
+      "sensor": "Sentinel-2",
+      "resolution": "10–20 m",
+      "cloud": 0,
+      "snow": 0.02,
+      "days_from_fire": 5,
+      "products": {
+       "natural": {
+        "file": "post_sentinel2_20210321T1444Z_natural.jpg",
+        "bounds": [
+         [
+          -42.235,
+          -71.595
+         ],
+         [
+          -41.835,
+          -71.055
+         ]
+        ]
+       },
+       "swir": {
+        "file": "post_sentinel2_20210321T1444Z_swir.jpg",
+        "bounds": [
+         [
+          -42.235,
+          -71.595
+         ],
+         [
+          -41.835,
+          -71.055
+         ]
+        ]
+       }
+      }
+     },
+     "recovery": {
+      "label": "Recuperación (meses después)",
+      "time": "2021-09-07T14:44:00Z",
+      "day": "2021-09-07",
+      "sensor": "Sentinel-2",
+      "resolution": "10–20 m",
+      "cloud": 0.02,
+      "snow": 0.1,
+      "days_from_fire": 175,
+      "products": {
+       "natural": {
+        "file": "recovery_sentinel2_20210907T1444Z_natural.jpg",
+        "bounds": [
+         [
+          -42.235,
+          -71.595
+         ],
+         [
+          -41.835,
+          -71.055
+         ]
+        ]
+       },
+       "swir": {
+        "file": "recovery_sentinel2_20210907T1444Z_swir.jpg",
+        "bounds": [
+         [
+          -42.235,
+          -71.595
+         ],
+         [
+          -41.835,
+          -71.055
+         ]
+        ]
+       }
+      }
+     }
+    },
+    "severity": {
+     "file": "severity_dnbr.png",
+     "bounds": [
+      [
+       -42.235,
+       -71.595
+      ],
+      [
+       -41.835,
+       -71.055
+      ]
+     ],
+     "pre": "2021-02-24",
+     "post": "2021-03-21",
+     "sensors": [
+      "Sentinel-2"
+     ],
+     "classes": [
+      {
+       "name": "Baja",
+       "min": 0.1,
+       "max": 0.27,
+       "color": "#fde725",
+       "ha": 4835
+      },
+      {
+       "name": "Moderada-baja",
+       "min": 0.27,
+       "max": 0.44,
+       "color": "#fca636",
+       "ha": 3397
+      },
+      {
+       "name": "Moderada-alta",
+       "min": 0.44,
+       "max": 0.66,
+       "color": "#e45a31",
+       "ha": 4263
+      },
+      {
+       "name": "Alta",
+       "min": 0.66,
+       "max": null,
+       "color": "#9c179e",
+       "ha": 9749
+      }
+     ],
+     "burned_ha": 22244
+    }
+   }
   },
   {
    "id": "patagonia-2025-02-n",
@@ -779,7 +1117,176 @@
       }
      }
     }
-   ]
+   ],
+   "timeline": {
+    "fire_start": "2025-01-26",
+    "fire_end": "2025-02-08",
+    "stages": {
+     "pre": {
+      "label": "Antes del incendio",
+      "time": "2025-01-19T14:44:00Z",
+      "day": "2025-01-19",
+      "sensor": "Sentinel-2",
+      "resolution": "10–20 m",
+      "cloud": 0.01,
+      "snow": 0.02,
+      "days_from_fire": -7,
+      "products": {
+       "natural": {
+        "file": "pre_sentinel2_20250119T1444Z_natural.jpg",
+        "bounds": [
+         [
+          -42.005,
+          -71.825
+         ],
+         [
+          -41.425,
+          -71.335
+         ]
+        ]
+       },
+       "swir": {
+        "file": "pre_sentinel2_20250119T1444Z_swir.jpg",
+        "bounds": [
+         [
+          -42.005,
+          -71.825
+         ],
+         [
+          -41.425,
+          -71.335
+         ]
+        ]
+       }
+      }
+     },
+     "post": {
+      "label": "Después (incendio apagado)",
+      "time": "2025-02-13T14:44:00Z",
+      "day": "2025-02-13",
+      "sensor": "Sentinel-2",
+      "resolution": "10–20 m",
+      "cloud": 0,
+      "snow": 0.01,
+      "days_from_fire": 5,
+      "products": {
+       "natural": {
+        "file": "post_sentinel2_20250213T1444Z_natural.jpg",
+        "bounds": [
+         [
+          -42.005,
+          -71.825
+         ],
+         [
+          -41.425,
+          -71.335
+         ]
+        ]
+       },
+       "swir": {
+        "file": "post_sentinel2_20250213T1444Z_swir.jpg",
+        "bounds": [
+         [
+          -42.005,
+          -71.825
+         ],
+         [
+          -41.425,
+          -71.335
+         ]
+        ]
+       }
+      }
+     },
+     "recovery": {
+      "label": "Recuperación (meses después)",
+      "time": "2025-10-21T14:44:00Z",
+      "day": "2025-10-21",
+      "sensor": "Sentinel-2",
+      "resolution": "10–20 m",
+      "cloud": 0.12,
+      "snow": 0.08,
+      "days_from_fire": 255,
+      "products": {
+       "natural": {
+        "file": "recovery_sentinel2_20251021T1444Z_natural.jpg",
+        "bounds": [
+         [
+          -42.005,
+          -71.825
+         ],
+         [
+          -41.425,
+          -71.335
+         ]
+        ]
+       },
+       "swir": {
+        "file": "recovery_sentinel2_20251021T1444Z_swir.jpg",
+        "bounds": [
+         [
+          -42.005,
+          -71.825
+         ],
+         [
+          -41.425,
+          -71.335
+         ]
+        ]
+       }
+      }
+     }
+    },
+    "severity": {
+     "file": "severity_dnbr.png",
+     "bounds": [
+      [
+       -42.005,
+       -71.825
+      ],
+      [
+       -41.425,
+       -71.335
+      ]
+     ],
+     "pre": "2025-01-19",
+     "post": "2025-02-13",
+     "sensors": [
+      "Sentinel-2"
+     ],
+     "classes": [
+      {
+       "name": "Baja",
+       "min": 0.1,
+       "max": 0.27,
+       "color": "#fde725",
+       "ha": 11051
+      },
+      {
+       "name": "Moderada-baja",
+       "min": 0.27,
+       "max": 0.44,
+       "color": "#fca636",
+       "ha": 3753
+      },
+      {
+       "name": "Moderada-alta",
+       "min": 0.44,
+       "max": 0.66,
+       "color": "#e45a31",
+       "ha": 2309
+      },
+      {
+       "name": "Alta",
+       "min": 0.66,
+       "max": null,
+       "color": "#9c179e",
+       "ha": 2623
+      }
+     ],
+     "burned_ha": 19736
+    }
+   }
   },
   {
    "id": "patagonia-2025-02-s",
@@ -1100,7 +1607,176 @@
       }
      }
     }
-   ]
+   ],
+   "timeline": {
+    "fire_start": "2025-02-17",
+    "fire_end": "2025-02-28",
+    "stages": {
+     "pre": {
+      "label": "Antes del incendio",
+      "time": "2025-02-13T14:45:00Z",
+      "day": "2025-02-13",
+      "sensor": "Sentinel-2",
+      "resolution": "10–20 m",
+      "cloud": 0,
+      "snow": 0.03,
+      "days_from_fire": -4,
+      "products": {
+       "natural": {
+        "file": "pre_sentinel2_20250213T1445Z_natural.jpg",
+        "bounds": [
+         [
+          -43.165,
+          -71.735
+         ],
+         [
+          -42.815,
+          -70.955
+         ]
+        ]
+       },
+       "swir": {
+        "file": "pre_sentinel2_20250213T1445Z_swir.jpg",
+        "bounds": [
+         [
+          -43.165,
+          -71.735
+         ],
+         [
+          -42.815,
+          -70.955
+         ]
+        ]
+       }
+      }
+     },
+     "post": {
+      "label": "Después (incendio apagado)",
+      "time": "2025-03-10T14:44:00Z",
+      "day": "2025-03-10",
+      "sensor": "Sentinel-2",
+      "resolution": "10–20 m",
+      "cloud": 0.0,
+      "snow": 0.03,
+      "days_from_fire": 10,
+      "products": {
+       "natural": {
+        "file": "post_sentinel2_20250310T1444Z_natural.jpg",
+        "bounds": [
+         [
+          -43.165,
+          -71.735
+         ],
+         [
+          -42.815,
+          -70.955
+         ]
+        ]
+       },
+       "swir": {
+        "file": "post_sentinel2_20250310T1444Z_swir.jpg",
+        "bounds": [
+         [
+          -43.165,
+          -71.735
+         ],
+         [
+          -42.815,
+          -70.955
+         ]
+        ]
+       }
+      }
+     },
+     "recovery": {
+      "label": "Recuperación (meses después)",
+      "time": "2025-09-05T14:30:00Z",
+      "day": "2025-09-05",
+      "sensor": "Landsat 9",
+      "resolution": "30 m",
+      "cloud": 0.04,
+      "snow": 0.08,
+      "days_from_fire": 189,
+      "products": {
+       "natural": {
+        "file": "recovery_landsat9_20250905T1430Z_natural.jpg",
+        "bounds": [
+         [
+          -43.165,
+          -71.735
+         ],
+         [
+          -42.815,
+          -70.955
+         ]
+        ]
+       },
+       "swir": {
+        "file": "recovery_landsat9_20250905T1430Z_swir.jpg",
+        "bounds": [
+         [
+          -43.165,
+          -71.735
+         ],
+         [
+          -42.815,
+          -70.955
+         ]
+        ]
+       }
+      }
+     }
+    },
+    "severity": {
+     "file": "severity_dnbr.png",
+     "bounds": [
+      [
+       -43.165,
+       -71.735
+      ],
+      [
+       -42.815,
+       -70.955
+      ]
+     ],
+     "pre": "2025-02-13",
+     "post": "2025-03-10",
+     "sensors": [
+      "Sentinel-2"
+     ],
+     "classes": [
+      {
+       "name": "Baja",
+       "min": 0.1,
+       "max": 0.27,
+       "color": "#fde725",
+       "ha": 19409
+      },
+      {
+       "name": "Moderada-baja",
+       "min": 0.27,
+       "max": 0.44,
+       "color": "#fca636",
+       "ha": 2848
+      },
+      {
+       "name": "Moderada-alta",
+       "min": 0.44,
+       "max": 0.66,
+       "color": "#e45a31",
+       "ha": 1504
+      },
+      {
+       "name": "Alta",
+       "min": 0.66,
+       "max": null,
+       "color": "#9c179e",
+       "ha": 509
+      }
+     ],
+     "burned_ha": 24269
+    }
+   }
   },
   {
    "id": "patagonia-2025-12",
@@ -1383,7 +2059,176 @@
       }
      }
     }
-   ]
+   ],
+   "timeline": {
+    "fire_start": "2025-12-03",
+    "fire_end": "2025-12-12",
+    "stages": {
+     "pre": {
+      "label": "Antes del incendio",
+      "time": "2025-11-25T14:44:00Z",
+      "day": "2025-11-25",
+      "sensor": "Sentinel-2",
+      "resolution": "10–20 m",
+      "cloud": 0.0,
+      "snow": 0.13,
+      "days_from_fire": -8,
+      "products": {
+       "natural": {
+        "file": "pre_sentinel2_20251125T1444Z_natural.jpg",
+        "bounds": [
+         [
+          -42.46,
+          -72.085
+         ],
+         [
+          -42.16,
+          -71.705
+         ]
+        ]
+       },
+       "swir": {
+        "file": "pre_sentinel2_20251125T1444Z_swir.jpg",
+        "bounds": [
+         [
+          -42.46,
+          -72.085
+         ],
+         [
+          -42.16,
+          -71.705
+         ]
+        ]
+       }
+      }
+     },
+     "post": {
+      "label": "Después (incendio apagado)",
+      "time": "2026-01-04T14:44:00Z",
+      "day": "2026-01-04",
+      "sensor": "Sentinel-2",
+      "resolution": "10–20 m",
+      "cloud": 0.0,
+      "snow": 0.07,
+      "days_from_fire": 23,
+      "products": {
+       "natural": {
+        "file": "post_sentinel2_20260104T1444Z_natural.jpg",
+        "bounds": [
+         [
+          -42.46,
+          -72.085
+         ],
+         [
+          -42.16,
+          -71.705
+         ]
+        ]
+       },
+       "swir": {
+        "file": "post_sentinel2_20260104T1444Z_swir.jpg",
+        "bounds": [
+         [
+          -42.46,
+          -72.085
+         ],
+         [
+          -42.16,
+          -71.705
+         ]
+        ]
+       }
+      }
+     },
+     "recovery": {
+      "label": "Recuperación (meses después)",
+      "time": "2026-05-21T14:44:00Z",
+      "day": "2026-05-21",
+      "sensor": "Sentinel-2",
+      "resolution": "10–20 m",
+      "cloud": 0.01,
+      "snow": 0.39,
+      "days_from_fire": 160,
+      "products": {
+       "natural": {
+        "file": "recovery_sentinel2_20260521T1444Z_natural.jpg",
+        "bounds": [
+         [
+          -42.46,
+          -72.085
+         ],
+         [
+          -42.16,
+          -71.705
+         ]
+        ]
+       },
+       "swir": {
+        "file": "recovery_sentinel2_20260521T1444Z_swir.jpg",
+        "bounds": [
+         [
+          -42.46,
+          -72.085
+         ],
+         [
+          -42.16,
+          -71.705
+         ]
+        ]
+       }
+      }
+     }
+    },
+    "severity": {
+     "file": "severity_dnbr.png",
+     "bounds": [
+      [
+       -42.46,
+       -72.085
+      ],
+      [
+       -42.16,
+       -71.705
+      ]
+     ],
+     "pre": "2025-11-25",
+     "post": "2026-01-04",
+     "sensors": [
+      "Sentinel-2"
+     ],
+     "classes": [
+      {
+       "name": "Baja",
+       "min": 0.1,
+       "max": 0.27,
+       "color": "#fde725",
+       "ha": 6222
+      },
+      {
+       "name": "Moderada-baja",
+       "min": 0.27,
+       "max": 0.44,
+       "color": "#fca636",
+       "ha": 4759
+      },
+      {
+       "name": "Moderada-alta",
+       "min": 0.44,
+       "max": 0.66,
+       "color": "#e45a31",
+       "ha": 4173
+      },
+      {
+       "name": "Alta",
+       "min": 0.66,
+       "max": null,
+       "color": "#9c179e",
+       "ha": 2000
+      }
+     ],
+     "burned_ha": 17155
+    }
+   }
   },
   {
    "id": "patagonia-2026-01",
@@ -1704,7 +2549,177 @@
       }
      }
     }
-   ]
+   ],
+   "timeline": {
+    "fire_start": "2026-01-04",
+    "fire_end": "2026-02-01",
+    "stages": {
+     "pre": {
+      "label": "Antes del incendio",
+      "time": "2025-12-18T14:30:00Z",
+      "day": "2025-12-18",
+      "sensor": "Landsat 8",
+      "resolution": "30 m",
+      "cloud": 0.04,
+      "snow": 0.05,
+      "days_from_fire": -17,
+      "products": {
+       "natural": {
+        "file": "pre_landsat8_20251218T1430Z_natural.jpg",
+        "bounds": [
+         [
+          -42.875,
+          -71.995
+         ],
+         [
+          -42.025,
+          -71.125
+         ]
+        ]
+       },
+       "swir": {
+        "file": "pre_landsat8_20251218T1430Z_swir.jpg",
+        "bounds": [
+         [
+          -42.875,
+          -71.995
+         ],
+         [
+          -42.025,
+          -71.125
+         ]
+        ]
+       }
+      }
+     },
+     "post": {
+      "label": "Después (incendio apagado)",
+      "time": "2026-02-08T14:44:00Z",
+      "day": "2026-02-08",
+      "sensor": "Sentinel-2",
+      "resolution": "10–20 m",
+      "cloud": 0.03,
+      "snow": 0.04,
+      "days_from_fire": 7,
+      "products": {
+       "natural": {
+        "file": "post_sentinel2_20260208T1444Z_natural.jpg",
+        "bounds": [
+         [
+          -42.875,
+          -71.995
+         ],
+         [
+          -42.025,
+          -71.125
+         ]
+        ]
+       },
+       "swir": {
+        "file": "post_sentinel2_20260208T1444Z_swir.jpg",
+        "bounds": [
+         [
+          -42.875,
+          -71.995
+         ],
+         [
+          -42.025,
+          -71.125
+         ]
+        ]
+       }
+      }
+     },
+     "recovery": {
+      "label": "Recuperación (meses después)",
+      "time": "2026-11-07T14:44:00Z",
+      "day": "2026-11-07",
+      "sensor": "Sentinel-2",
+      "resolution": "10–20 m",
+      "cloud": 0,
+      "snow": 0.11,
+      "days_from_fire": 279,
+      "products": {
+       "natural": {
+        "file": "recovery_sentinel2_20261107T1444Z_natural.jpg",
+        "bounds": [
+         [
+          -42.875,
+          -71.995
+         ],
+         [
+          -42.025,
+          -71.125
+         ]
+        ]
+       },
+       "swir": {
+        "file": "recovery_sentinel2_20261107T1444Z_swir.jpg",
+        "bounds": [
+         [
+          -42.875,
+          -71.995
+         ],
+         [
+          -42.025,
+          -71.125
+         ]
+        ]
+       }
+      }
+     }
+    },
+    "severity": {
+     "file": "severity_dnbr.png",
+     "bounds": [
+      [
+       -42.875,
+       -71.995
+      ],
+      [
+       -42.025,
+       -71.125
+      ]
+     ],
+     "pre": "2025-12-18",
+     "post": "2026-02-08",
+     "sensors": [
+      "Landsat 8",
+      "Sentinel-2"
+     ],
+     "classes": [
+      {
+       "name": "Baja",
+       "min": 0.1,
+       "max": 0.27,
+       "color": "#fde725",
+       "ha": 66456
+      },
+      {
+       "name": "Moderada-baja",
+       "min": 0.27,
+       "max": 0.44,
+       "color": "#fca636",
+       "ha": 20353
+      },
+      {
+       "name": "Moderada-alta",
+       "min": 0.44,
+       "max": 0.66,
+       "color": "#e45a31",
+       "ha": 19958
+      },
+      {
+       "name": "Alta",
+       "min": 0.66,
+       "max": null,
+       "color": "#9c179e",
+       "ha": 28887
+      }
+     ],
+     "burned_ha": 135654
+    }
+   }
   },
   {
    "id": "cordoba-2013",
@@ -1914,7 +2929,176 @@
       }
      }
     }
-   ]
+   ],
+   "timeline": {
+    "fire_start": "2013-09-07",
+    "fire_end": "2013-09-12",
+    "stages": {
+     "pre": {
+      "label": "Antes del incendio",
+      "time": "2013-08-22T14:10:00Z",
+      "day": "2013-08-22",
+      "sensor": "Landsat 8",
+      "resolution": "30 m",
+      "cloud": 0.1,
+      "snow": 0.01,
+      "days_from_fire": -16,
+      "products": {
+       "natural": {
+        "file": "pre_landsat8_20130822T1410Z_natural.jpg",
+        "bounds": [
+         [
+          -32.205,
+          -65.205
+         ],
+         [
+          -31.375,
+          -64.215
+         ]
+        ]
+       },
+       "swir": {
+        "file": "pre_landsat8_20130822T1410Z_swir.jpg",
+        "bounds": [
+         [
+          -32.205,
+          -65.205
+         ],
+         [
+          -31.375,
+          -64.215
+         ]
+        ]
+       }
+      }
+     },
+     "post": {
+      "label": "Después (incendio apagado)",
+      "time": "2013-10-09T14:10:00Z",
+      "day": "2013-10-09",
+      "sensor": "Landsat 8",
+      "resolution": "30 m",
+      "cloud": 0.03,
+      "snow": 0.0,
+      "days_from_fire": 27,
+      "products": {
+       "natural": {
+        "file": "post_landsat8_20131009T1410Z_natural.jpg",
+        "bounds": [
+         [
+          -32.205,
+          -65.205
+         ],
+         [
+          -31.375,
+          -64.215
+         ]
+        ]
+       },
+       "swir": {
+        "file": "post_landsat8_20131009T1410Z_swir.jpg",
+        "bounds": [
+         [
+          -32.205,
+          -65.205
+         ],
+         [
+          -31.375,
+          -64.215
+         ]
+        ]
+       }
+      }
+     },
+     "recovery": {
+      "label": "Recuperación (meses después)",
+      "time": "2014-04-19T14:08:00Z",
+      "day": "2014-04-19",
+      "sensor": "Landsat 8",
+      "resolution": "30 m",
+      "cloud": 0.06,
+      "snow": 0.01,
+      "days_from_fire": 219,
+      "products": {
+       "natural": {
+        "file": "recovery_landsat8_20140419T1408Z_natural.jpg",
+        "bounds": [
+         [
+          -32.205,
+          -65.205
+         ],
+         [
+          -31.375,
+          -64.215
+         ]
+        ]
+       },
+       "swir": {
+        "file": "recovery_landsat8_20140419T1408Z_swir.jpg",
+        "bounds": [
+         [
+          -32.205,
+          -65.205
+         ],
+         [
+          -31.375,
+          -64.215
+         ]
+        ]
+       }
+      }
+     }
+    },
+    "severity": {
+     "file": "severity_dnbr.png",
+     "bounds": [
+      [
+       -32.205,
+       -65.205
+      ],
+      [
+       -31.375,
+       -64.215
+      ]
+     ],
+     "pre": "2013-08-22",
+     "post": "2013-10-09",
+     "sensors": [
+      "Landsat 8"
+     ],
+     "classes": [
+      {
+       "name": "Baja",
+       "min": 0.1,
+       "max": 0.27,
+       "color": "#fde725",
+       "ha": 58130
+      },
+      {
+       "name": "Moderada-baja",
+       "min": 0.27,
+       "max": 0.44,
+       "color": "#fca636",
+       "ha": 33854
+      },
+      {
+       "name": "Moderada-alta",
+       "min": 0.44,
+       "max": 0.66,
+       "color": "#e45a31",
+       "ha": 13229
+      },
+      {
+       "name": "Alta",
+       "min": 0.66,
+       "max": null,
+       "color": "#9c179e",
+       "ha": 1777
+      }
+     ],
+     "burned_ha": 106989
+    }
+   }
   },
   {
    "id": "cordoba-2020",
@@ -2235,7 +3419,177 @@
       }
      }
     }
-   ]
+   ],
+   "timeline": {
+    "fire_start": "2020-09-22",
+    "fire_end": "2020-10-08",
+    "stages": {
+     "pre": {
+      "label": "Antes del incendio",
+      "time": "2020-09-19T14:31:00Z",
+      "day": "2020-09-19",
+      "sensor": "Sentinel-2",
+      "resolution": "10–20 m",
+      "cloud": 0.0,
+      "snow": 0.0,
+      "days_from_fire": -3,
+      "products": {
+       "natural": {
+        "file": "pre_sentinel2_20200919T1431Z_natural.jpg",
+        "bounds": [
+         [
+          -31.575,
+          -65.065
+         ],
+         [
+          -30.775,
+          -64.245
+         ]
+        ]
+       },
+       "swir": {
+        "file": "pre_sentinel2_20200919T1431Z_swir.jpg",
+        "bounds": [
+         [
+          -31.575,
+          -65.065
+         ],
+         [
+          -30.775,
+          -64.245
+         ]
+        ]
+       }
+      }
+     },
+     "post": {
+      "label": "Después (incendio apagado)",
+      "time": "2020-10-12T14:08:00Z",
+      "day": "2020-10-12",
+      "sensor": "Landsat 8",
+      "resolution": "30 m",
+      "cloud": 0.0,
+      "snow": 0.0,
+      "days_from_fire": 4,
+      "products": {
+       "natural": {
+        "file": "post_landsat8_20201012T1408Z_natural.jpg",
+        "bounds": [
+         [
+          -31.575,
+          -65.065
+         ],
+         [
+          -30.775,
+          -64.245
+         ]
+        ]
+       },
+       "swir": {
+        "file": "post_landsat8_20201012T1408Z_swir.jpg",
+        "bounds": [
+         [
+          -31.575,
+          -65.065
+         ],
+         [
+          -30.775,
+          -64.245
+         ]
+        ]
+       }
+      }
+     },
+     "recovery": {
+      "label": "Recuperación (meses después)",
+      "time": "2021-04-12T14:31:00Z",
+      "day": "2021-04-12",
+      "sensor": "Sentinel-2",
+      "resolution": "10–20 m",
+      "cloud": 0.01,
+      "snow": 0.0,
+      "days_from_fire": 186,
+      "products": {
+       "natural": {
+        "file": "recovery_sentinel2_20210412T1431Z_natural.jpg",
+        "bounds": [
+         [
+          -31.575,
+          -65.065
+         ],
+         [
+          -30.775,
+          -64.245
+         ]
+        ]
+       },
+       "swir": {
+        "file": "recovery_sentinel2_20210412T1431Z_swir.jpg",
+        "bounds": [
+         [
+          -31.575,
+          -65.065
+         ],
+         [
+          -30.775,
+          -64.245
+         ]
+        ]
+       }
+      }
+     }
+    },
+    "severity": {
+     "file": "severity_dnbr.png",
+     "bounds": [
+      [
+       -31.575,
+       -65.065
+      ],
+      [
+       -30.775,
+       -64.245
+      ]
+     ],
+     "pre": "2020-09-19",
+     "post": "2020-10-12",
+     "sensors": [
+      "Landsat 8",
+      "Sentinel-2"
+     ],
+     "classes": [
+      {
+       "name": "Baja",
+       "min": 0.1,
+       "max": 0.27,
+       "color": "#fde725",
+       "ha": 38204
+      },
+      {
+       "name": "Moderada-baja",
+       "min": 0.27,
+       "max": 0.44,
+       "color": "#fca636",
+       "ha": 39028
+      },
+      {
+       "name": "Moderada-alta",
+       "min": 0.44,
+       "max": 0.66,
+       "color": "#e45a31",
+       "ha": 5280
+      },
+      {
+       "name": "Alta",
+       "min": 0.66,
+       "max": null,
+       "color": "#9c179e",
+       "ha": 35
+      }
+     ],
+     "burned_ha": 82547
+    }
+   }
   },
   {
    "id": "cordoba-2024",
@@ -2556,7 +3910,176 @@
       }
      }
     }
-   ]
+   ],
+   "timeline": {
+    "fire_start": "2024-09-16",
+    "fire_end": "2024-09-29",
+    "stages": {
+     "pre": {
+      "label": "Antes del incendio",
+      "time": "2024-09-08T14:31:00Z",
+      "day": "2024-09-08",
+      "sensor": "Sentinel-2",
+      "resolution": "10–20 m",
+      "cloud": 0.0,
+      "snow": 0.0,
+      "days_from_fire": -8,
+      "products": {
+       "natural": {
+        "file": "pre_sentinel2_20240908T1431Z_natural.jpg",
+        "bounds": [
+         [
+          -31.525,
+          -64.925
+         ],
+         [
+          -30.725,
+          -64.055
+         ]
+        ]
+       },
+       "swir": {
+        "file": "pre_sentinel2_20240908T1431Z_swir.jpg",
+        "bounds": [
+         [
+          -31.525,
+          -64.925
+         ],
+         [
+          -30.725,
+          -64.055
+         ]
+        ]
+       }
+      }
+     },
+     "post": {
+      "label": "Después (incendio apagado)",
+      "time": "2024-10-03T14:31:00Z",
+      "day": "2024-10-03",
+      "sensor": "Sentinel-2",
+      "resolution": "10–20 m",
+      "cloud": 0,
+      "snow": 0.0,
+      "days_from_fire": 4,
+      "products": {
+       "natural": {
+        "file": "post_sentinel2_20241003T1431Z_natural.jpg",
+        "bounds": [
+         [
+          -31.525,
+          -64.925
+         ],
+         [
+          -30.725,
+          -64.055
+         ]
+        ]
+       },
+       "swir": {
+        "file": "post_sentinel2_20241003T1431Z_swir.jpg",
+        "bounds": [
+         [
+          -31.525,
+          -64.925
+         ],
+         [
+          -30.725,
+          -64.055
+         ]
+        ]
+       }
+      }
+     },
+     "recovery": {
+      "label": "Recuperación (meses después)",
+      "time": "2025-03-22T14:31:00Z",
+      "day": "2025-03-22",
+      "sensor": "Sentinel-2",
+      "resolution": "10–20 m",
+      "cloud": 0.05,
+      "snow": 0.0,
+      "days_from_fire": 174,
+      "products": {
+       "natural": {
+        "file": "recovery_sentinel2_20250322T1431Z_natural.jpg",
+        "bounds": [
+         [
+          -31.525,
+          -64.925
+         ],
+         [
+          -30.725,
+          -64.055
+         ]
+        ]
+       },
+       "swir": {
+        "file": "recovery_sentinel2_20250322T1431Z_swir.jpg",
+        "bounds": [
+         [
+          -31.525,
+          -64.925
+         ],
+         [
+          -30.725,
+          -64.055
+         ]
+        ]
+       }
+      }
+     }
+    },
+    "severity": {
+     "file": "severity_dnbr.png",
+     "bounds": [
+      [
+       -31.525,
+       -64.925
+      ],
+      [
+       -30.725,
+       -64.055
+      ]
+     ],
+     "pre": "2024-09-08",
+     "post": "2024-10-03",
+     "sensors": [
+      "Sentinel-2"
+     ],
+     "classes": [
+      {
+       "name": "Baja",
+       "min": 0.1,
+       "max": 0.27,
+       "color": "#fde725",
+       "ha": 28328
+      },
+      {
+       "name": "Moderada-baja",
+       "min": 0.27,
+       "max": 0.44,
+       "color": "#fca636",
+       "ha": 24000
+      },
+      {
+       "name": "Moderada-alta",
+       "min": 0.44,
+       "max": 0.66,
+       "color": "#e45a31",
+       "ha": 9438
+      },
+      {
+       "name": "Alta",
+       "min": 0.66,
+       "max": null,
+       "color": "#9c179e",
+       "ha": 113
+      }
+     ],
+     "burned_ha": 61879
+    }
+   }
   }
  ]
 }

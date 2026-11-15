@@ -20,8 +20,13 @@ import {
   sceneBounds,
   sceneLabel,
   sceneUrl,
+  fmtDay,
+  STAGE_ORDER,
+  STAGE_SHORT,
+  stageUrl,
   type FireEvent,
   type SceneProduct,
+  type StageKey,
 } from "@/lib/goesEvents";
 import { ChevronLeft, ChevronRight, Crosshair } from "lucide-react";
 import dynamic from "next/dynamic";
@@ -91,6 +96,9 @@ export default function MapSelector(props: Props) {
   const [eventId, setEventId] = useState<string | null>(null);
   const [sceneIdx, setSceneIdx] = useState(0);
   const [sceneProduct, setSceneProduct] = useState<SceneProduct>("swir");
+  /** Apartado del incendio: imágenes durante el fuego, o Antes / Después / Recuperación / Severidad */
+  const [fireTab, setFireTab] = useState<"during" | "timeline">("during");
+  const [stage, setStage] = useState<StageKey | "severity">("pre");
   const { year: gYear, month: gMonth, preferredDay, center } = props.goesDate;
   const historic = gMonth != null;
 
@@ -189,6 +197,16 @@ export default function MapSelector(props: Props) {
     return () => clearTimeout(t);
   }, [scenes, preferredDay]);
   const scene = scenes[Math.min(sceneIdx, scenes.length - 1)] ?? null;
+  const timeline = fireEvent?.timeline;
+  const timelineItem = useMemo(() => {
+    if (!fireEvent || !timeline) return null;
+    if (stage === "severity") return timeline.severity ? { url: `/goes/${fireEvent.id}/${timeline.severity.file}`, bounds: timeline.severity.bounds } : null;
+    const st = timeline.stages[stage];
+    if (!st) return null;
+    const url = stageUrl(fireEvent, st, sceneProduct);
+    const b = (st.products[sceneProduct] ?? st.products.natural)?.bounds;
+    return url && b ? { url, bounds: b } : null;
+  }, [fireEvent, timeline, stage, sceneProduct]);
   const [focus, setFocus] = useState<{ bounds: [[number, number], [number, number]]; key: number } | null>(null);
   // Al aparecer un incendio histórico, el mapa se acerca solo a su recuadro
   const fireId = fireEvent?.id;
@@ -227,13 +245,15 @@ export default function MapSelector(props: Props) {
             : null
         }
         scenes={
-          layers.goes && fireEvent && scenes.length
-            ? {
-                index: Math.min(sceneIdx, scenes.length - 1),
-                opacity: goesOpacity,
-                items: scenes.map((s) => ({ url: sceneUrl(fireEvent, s, sceneProduct) ?? "", bounds: sceneBounds(s, sceneProduct)! })),
-              }
-            : null
+          layers.goes && fireEvent && fireTab === "timeline" && timelineItem
+            ? { index: 0, opacity: goesOpacity, items: [timelineItem] }
+            : layers.goes && fireEvent && scenes.length
+              ? {
+                  index: Math.min(sceneIdx, scenes.length - 1),
+                  opacity: goesOpacity,
+                  items: scenes.map((s) => ({ url: sceneUrl(fireEvent, s, sceneProduct) ?? "", bounds: sceneBounds(s, sceneProduct)! })),
+                }
+              : null
         }
         focus={focus}
         show={layers}
@@ -334,6 +354,109 @@ export default function MapSelector(props: Props) {
               <Crosshair className="h-3.5 w-3.5" aria-hidden /> Ir al incendio
             </button>
           </div>
+          <div className="mt-1.5 flex rounded border border-slate-700 p-0.5 text-[11px]" role="tablist" aria-label="Apartado del incendio">
+            {(
+              [
+                ["during", "Durante el incendio"],
+                ["timeline", "Antes y después"],
+              ] as const
+            ).map(([k, l]) => (
+              <button
+                key={k}
+                type="button"
+                role="tab"
+                aria-selected={fireTab === k}
+                disabled={k === "timeline" && !timeline}
+                title={k === "timeline" && !timeline ? "Todavía no se generaron (fire_imagery.py --stages-only)" : undefined}
+                onClick={() => setFireTab(k)}
+                className={`flex-1 rounded px-2 py-0.5 disabled:opacity-40 ${fireTab === k ? "bg-orange-500/20 text-orange-200" : "text-slate-400 hover:text-slate-200"}`}
+              >
+                {l}
+              </button>
+            ))}
+          </div>
+          {fireTab === "timeline" && timeline ? (
+            <div className="mt-1.5">
+              <div className="grid grid-cols-4 gap-1">
+                {[...STAGE_ORDER, "severity" as const].map((k) => {
+                  const st = k === "severity" ? null : timeline.stages[k];
+                  const has = k === "severity" ? !!timeline.severity : !!st;
+                  return (
+                    <button
+                      key={k}
+                      type="button"
+                      disabled={!has}
+                      onClick={() => setStage(k)}
+                      className={`rounded border px-1 py-1 text-center leading-tight disabled:opacity-35 ${
+                        stage === k ? "border-orange-500/80 bg-orange-500/15 text-orange-100" : "border-slate-700 text-slate-300 hover:bg-slate-800"
+                      }`}
+                    >
+                      <span className="block text-[11px] font-semibold">{k === "severity" ? "Severidad" : STAGE_SHORT[k]}</span>
+                      <span className="block text-[9.5px] text-slate-400">
+                        {k === "severity"
+                          ? timeline.severity
+                            ? `${timeline.severity.burned_ha.toLocaleString("es-AR")} ha`
+                            : "—"
+                          : st
+                            ? fmtDay(st.day)
+                            : k === "recovery"
+                              ? "aún no"
+                              : "sin imagen"}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+              {stage === "severity" && timeline.severity ? (
+                <div className="mt-1.5">
+                  <div className="flex flex-wrap gap-x-2 gap-y-0.5">
+                    {timeline.severity.classes.map((c) => (
+                      <span key={c.name} className="flex items-center gap-1 text-[10.5px] text-slate-300">
+                        <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ background: c.color }} />
+                        {c.name} <span className="font-mono text-slate-400">{c.ha.toLocaleString("es-AR")} ha</span>
+                      </span>
+                    ))}
+                  </div>
+                  <p className="mt-1 text-[10px] text-slate-500">
+                    dNBR = NBR antes ({fmtDay(timeline.severity.pre)}) − NBR después ({fmtDay(timeline.severity.post)}), NBR = (NIR − SWIR2)/(NIR + SWIR2);
+                    clases USGS (Key &amp; Benson). {timeline.severity.sensors.join(" / ")}, nubes enmascaradas. Superficie dentro del recuadro del incendio.
+                  </p>
+                </div>
+              ) : stage !== "severity" && timeline.stages[stage] ? (
+                <>
+                  <div className="mt-1.5 flex flex-wrap items-center gap-2">
+                    <div className="flex rounded border border-slate-700 p-0.5" role="group" aria-label="Producto">
+                      {(Object.keys(SCENE_PRODUCTS) as SceneProduct[]).map((p) => (
+                        <button
+                          key={p}
+                          type="button"
+                          aria-pressed={sceneProduct === p}
+                          onClick={() => setSceneProduct(p)}
+                          className={`rounded px-2 py-0.5 text-[11px] ${sceneProduct === p ? "bg-slate-700 text-white" : "text-slate-400 hover:text-slate-200"}`}
+                        >
+                          {p === "swir" ? "Onda corta (quemado)" : SCENE_PRODUCTS[p].label}
+                        </button>
+                      ))}
+                    </div>
+                    <label className="flex items-center gap-1 text-slate-400">
+                      Opacidad
+                      <input type="range" min={0.2} max={1} step={0.1} value={goesOpacity} onChange={(e) => setGoesOpacity(+e.target.value)} className="w-16 accent-sky-400" />
+                    </label>
+                  </div>
+                  <p className="mt-1 text-[10px] text-slate-500">
+                    {(() => {
+                      const st = timeline.stages[stage]!;
+                      const rel = st.days_from_fire;
+                      const when = stage === "pre" ? `${Math.abs(rel)} días antes del inicio` : `${rel} días después del fin (${fmtDay(timeline.fire_end)})`;
+                      return `${st.label}: ${st.sensor} (${st.resolution}), ${fmtDay(st.day)} · ${when} · nubes ${Math.round(st.cloud * 100)} %.`;
+                    })()}{" "}
+                    {sceneProduct === "swir" ? "En onda corta lo quemado se ve marrón oscuro/rojizo y la vegetación sana verde." : ""}
+                  </p>
+                </>
+              ) : null}
+            </div>
+          ) : (
+          <>
           <div className="mt-1.5 flex items-center gap-1.5">
             <button
               type="button"
@@ -403,6 +526,8 @@ export default function MapSelector(props: Props) {
             {scene.detections ? `${scene.detections} detecciones FIRMS ese día · ` : ""}nubes {Math.round(scene.cloud * 100)} % ·{" "}
             {scenes.length} imágenes elegidas por mostrar fuego o humo (Earth Engine).
           </p>
+          </>
+          )}
         </div>
       )}
 

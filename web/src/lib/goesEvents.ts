@@ -22,6 +22,49 @@ export interface FireScene {
   products: Partial<Record<SceneProduct, { file: string; bounds: [[number, number], [number, number]] }>>;
 }
 
+export type StageKey = "pre" | "post" | "recovery";
+
+export interface FireStage {
+  label: string;
+  time: string;
+  day: string;
+  sensor: string;
+  resolution: string;
+  cloud: number;
+  snow: number;
+  days_from_fire: number;
+  products: Partial<Record<SceneProduct, { file: string; bounds: [[number, number], [number, number]] }>>;
+}
+
+export interface FireSeverity {
+  file: string;
+  bounds: [[number, number], [number, number]];
+  pre: string;
+  post: string;
+  sensors: string[];
+  classes: { name: string; min: number; max: number | null; color: string; ha: number }[];
+  burned_ha: number;
+}
+
+export interface FireTimeline {
+  fire_start: string;
+  fire_end: string;
+  stages: Partial<Record<StageKey, FireStage>>;
+  severity?: FireSeverity;
+}
+
+export const STAGE_ORDER: StageKey[] = ["pre", "post", "recovery"];
+export const STAGE_SHORT: Record<StageKey, string> = { pre: "Antes", post: "Después", recovery: "Recuperación" };
+
+export function stageUrl(ev: FireEvent, st: FireStage, p: SceneProduct): string | null {
+  const f = st.products[p] ?? st.products.natural;
+  return f ? `/goes/${ev.id}/${f.file}` : null;
+}
+
+export function fmtDay(d: string): string {
+  return new Date(`${d}T12:00:00Z`).toLocaleDateString("es-AR", { day: "numeric", month: "short", year: "numeric" });
+}
+
 export interface FireEvent {
   id: string;
   name: string;
@@ -30,6 +73,7 @@ export interface FireEvent {
   center: [number, number];
   fire_bounds: [[number, number], [number, number]];
   scenes: FireScene[];
+  timeline?: FireTimeline;
 }
 
 let cache: Promise<FireEvent[]> | null = null;

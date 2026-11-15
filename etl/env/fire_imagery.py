@@ -229,6 +229,154 @@ def modis_vis(img: ee.Image, product: str) -> ee.Image:
     return img.select(["sur_refl_b07", "sur_refl_b02", "sur_refl_b01"]).multiply(1e-4).resample("bilinear").visualize(min=0, max=[0.35, 0.5, 0.3], gamma=1.2)
 
 
+# --------------------------------------------------------------------------- antes / después / recuperación
+STAGES = {
+    # etapa: (desde, hasta) en días respecto del inicio (pre) o del fin (post/recuperación) del incendio
+    "pre": (-75, -2),
+    "post": (3, 60),
+    "recovery": (120, 300),
+}
+RECOVERY_TARGET_DAYS = 180
+STAGE_LABELS = {"pre": "Antes del incendio", "post": "Después (incendio apagado)", "recovery": "Recuperación (meses después)"}
+# Severidad dNBR (Key & Benson 2006, USGS FIREMON)
+DNBR_CLASSES = [
+    ("Baja", 0.10, 0.27, "#fde725"),
+    ("Moderada-baja", 0.27, 0.44, "#fca636"),
+    ("Moderada-alta", 0.44, 0.66, "#e45a31"),
+    ("Alta", 0.66, 9.99, "#9c179e"),
+]
+
+
+def fire_span(per_day: dict, min_det: int = 3) -> tuple[pd.Timestamp, pd.Timestamp]:
+    """Primer y último día con actividad real dentro del recuadro (≥ min_det detecciones)."""
+    act = sorted(d for d, n in per_day.items() if n >= min_det) or sorted(per_day)
+    return pd.Timestamp(act[0]), pd.Timestamp(act[-1])
+
+
+def clear_candidates(sensor: str, geom: ee.Geometry, start: str, end: str) -> list[dict]:
+    """Escenas despejadas: nubes, nieve (NDSI > 0.4) y cobertura de datos sobre el incendio."""
+    col = SENSORS[sensor]["col"]().filterBounds(geom).filterDate(start, end)
+    stamps = col.aggregate_array("system:time_start").getInfo() or []
+    days = sorted({datetime.fromtimestamp(t / 1000, tz=timezone.utc).date().isoformat() for t in stamps})
+    out = []
+    for day in days:
+        nxt = (datetime.fromisoformat(day) + timedelta(days=1)).date().isoformat()
+        sub = col.filterDate(day, nxt)
+        img = sub.mosaic()
+        r = refl(img, sensor)
+        ndsi = r.normalizedDifference(["g", "s1"])
+        stats = ee.Image.cat(
+            [
+                cloud_mask(img, sensor, day, geom).rename("cloud"),
+                ndsi.gt(0.4).rename("snow"),
+                r.select("r").mask().rename("valid"),
+            ]
+        ).unmask(0).reduceRegion(ee.Reducer.mean(), geom, 120, maxPixels=1e9, bestEffort=True)
+        try:
+            st = stats.getInfo()
+        except Exception as ex:
+            print(f"    · {sensor} {day}: {ex}")
+            continue
+        out.append(dict(sensor=sensor, day=day, time=iso_z(sub.aggregate_min("system:time_start").getInfo()),
+                        cloud=round(st.get("cloud") or 0, 2), snow=round(st.get("snow") or 0, 2),
+                        valid=round(st.get("valid") or 0, 2), img=img))
+    return out
+
+
+def pick_stage(cands: list[dict], stage: str, anchor: pd.Timestamp) -> dict | None:
+    ok = [c for c in cands if c["valid"] >= 0.9]
+    if not ok:
+        return None
+    dist = lambda c: abs((pd.Timestamp(c["day"]) - anchor).days)  # noqa: E731
+    good = [c for c in ok if c["cloud"] <= 0.12 and c["snow"] <= 0.15]
+    if good:
+        if stage == "pre":       # la más cercana al inicio
+            return min(good, key=dist)
+        if stage == "post":      # la primera despejada después del fin
+            return min(good, key=lambda c: c["day"])
+        return min(good, key=dist)  # recuperación: la más cercana a ~6 meses
+    return min(ok, key=lambda c: c["cloud"] + c["snow"] + dist(c) / 1000)
+
+
+def process_stages(ev: dict, h: pd.DataFrame, force: bool) -> dict | None:
+    fb = fire_box(h, ev["region"], ev["days"])
+    if not fb:
+        return None
+    box, _, per_day, _ = fb
+    geom = rect(box)
+    f_start, f_end = fire_span(per_day)
+    today = pd.Timestamp(datetime.now(timezone.utc).date())
+    folder = OUT / ev["id"]
+    folder.mkdir(parents=True, exist_ok=True)
+    print(f"  incendio activo {f_start.date()} → {f_end.date()} (días con ≥3 detecciones en el recuadro)")
+    chosen: dict[str, dict] = {}
+    for stage, (d0, d1) in STAGES.items():
+        ref = f_start if stage == "pre" else f_end
+        lo, hi = ref + pd.Timedelta(days=d0), min(ref + pd.Timedelta(days=d1), today)
+        if lo >= today:
+            print(f"  · {STAGE_LABELS[stage]}: todavía no hay imágenes (desde {lo.date()})")
+            continue
+        cands: list[dict] = []
+        for sensor in SENSORS:
+            if sensor == "Sentinel-2" and hi.tz_localize("UTC") < S2_START:
+                continue
+            cands += clear_candidates(sensor, geom, lo.date().isoformat(), (hi + pd.Timedelta(days=1)).date().isoformat())
+        anchor = ref + pd.Timedelta(days=RECOVERY_TARGET_DAYS) if stage == "recovery" else ref
+        c = pick_stage(cands, stage, anchor)
+        if not c:
+            print(f"  · {STAGE_LABELS[stage]}: sin escena útil entre {lo.date()} y {hi.date()}")
+            continue
+        chosen[stage] = c
+        print(f"  ✓ {STAGE_LABELS[stage]}: {c['sensor']} {c['day']} · nubes {c['cloud']:.0%} · nieve {c['snow']:.0%}")
+
+    timeline: dict = {"fire_start": f_start.date().isoformat(), "fire_end": f_end.date().isoformat(), "stages": {}}
+    for stage, c in chosen.items():
+        tag = c["time"].replace("-", "").replace(":", "")[:13] + "Z"
+        slug = c["sensor"].lower().replace(" ", "").replace("-", "")
+        products = {}
+        for p in ("natural", "swir"):
+            f = folder / f"{stage}_{slug}_{tag}_{p}.jpg"
+            if force or not f.exists():
+                download(thumb((vis_swir if p == "swir" else vis_natural)(refl(c["img"], c["sensor"])), box), f)
+            products[p] = {"file": f.name, "bounds": [[box[1], box[0]], [box[3], box[2]]]}
+        days_rel = (pd.Timestamp(c["day"]) - (f_start if stage == "pre" else f_end)).days
+        timeline["stages"][stage] = dict(label=STAGE_LABELS[stage], time=c["time"], day=c["day"], sensor=c["sensor"],
+                                         resolution=SENSORS[c["sensor"]]["res"], cloud=c["cloud"], snow=c["snow"],
+                                         days_from_fire=days_rel, products=products)
+
+    # ---- severidad dNBR (antes vs. después), con nubes enmascaradas en ambas
+    if "pre" in chosen and "post" in chosen:
+        def nbr(c):
+            r = refl(c["img"], c["sensor"])
+            clouds = cloud_mask(c["img"], c["sensor"], c["day"], geom)
+            return r.normalizedDifference(["nir", "s2"]).updateMask(clouds.Not())
+        dnbr = nbr(chosen["pre"]).subtract(nbr(chosen["post"])).rename("dnbr")
+        cls = ee.Image(0)
+        for i, (_, lo_, hi_, _) in enumerate(DNBR_CLASSES, start=1):
+            cls = cls.where(dnbr.gte(lo_).And(dnbr.lt(hi_)), i)
+        cls = cls.updateMask(dnbr.mask()).rename("cls")
+        area = ee.Image.pixelArea().divide(1e4).addBands(cls).reduceRegion(
+            ee.Reducer.sum().group(groupField=1, groupName="cls"), geom, 30, maxPixels=1e10, bestEffort=True
+        ).getInfo()
+        ha = {int(g["cls"]): g["sum"] for g in area.get("groups", [])}
+        f = folder / "severity_dnbr.png"
+        if force or not f.exists():
+            vis = cls.updateMask(cls.gt(0)).visualize(min=1, max=len(DNBR_CLASSES), palette=[c[3] for c in DNBR_CLASSES])
+            url = vis.getThumbURL({"region": geom, "dimensions": WIDTH_PX, "format": "png", "crs": "EPSG:3857"})
+            download(url, f)
+        burned = sum(v for k, v in ha.items() if k >= 1)
+        timeline["severity"] = dict(
+            file=f.name, bounds=[[box[1], box[0]], [box[3], box[2]]],
+            pre=chosen["pre"]["day"], post=chosen["post"]["day"],
+            sensors=sorted({chosen["pre"]["sensor"], chosen["post"]["sensor"]}),
+            classes=[dict(name=n, min=lo_, max=None if hi_ > 9 else hi_, color=col, ha=round(ha.get(i, 0)))
+                     for i, (n, lo_, hi_, col) in enumerate(DNBR_CLASSES, start=1)],
+            burned_ha=round(burned),
+        )
+        print(f"  ✓ Severidad dNBR: {round(burned):,} ha afectadas (dNBR ≥ 0,10) dentro del recuadro")
+    return timeline if timeline["stages"] else None
+
+
 # --------------------------------------------------------------------------- evento
 def process_event(ev: dict, h: pd.DataFrame, force: bool) -> dict | None:
     fb = fire_box(h, ev["region"], ev["days"])
@@ -297,6 +445,8 @@ def main() -> None:
     ap.add_argument("--project", required=True)
     ap.add_argument("--only", help="ids de evento separados por comas")
     ap.add_argument("--force", action="store_true", help="borra y vuelve a generar las imágenes del evento")
+    ap.add_argument("--stages-only", action="store_true",
+                    help="solo agrega Antes / Después / Recuperación y severidad a los eventos ya exportados")
     a = ap.parse_args()
     if not HARMONIZED.exists():
         sys.exit("✗ Falta etl/harmonized_output.csv: correr antes python etl/harmonize.py")
@@ -323,8 +473,15 @@ def main() -> None:
         if only and ev["id"] not in only:
             continue
         print(f"▶ {ev['id']}: {ev['name']}")
-        out = process_event(ev, h, a.force)
+        if a.stages_only and ev["id"] in manifest:
+            out = manifest[ev["id"]]
+        else:
+            out = process_event(ev, h, a.force)
         if out:
+            print("  — Antes / Después / Recuperación")
+            tl = process_stages(ev, h, a.force)
+            if tl:
+                out["timeline"] = tl
             manifest[ev["id"]] = out
         else:
             manifest.pop(ev["id"], None)
