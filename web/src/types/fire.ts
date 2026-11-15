@@ -154,6 +154,12 @@ export interface RawDetection {
   thermal_type: ThermalType;
   /** true = entra en la serie armonizada (MODIS + plataforma VIIRS de referencia) */
   in_calendar: boolean;
+  /** Contraste térmico espectral T(4 µm) − T(11 µm) en K (FIRMS no trae la temperatura de fondo) */
+  delta_t?: number | null;
+  /** Índice de prioridad 0–100 dentro de la escala PROPIA del sensor (etl/priority_scale.py) */
+  priority_score?: number | null;
+  /** 1 Bajo · 2 Medio · 3 Alto · 4 Extremo — escala propia de cada sensor, no comparable entre sensores */
+  priority_level?: 1 | 2 | 3 | 4 | null;
 }
 
 export interface RawDetectionsResult {

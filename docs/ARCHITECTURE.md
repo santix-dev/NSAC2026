@@ -39,7 +39,7 @@ web/src/
 │   ├── layout.tsx                 # Tema oscuro slate-950, tipografía Inter/JetBrains Mono
 │   └── page.tsx                   # Estado global del AOI (Bounding Box), filtros y año seleccionado
 ├── components/
-│   ├── HeaderBar.tsx              # Logo PyroSync, selector de Presets y botón Exportar CSV
+│   ├── HeaderBar.tsx              # Logo Foco Cero, selector de Presets y botón Exportar CSV
 │   ├── FilterControls.tsx         # Switches: [Serie Armonizada] y [Filtro Geológico]
 │   ├── MapSelector.tsx            # Mapa Leaflet con rectángulo BBox editable + inputs manuales Lat/Lon
 │   ├── KpiCards.tsx               # 3 tarjetas métricas resumen del área seleccionada

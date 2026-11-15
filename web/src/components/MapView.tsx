@@ -26,7 +26,7 @@ import { fmt, type IotReading } from "@/lib/iot";
 import type { SpreadVector } from "@/lib/spread";
 import type { SusceptibilityCell } from "@/lib/susceptibility";
 import { compassLabel, destination } from "@/lib/spread";
-import { HARM_SOURCE_COLORS, RAW_COLORS, RISK_COLORS } from "@/lib/colors";
+import { HARM_SOURCE_COLORS, PRIORITY_COLORS, PRIORITY_LABEL, RAW_COLORS, RISK_COLORS } from "@/lib/colors";
 import { ageHours, ageLabel, localTime, type LiveFire } from "@/lib/firmsLive";
 import type { RawDetection } from "@/types/fire";
 import { GOES_MAX_NATIVE_ZOOM, goesTileUrl, type GoesProduct } from "@/lib/goes";
@@ -63,6 +63,8 @@ export interface MapViewProps {
   liveFires: LiveFire[];
   /** Detecciones originales (sin armonizar). Si viene, reemplaza a las celdas armonizadas en el mapa. */
   rawPoints?: RawDetection[] | null;
+  /** Color de las detecciones originales: por sensor o por prioridad de atención */
+  rawColorBy?: "sensor" | "priority";
   goes: GoesOverlay | null;
   scenes?: SceneOverlay | null;
   /** Encuadrar el mapa en estos límites (cambia `key` para volver a hacerlo) */
@@ -193,7 +195,7 @@ function FocusBounds({ focus }: { focus: { bounds: [[number, number], [number, n
 
 const PLATFORM_LABEL: Record<string, string> = { SNPP: "Suomi-NPP", N20: "NOAA-20", N21: "NOAA-21", Terra: "Terra", Aqua: "Aqua" };
 
-export default function MapView({ bbox, hotspots, spread, susceptibility, iot, wind, liveFires, rawPoints, goes, scenes, focus, show }: MapViewProps) {
+export default function MapView({ bbox, hotspots, spread, susceptibility, iot, wind, liveFires, rawPoints, rawColorBy = "sensor", goes, scenes, focus, show }: MapViewProps) {
   const parks = useProtectedAreas(show.park);
   const drawn = useMemo(
     () =>
@@ -350,7 +352,11 @@ export default function MapView({ bbox, hotspots, spread, susceptibility, iot, w
                 color: industrial ? "#c084fc" : d.in_calendar ? "#0f172a" : "#e2e8f0",
                 weight: industrial ? 1.5 : 0.7,
                 dashArray: d.in_calendar ? undefined : "2 2",
-                fillColor: industrial ? "#a855f7" : RAW_COLORS[d.sensor],
+                fillColor: industrial
+                  ? "#a855f7"
+                  : rawColorBy === "priority" && d.priority_level
+                    ? PRIORITY_COLORS[d.priority_level]
+                    : RAW_COLORS[d.sensor],
                 fillOpacity: d.in_calendar ? 0.85 : 0.45,
               }}
             >
@@ -366,7 +372,14 @@ export default function MapView({ bbox, hotspots, spread, susceptibility, iot, w
                 <Row k="Satélite" v={`${d.sensor} ${PLATFORM_LABEL[d.platform ?? ""] ?? d.platform ?? ""}`} />
                 <Row k="Hora local (AR)" v={localTime(iso)} />
                 <Row k="Confianza" v={d.confidence ?? "—"} />
+                {d.priority_level ? (
+                  <Row
+                    k={`Prioridad (escala ${d.sensor})`}
+                    v={`${PRIORITY_LABEL[d.priority_level]} · índice ${d.priority_score ?? "—"}/100`}
+                  />
+                ) : null}
                 <Row k="FRP" v={d.frp != null ? `${d.frp.toFixed(1)} MW` : "—"} />
+                {d.delta_t != null && <Row k="ΔT (4 − 11 µm)" v={`${Number(d.delta_t).toFixed(1)} K`} />}
                 <Row k="Tipo térmico" v={industrial ? "Volcánico/Industrial" : "Vegetación"} />
                 <Row
                   k="En la serie armonizada"

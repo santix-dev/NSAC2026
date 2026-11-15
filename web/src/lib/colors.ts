@@ -46,6 +46,10 @@ export const RISK_COLORS = {
 } as const;
 
 /** Detecciones originales por sensor (naranja / cian: distinguibles con daltonismo rojo-verde) */
+/** Escala de prioridad de atención por sensor (1 Bajo → 4 Extremo) */
+export const PRIORITY_COLORS: Record<1 | 2 | 3 | 4, string> = { 1: "#94a3b8", 2: "#facc15", 3: "#f97316", 4: "#dc2626" };
+export const PRIORITY_LABEL: Record<1 | 2 | 3 | 4, string> = { 1: "Bajo", 2: "Medio", 3: "Alto", 4: "Extremo" };
+
 export const RAW_COLORS = { MODIS: "#f97316", VIIRS: "#22d3ee" } as const;
 
 /** Celdas armonizadas según qué sensor las vio (mismos tonos que las detecciones originales) */

@@ -1,7 +1,7 @@
 # CLAUDE.md — Contexto y Reglas del Proyecto (NASA Space Apps 2026)
 
 ## 1. Identidad y Estrategia Científica
-- **Nombre:** PyroSync
+- **Nombre:** Foco Cero (antes PyroSync). Logo: `web/public/brand/` (isotipo SVG para tema oscuro + logo original).
 - **Desafío:** NASA Space Apps Challenge 2026 — *Harmonization of MODIS and VIIRS Hot Spots* (en colaboración con CONAE).
 - **Enfoque Dual (Calibración + Operación):**
   1. **Calibración Histórica (Sierras de Córdoba, Argentina):** Se utiliza el registro histórico completo (2000–2026) y de baja nubosidad de Córdoba para calcular el factor empírico de armonización espacial/radiométrica ($\alpha$) entre MODIS (1 km) y VIIRS (375 m) en la ventana de solapamiento 2012–2024.

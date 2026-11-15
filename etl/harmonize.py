@@ -135,7 +135,10 @@ OUTPUT_COLUMNS = [
 ]
 
 REQUIRED_INPUT_COLUMNS = {"latitude", "longitude", "acq_date", "confidence"}
-OPTIONAL_INPUT_COLUMNS = {"frp", "instrument", "acq_time", "satellite"}
+# La API de FIRMS (VIIRS) nombra las temperaturas por banda: I4 (~4 µm) e I5 (~11 µm)
+COLUMN_ALIASES = {"bright_ti4": "brightness", "bright_ti5": "bright_t31"}
+OPTIONAL_INPUT_COLUMNS = {"frp", "instrument", "acq_time", "satellite",
+                          "brightness", "bright_t31", "scan", "track", "daynight"}
 
 
 # ---------------------------------------------------------------------------
@@ -172,11 +175,11 @@ def _platform(df: pd.DataFrame, sensor: pd.Series, filename: str) -> pd.Series:
 def load_firms_csv(path: Path) -> pd.DataFrame:
     df = pd.read_csv(
         path,
-        usecols=lambda c: c.strip().lower() in REQUIRED_INPUT_COLUMNS | OPTIONAL_INPUT_COLUMNS,
+        usecols=lambda c: COLUMN_ALIASES.get(c.strip().lower(), c.strip().lower()) in REQUIRED_INPUT_COLUMNS | OPTIONAL_INPUT_COLUMNS,
         dtype={"confidence": str, "instrument": str, "acq_time": str, "satellite": str},
         low_memory=False,
     )
-    df.columns = [c.strip().lower() for c in df.columns]
+    df.columns = [COLUMN_ALIASES.get(c.strip().lower(), c.strip().lower()) for c in df.columns]
     missing = REQUIRED_INPUT_COLUMNS - set(df.columns)
     if missing:
         raise ValueError(f"{path.name}: faltan columnas requeridas {sorted(missing)}")
@@ -200,6 +203,12 @@ def load_firms_csv(path: Path) -> pd.DataFrame:
             "confidence": df["confidence"].astype(str).str.strip().str.lower(),
             "acq_time": df["acq_time"].astype(str).str.strip().str.zfill(4) if "acq_time" in df else "",
             "platform": _platform(df, sensor, path.name),
+            # Para la escala de prioridad por sensor (priority_scale.py)
+            "brightness": pd.to_numeric(df["brightness"], errors="coerce") if "brightness" in df else np.nan,
+            "bright_t31": pd.to_numeric(df["bright_t31"], errors="coerce") if "bright_t31" in df else np.nan,
+            "scan": pd.to_numeric(df["scan"], errors="coerce") if "scan" in df else np.nan,
+            "track": pd.to_numeric(df["track"], errors="coerce") if "track" in df else np.nan,
+            "daynight": df["daynight"].astype(str).str.strip().str.upper() if "daynight" in df else "",
         }
     )
     bad = out[["lat", "lon", "acq_date", "sensor"]].isna().any(axis=1)
@@ -297,7 +306,11 @@ def select_viirs_reference(df: pd.DataFrame, stats: PipelineStats) -> tuple[pd.D
 
 
 RAW_COLUMNS = ["region", "acq_date", "acq_time", "lat", "lon", "sensor", "platform", "confidence", "frp",
-               "thermal_type", "in_calendar"]
+               "thermal_type", "in_calendar",
+               "delta_t", "priority_score", "priority_level"]
+
+
+PRIORITY_MODEL: dict = {}
 
 
 def build_raw_detections(df_all: pd.DataFrame, ref: pd.DataFrame) -> pd.DataFrame:
@@ -314,6 +327,11 @@ def build_raw_detections(df_all: pd.DataFrame, ref: pd.DataFrame) -> pd.DataFram
         rest["thermal_type"] = np.where(cell(rest).isin(fixed), VOLCANIC_INDUSTRIAL, VEGETATION)
         rest["in_calendar"] = False
     raw = pd.concat([ref, rest], ignore_index=True)
+    # Escala de prioridad de atención por sensor (priority_scale.py): delta_t, priority_score, priority_level
+    if {"brightness", "bright_t31", "scan", "track", "daynight"} <= set(raw.columns):
+        import priority_scale
+
+        raw, PRIORITY_MODEL["model"] = priority_scale.apply(raw)
     for c in RAW_COLUMNS:
         if c not in raw:
             raw[c] = None
@@ -950,6 +968,11 @@ def main(argv=None) -> int:
         raw_path = args.output.parent / "raw_detections.csv"
         stats.raw_detections.to_csv(raw_path, index=False)
         print(f"✔ {len(stats.raw_detections):,} detecciones originales (sin armonizar) en {raw_path}")
+        if PRIORITY_MODEL.get("model"):
+            (args.output.parent / "priority_scale.json").write_text(
+                json.dumps(PRIORITY_MODEL["model"], indent=2, ensure_ascii=False), encoding="utf-8")
+            lv = stats.raw_detections.groupby("sensor")["priority_level"].value_counts().unstack(fill_value=0)
+            print(f"✔ Escala de prioridad por sensor (priority_scale.json):\n{lv.to_string()}")
     print_summary(out, stats)
     calib = {
         "alpha": stats.alpha, "alpha_n20": stats.alpha_n20, "beta_snpp_n20": stats.beta_snpp_n20,

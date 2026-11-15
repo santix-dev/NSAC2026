@@ -34,7 +34,7 @@ import { ChevronDown, Flame, Layers, Loader2, Navigation, Radio, Route, Satellit
 import type { MapLayers, SeriesMode } from "@/types/fire";
 import SeriesToggle from "./SeriesToggle";
 import type { MapViewProps } from "./MapView";
-import { HARM_SOURCE_COLORS, RAW_COLORS, RISK_COLORS } from "@/lib/colors";
+import { HARM_SOURCE_COLORS, PRIORITY_COLORS, PRIORITY_LABEL, RAW_COLORS, RISK_COLORS } from "@/lib/colors";
 import { compassLabel } from "@/lib/spread";
 
 const MapView = dynamic(() => import("./MapView"), {
@@ -66,6 +66,10 @@ interface Props extends Omit<MapViewProps, "show" | "goes"> {
     truncated: boolean;
     includeExtra: boolean;
     onIncludeExtra: (v: boolean) => void;
+    colorBy: "sensor" | "priority";
+    onColorBy: (v: "sensor" | "priority") => void;
+    minPriority: 0 | 2 | 3 | 4;
+    onMinPriority: (v: 0 | 2 | 3 | 4) => void;
   } | null;
   /** Serie de focos que se dibuja: armonizada, solo MODIS, solo VIIRS o cruda */
   mode: SeriesMode;
@@ -251,6 +255,7 @@ export default function MapSelector(props: Props) {
         wind={wind}
         liveFires={props.liveFires}
         rawPoints={props.rawPoints}
+        rawColorBy={props.rawInfo?.colorBy ?? "sensor"}
         goes={
           layers.goes && !goesError && !fireEvent
             ? {
@@ -324,6 +329,39 @@ export default function MapSelector(props: Props) {
                       {l} <span className="font-mono text-slate-500">{props.harmCounts[k].toLocaleString("es-AR")}</span>
                     </label>
                   ))}
+                </div>
+              )}
+              {props.rawInfo && props.rawInfo.available && (
+                <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[10.5px] text-slate-300">
+                  <span className="text-slate-500">Color:</span>
+                  {(
+                    [
+                      ["priority", "Prioridad"],
+                      ["sensor", "Sensor"],
+                    ] as const
+                  ).map(([k, l]) => (
+                    <button
+                      key={k}
+                      type="button"
+                      onClick={() => props.rawInfo!.onColorBy(k)}
+                      className={`rounded px-1.5 py-0.5 ${
+                        props.rawInfo!.colorBy === k ? "bg-slate-700 text-slate-50" : "text-slate-400 hover:text-slate-200"
+                      }`}
+                    >
+                      {l}
+                    </button>
+                  ))}
+                  <select
+                    value={props.rawInfo.minPriority}
+                    onChange={(e) => props.rawInfo!.onMinPriority(Number(e.target.value) as 0 | 2 | 3 | 4)}
+                    className="rounded border border-slate-700 bg-slate-900 px-1 py-0.5 text-[10.5px] text-slate-200"
+                    aria-label="Prioridad mínima"
+                  >
+                    <option value={0}>Todas las prioridades</option>
+                    <option value={2}>Medio o más</option>
+                    <option value={3}>Alto o más</option>
+                    <option value={4}>Solo extremo</option>
+                  </select>
                 </div>
               )}
               {props.rawInfo && props.mode !== "modis" && props.rawInfo.available && (
@@ -731,7 +769,21 @@ export default function MapSelector(props: Props) {
             </div>
           </div>
         )}
-        {layers.hotspots && props.rawPoints && (
+        {layers.hotspots && props.rawPoints && props.rawInfo?.colorBy === "priority" && (
+          <div className="space-y-0.5">
+            <p className="text-slate-400">Prioridad de atención</p>
+            {([4, 3, 2, 1] as const).map((l) => (
+              <p key={l} className="flex items-center gap-1.5">
+                <span className="inline-block h-2.5 w-2.5 rounded-full border border-slate-900" style={{ background: PRIORITY_COLORS[l] }} />{" "}
+                {PRIORITY_LABEL[l]}
+              </p>
+            ))}
+            <p className="max-w-[11rem] text-[9.5px] leading-tight text-slate-500">
+              Escala propia de cada sensor (FRP/km² + ΔT 4–11 µm). Círculo grande = MODIS, chico = VIIRS.
+            </p>
+          </div>
+        )}
+        {layers.hotspots && props.rawPoints && props.rawInfo?.colorBy !== "priority" && (
           <div className="space-y-0.5">
             <p className="text-slate-400">Detecciones originales</p>
             <p className="flex items-center gap-1.5">

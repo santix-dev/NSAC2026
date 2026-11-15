@@ -1,5 +1,5 @@
 /**
- * Acceso a datos de PyroSync — siempre datos REALES.
+ * Acceso a datos de Foco Cero — siempre datos REALES.
  *  1) Supabase (RPCs PostGIS y tablas: harmonized_hotspots, region_month_env, env_grid_clim, regions).
  *  2) Si no hay variables de Supabase o la base no responde: copia estática de los mismos datos
  *     (web/public/data, etl/export_web_snapshot.py). No hay datos sintéticos en la app.

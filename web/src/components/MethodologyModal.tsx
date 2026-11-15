@@ -165,11 +165,17 @@ export default function MethodologyModal({ open, onClose, alpha, dataSource, liv
           <X className="h-5 w-5" />
         </button>
 
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/brand/foco-cero-logo.jpg"
+          alt="Foco Cero — Monitoreo satelital de puntos calientes"
+          className="mb-4 w-full max-w-md rounded-lg border border-slate-800"
+        />
         <h2 id="methodology-title" className="pr-10 text-lg font-semibold text-slate-50">
           Metodología Multi-Agencia &amp; Uso de IA
         </h2>
         <p className="mt-1 text-slate-400">
-          PyroSync · NASA Space Apps Challenge 2026 · <i>Harmonization of MODIS and VIIRS Hot Spots</i> (con CONAE)
+          Foco Cero · NASA Space Apps Challenge 2026 · <i>Harmonization of MODIS and VIIRS Hot Spots</i> (con CONAE)
         </p>
 
         <H>1. Armonización MODIS (1 km) + VIIRS (375 m)</H>
@@ -207,6 +213,34 @@ export default function MethodologyModal({ open, onClose, alpha, dataSource, liv
         <p className="mt-2 text-slate-400">
           Calendario: línea base = mediana mensual P50 2001–2020; anomalía = (E − P50)/(P50 + 1)·100; mes crítico &gt; P75.
         </p>
+
+        <H>1b. Prioridad de atención por foco (escala propia de cada sensor)</H>
+        <p>
+          Cada detección original se clasifica en <b>Bajo · Medio · Alto · Extremo</b> dentro de la escala de <b>su propio
+          sensor</b>. No es una escala común: «VIIRS · Alto» significa «de los focos más intensos que VIIRS suele ver», no
+          que equivalga a «MODIS · Alto».
+        </p>
+        <ul className="list-disc space-y-1 pl-5">
+          <li>
+            <b>Densidad de potencia radiativa:</b> <code>FRP / (scan × track)</code> en MW/km² (la FRP por píxel crece con el
+            tamaño del píxel hacia el borde de la franja).
+          </li>
+          <li>
+            <b>Contraste térmico:</b> <code>ΔT = T(4 µm) − T(11 µm)</code> (MODIS banda 21/22 − 31; VIIRS I4 − I5), con
+            percentiles separados de día y de noche. FIRMS no incluye la temperatura de fondo: ΔT es el mismo sustituto en
+            ambos sensores. VIIRS I4 se satura a ~367 K; esos focos reciben el contraste máximo.
+          </li>
+          <li>
+            <b>Índice:</b> <code>IP = 0,5·P(FRP/km²) + 0,5·P(ΔT)</code>, con P = percentil dentro del sensor en su período de
+            referencia (MODIS 2000–2024, VIIRS S-NPP 2012–2024). Cortes fijos: P50 / P80 / P95 del índice → Medio / Alto /
+            Extremo. NOAA-20/21 usan la escala VIIRS.
+          </li>
+          <li>
+            <b>Diagnóstico con los datos reales:</b> en MODIS, FRP/km² y ΔT están muy correlacionados (Spearman 0,95); en VIIRS
+            de día casi nada (0,06) por la saturación. Cambiar el peso entre 0,3 y 0,7 casi no altera la clasificación
+            (kappa ponderado ≥ 0,89).
+          </li>
+        </ul>
 
         <H>2. Susceptibilidad y propagación en Patagonia Andina</H>
         <Formula>{"ISF = 0,30·S_pendiente + 0,30·(100 − H_suelo) + 0,20·V_viento + 0,20·R_histórico"}</Formula>

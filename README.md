@@ -1,8 +1,8 @@
-# PyroSync — Harmonized MODIS & VIIRS Burning Activity Calendar
+# Foco Cero — Monitoreo satelital de puntos calientes (MODIS + VIIRS armonizados)
 
 > **NASA Space Apps Challenge 2026** | Challenge: *Harmonization of MODIS and VIIRS Hot Spots*
 
-**PyroSync** es una plataforma web de observación terrestre que unifica más de dos décadas de detecciones térmicas satelitales (**MODIS Terra/Aqua** desde el año 2000 y **VIIRS S-NPP/NOAA-20** desde 2012) en una serie temporal consistente, eliminando las distorsiones espaciales entre sensores y separando incendios reales de anomalías geológicas o industriales.
+**Foco Cero** (antes PyroSync) es una plataforma web de observación terrestre que unifica más de dos décadas de detecciones térmicas satelitales (**MODIS Terra/Aqua** desde el año 2000 y **VIIRS S-NPP/NOAA-20** desde 2012) en una serie temporal consistente, eliminando las distorsiones espaciales entre sensores y separando incendios reales de anomalías geológicas o industriales.
 
 ---
 

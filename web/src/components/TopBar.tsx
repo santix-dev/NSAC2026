@@ -9,7 +9,6 @@ import {
   ChevronRight,
   Crosshair,
   Database,
-  Flame,
   Link2,
   Loader2,
   MapPin,
@@ -18,6 +17,7 @@ import {
 import type { BBox, DataSource, Region } from "@/types/fire";
 import { FIRST_YEAR, LAST_YEAR, MONTHS_LONG, YEARS } from "@/lib/regions";
 import { CustomBBoxForm } from "./AreaForms";
+import BrandLogo from "./BrandLogo";
 
 interface Props {
   regions: Region[];
@@ -64,14 +64,8 @@ export default function TopBar(p: Props) {
   return (
     <header className="z-[1100] border-b border-slate-800 bg-slate-950">
       <div className="flex flex-wrap items-center gap-2 px-3 py-2">
-        <div className="mr-1 flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-orange-500 to-rose-600">
-            <Flame className="h-4 w-4 text-white" aria-hidden />
-          </div>
-          <div className="hidden leading-tight sm:block">
-            <p className="text-sm font-semibold text-slate-50">PyroSync</p>
-            <p className="text-[10px] text-slate-500">Focos MODIS + VIIRS armonizados</p>
-          </div>
+        <div className="mr-1">
+          <BrandLogo />
         </div>
 
         <RegionPicker {...p} />

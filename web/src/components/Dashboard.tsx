@@ -81,6 +81,8 @@ export default function Dashboard() {
   /** Detecciones originales (sin armonizar) para las vistas MODIS / VIIRS / Cruda del mapa */
   const [rawRes, setRawRes] = useState<RawDetectionsResult | null>(null);
   const [includeExtra, setIncludeExtra] = useState(false);
+  const [rawColorBy, setRawColorBy] = useState<"sensor" | "priority">("priority");
+  const [minPriority, setMinPriority] = useState<0 | 2 | 3 | 4>(0);
   /** Vista armonizada: qué celdas mostrar según el sensor que las vio */
   const [harmSources, setHarmSources] = useState<Record<"BOTH" | "MODIS" | "VIIRS", boolean>>({ BOTH: true, MODIS: true, VIIRS: true });
   const [methodologyOpen, setMethodologyOpen] = useState(false);
@@ -277,10 +279,15 @@ export default function Dashboard() {
   const spread = useMemo(() => computeSpreadVectors(mapRows), [mapRows]);
   const rawPoints = useMemo(() => {
     if (mode === "harmonized" || !rawRes?.available) return null;
-    return rawRes.rows.filter(
-      (r) => (includeExtra || r.in_calendar) && (!selectedMonth || Number(r.acq_date.slice(5, 7)) === selectedMonth),
-    );
-  }, [mode, rawRes, includeExtra, selectedMonth]);
+    return rawRes.rows
+      .filter(
+        (r) =>
+          (includeExtra || r.in_calendar) &&
+          (!selectedMonth || Number(r.acq_date.slice(5, 7)) === selectedMonth) &&
+          (!minPriority || (r.priority_level ?? 0) >= minPriority),
+      )
+      .sort((a, b) => (a.priority_level ?? 0) - (b.priority_level ?? 0)); // los más prioritarios se dibujan arriba
+  }, [mode, rawRes, includeExtra, selectedMonth, minPriority]);
   const susceptibility = useMemo(
     () => buildSusceptibilityFromGrid(envGrid, recurrence, RECURRENCE_CELL_DEG),
     [envGrid, recurrence],
@@ -650,6 +657,10 @@ export default function Dashboard() {
                     truncated: rawRes?.truncated ?? false,
                     includeExtra,
                     onIncludeExtra: setIncludeExtra,
+                    colorBy: rawColorBy,
+                    onColorBy: setRawColorBy,
+                    minPriority,
+                    onMinPriority: setMinPriority,
                   }
             }
             truncated={hotspots?.truncated ?? false}

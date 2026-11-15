@@ -47,7 +47,9 @@ def main() -> int:
     raw_src = ETL / "raw_detections.csv"
     if raw_src.exists():
         r = pd.read_csv(raw_src, dtype={"acq_time": str, "confidence": str})
-        cols = ["acq_date", "acq_time", "lat", "lon", "sensor", "platform", "confidence", "frp", "thermal_type", "in_calendar"]
+        cols = ["acq_date", "acq_time", "lat", "lon", "sensor", "platform", "confidence", "frp", "thermal_type", "in_calendar",
+                "delta_t", "priority_score", "priority_level"]
+        cols = [c for c in cols if c in r.columns]
         r[cols].to_csv(OUT / "raw_detections.csv", index=False, float_format="%.6g")
         files["raw_detections.csv"] = len(r)
     else:
@@ -70,6 +72,8 @@ def main() -> int:
         "date_range": [h["acq_date"].min(), h["acq_date"].max()],
         "rows": files,
         "calibration": calib,
+        "priority_scale": (json.loads((ETL / "priority_scale.json").read_text(encoding="utf-8"))
+                           if (ETL / "priority_scale.json").exists() else None),
         "source": "NASA FIRMS MODIS C6.1 + VIIRS S-NPP C2 → NOAA-20 (desde 02-11-2026) armonizado (etl/harmonize.py)",
     }
     (OUT / "meta.json").write_text(json.dumps(meta, indent=2, ensure_ascii=False), encoding="utf-8")
