@@ -47,3 +47,6 @@ export const RISK_COLORS = {
 
 /** Detecciones originales por sensor (naranja / cian: distinguibles con daltonismo rojo-verde) */
 export const RAW_COLORS = { MODIS: "#f97316", VIIRS: "#22d3ee" } as const;
+
+/** Celdas armonizadas según qué sensor las vio (mismos tonos que las detecciones originales) */
+export const HARM_SOURCE_COLORS = { BOTH: "#fde047", MODIS: "#f97316", VIIRS: "#22d3ee" } as const;

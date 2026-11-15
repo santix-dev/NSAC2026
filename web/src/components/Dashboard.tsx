@@ -81,6 +81,8 @@ export default function Dashboard() {
   /** Detecciones originales (sin armonizar) para las vistas MODIS / VIIRS / Cruda del mapa */
   const [rawRes, setRawRes] = useState<RawDetectionsResult | null>(null);
   const [includeExtra, setIncludeExtra] = useState(false);
+  /** Vista armonizada: qué celdas mostrar según el sensor que las vio */
+  const [harmSources, setHarmSources] = useState<Record<"BOTH" | "MODIS" | "VIIRS", boolean>>({ BOTH: true, MODIS: true, VIIRS: true });
   const [methodologyOpen, setMethodologyOpen] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
@@ -264,9 +266,14 @@ export default function Dashboard() {
         ? monthRows.filter((r) => r.sensor_source !== "VIIRS")
         : mode === "viirs"
           ? monthRows.filter((r) => r.sensor_source !== "MODIS")
-          : monthRows,
-    [monthRows, mode],
+          : monthRows.filter((r) => harmSources[r.sensor_source]),
+    [monthRows, mode, harmSources],
   );
+  const harmCounts = useMemo(() => {
+    const c = { BOTH: 0, MODIS: 0, VIIRS: 0 };
+    for (const r of monthRows) c[r.sensor_source]++;
+    return c;
+  }, [monthRows]);
   const spread = useMemo(() => computeSpreadVectors(mapRows), [mapRows]);
   const rawPoints = useMemo(() => {
     if (mode === "harmonized" || !rawRes?.available) return null;
@@ -631,6 +638,9 @@ export default function Dashboard() {
             hotspotCount={rawPoints ? rawPoints.length : mapRows.length}
             countUnit={rawPoints ? "detecciones originales" : "celdas-día"}
             rawPoints={rawPoints}
+            harmSources={harmSources}
+            harmCounts={harmCounts}
+            onHarmSources={setHarmSources}
             rawInfo={
               mode === "harmonized"
                 ? null

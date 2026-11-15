@@ -34,7 +34,7 @@ import { ChevronDown, Flame, Layers, Loader2, Navigation, Radio, Route, Satellit
 import type { MapLayers, SeriesMode } from "@/types/fire";
 import SeriesToggle from "./SeriesToggle";
 import type { MapViewProps } from "./MapView";
-import { RAW_COLORS, RISK_COLORS, YLORRD } from "@/lib/colors";
+import { HARM_SOURCE_COLORS, RAW_COLORS, RISK_COLORS } from "@/lib/colors";
 import { compassLabel } from "@/lib/spread";
 
 const MapView = dynamic(() => import("./MapView"), {
@@ -57,6 +57,9 @@ interface Props extends Omit<MapViewProps, "show" | "goes"> {
   /** Fecha elegida en la app: con mes, la imagen GOES sigue ese mes; sin mes, últimas 6 h. */
   goesDate: { year: number; month: number | null; preferredDay?: string; center: [number, number] };
   countUnit?: string;
+  harmSources: Record<"BOTH" | "MODIS" | "VIIRS", boolean>;
+  harmCounts: Record<"BOTH" | "MODIS" | "VIIRS", number>;
+  onHarmSources: (v: Record<"BOTH" | "MODIS" | "VIIRS", boolean>) => void;
   rawInfo?: {
     loading: boolean;
     available: boolean;
@@ -300,6 +303,29 @@ export default function MapSelector(props: Props) {
                           : "Mapa: todas las detecciones originales, sin armonizar."}
                 {props.rawInfo?.truncated ? " Se muestran las primeras 15.000; elegí un mes para ver todo." : ""}
               </p>
+              {props.mode === "harmonized" && (
+                <div className="mt-1 flex flex-wrap gap-x-2.5 gap-y-0.5 text-[10.5px] text-slate-300">
+                  {(
+                    [
+                      ["BOTH", "Ambos"],
+                      ["MODIS", "Solo MODIS"],
+                      ["VIIRS", "Solo VIIRS (α)"],
+                    ] as const
+                  ).map(([k, l]) => (
+                    <label key={k} className="flex cursor-pointer items-center gap-1">
+                      <input
+                        type="checkbox"
+                        checked={props.harmSources[k]}
+                        onChange={() => props.onHarmSources({ ...props.harmSources, [k]: !props.harmSources[k] })}
+                        className="h-3 w-3"
+                        style={{ accentColor: HARM_SOURCE_COLORS[k] }}
+                      />
+                      <span className="inline-block h-2 w-2 rounded-full" style={{ background: HARM_SOURCE_COLORS[k] }} />
+                      {l} <span className="font-mono text-slate-500">{props.harmCounts[k].toLocaleString("es-AR")}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
               {props.rawInfo && props.mode !== "modis" && props.rawInfo.available && (
                 <label className="mt-0.5 flex cursor-pointer items-center gap-1 text-[10px] text-slate-400">
                   <input
@@ -717,14 +743,17 @@ export default function MapSelector(props: Props) {
           </div>
         )}
         {layers.hotspots && !props.rawPoints && (
-          <div>
-            <p className="mb-1 text-slate-400">Potencia del fuego (FRP, MW)</p>
-            <div className="h-2 w-40 rounded" style={{ background: `linear-gradient(90deg, ${YLORRD.slice(3).join(",")})` }} />
-            <div className="flex w-40 justify-between font-mono text-[9.5px] text-slate-500">
-              <span>1</span>
-              <span>20</span>
-              <span>300+</span>
-            </div>
+          <div className="space-y-0.5">
+            <p className="text-slate-400">Celda armonizada de 1 km vista por…</p>
+            <p className="flex items-center gap-1.5">
+              <span className="inline-block h-3 w-3 rounded-full border border-slate-900" style={{ background: HARM_SOURCE_COLORS.BOTH }} /> Ambos sensores · peso 1
+            </p>
+            <p className="flex items-center gap-1.5">
+              <span className="inline-block h-3 w-3 rounded-full border border-slate-900" style={{ background: HARM_SOURCE_COLORS.MODIS }} /> Solo MODIS · peso 1
+            </p>
+            <p className="flex items-center gap-1.5">
+              <span className="inline-block h-2.5 w-2.5 rounded-full border border-slate-900" style={{ background: HARM_SOURCE_COLORS.VIIRS }} /> Solo VIIRS · peso α
+            </p>
             <p className="mt-1 flex items-center gap-1.5">
               <span className="inline-block h-2.5 w-2.5 rounded-full border border-purple-300 bg-purple-500" /> Fuente fija (industrial)
             </p>

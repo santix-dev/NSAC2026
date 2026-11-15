@@ -26,7 +26,7 @@ import { fmt, type IotReading } from "@/lib/iot";
 import type { SpreadVector } from "@/lib/spread";
 import type { SusceptibilityCell } from "@/lib/susceptibility";
 import { compassLabel, destination } from "@/lib/spread";
-import { interpolate, RAW_COLORS, RISK_COLORS, YLORRD } from "@/lib/colors";
+import { HARM_SOURCE_COLORS, RAW_COLORS, RISK_COLORS } from "@/lib/colors";
 import { ageHours, ageLabel, localTime, type LiveFire } from "@/lib/firmsLive";
 import type { RawDetection } from "@/types/fire";
 import { GOES_MAX_NATIVE_ZOOM, goesTileUrl, type GoesProduct } from "@/lib/goes";
@@ -115,10 +115,6 @@ const iotIcon = L.divIcon({
   popupAnchor: [0, -14],
 });
 
-function frpColor(frp: number | null): string {
-  const t = frp == null ? 0.3 : Math.min(1, Math.log10(1 + frp) / Math.log10(301));
-  return interpolate(YLORRD.slice(3), t);
-}
 
 function Row({ k, v }: { k: string; v: string }) {
   return (
@@ -392,11 +388,11 @@ export default function MapView({ bbox, hotspots, spread, susceptibility, iot, w
             <CircleMarker
               key={`${h.grid_cell_id}-${h.acq_date}`}
               center={[h.lat, h.lon]}
-              radius={2.5 + Math.min(4, Math.log2(1 + h.raw_detections_count))}
+              radius={(2.5 + Math.min(4, Math.log2(1 + h.raw_detections_count))) * (0.6 + 0.4 * Math.min(1, h.harmonized_weight))}
               pathOptions={{
                 color: industrial ? "#c084fc" : "#0f172a",
                 weight: industrial ? 1.5 : 0.6,
-                fillColor: industrial ? "#a855f7" : frpColor(h.max_frp),
+                fillColor: industrial ? "#a855f7" : HARM_SOURCE_COLORS[h.sensor_source],
                 fillOpacity: 0.9,
               }}
             >
