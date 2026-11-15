@@ -47,7 +47,7 @@ REGIONS = {
     "PATAGONIA": (-72.20, -43.50, -70.80, -41.50),
 }
 MARGIN_DEG = 0.6
-WIDTH_PX = 900
+WIDTH_PX = 1200  # lado mayor de la imagen (px)
 GOES16_END = datetime(2025, 4, 7, 18, 0, tzinfo=timezone.utc)
 GOES16_START = datetime(2017, 7, 10, tzinfo=timezone.utc)
 GOES_HOURS_UTC = range(11, 24)  # 8–20 h en Argentina (UTC−3)
@@ -60,12 +60,10 @@ def _goes_scaled(img: ee.Image) -> ee.Image:
     names = img.select("CMI_C..").bandNames()
     scales = names.map(lambda n: img.getNumber(ee.String(n).cat("_scale")))
     offsets = names.map(lambda n: img.getNumber(ee.String(n).cat("_offset")))
-    return (
-        img.select(names)
-        .multiply(ee.Image.constant(scales))
-        .add(ee.Image.constant(offsets))
-        .rename(names)
-    )
+    scaled = img.select(names).multiply(ee.Image.constant(scales)).add(ee.Image.constant(offsets)).rename(names)
+    # El píxel GOES es de 2 km (3–4 km efectivos a 42° S). Con el vecino más cercano (por defecto
+    # en EE) se ven bloques; la interpolación bicúbica da una imagen continua sin inventar detalle.
+    return scaled.resample("bicubic")
 
 
 def goes_natural(img: ee.Image) -> ee.Image:
@@ -88,7 +86,7 @@ def goes_collection(t: datetime) -> str:
 
 # --------------------------------------------------------------------------- MODIS
 def modis_natural(img: ee.Image) -> ee.Image:
-    rgb = img.select(["sur_refl_b01", "sur_refl_b04", "sur_refl_b03"]).multiply(0.0001)
+    rgb = img.select(["sur_refl_b01", "sur_refl_b04", "sur_refl_b03"]).multiply(0.0001).resample("bilinear")
     return rgb.visualize(min=0, max=0.3, gamma=1.4)
 
 
