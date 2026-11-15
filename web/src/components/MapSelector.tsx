@@ -34,6 +34,7 @@ import { ChevronDown, Flame, Layers, Loader2, Navigation, Radio, Route, Satellit
 import type { MapLayers, SeriesMode } from "@/types/fire";
 import SeriesToggle from "./SeriesToggle";
 import type { MapViewProps } from "./MapView";
+import type { Agreement, CellPriority, Concordance } from "@/lib/cellPriority";
 import { HARM_SOURCE_COLORS, PRIORITY_COLORS, PRIORITY_LABEL, RAW_COLORS, RISK_COLORS } from "@/lib/colors";
 import { compassLabel } from "@/lib/spread";
 
@@ -60,6 +61,16 @@ interface Props extends Omit<MapViewProps, "show" | "goes"> {
   harmSources: Record<"BOTH" | "MODIS" | "VIIRS", boolean>;
   harmCounts: Record<"BOTH" | "MODIS" | "VIIRS", number>;
   onHarmSources: (v: Record<"BOTH" | "MODIS" | "VIIRS", boolean>) => void;
+  /** Prioridad MODIS/VIIRS por celda armonizada (clave grid_cell_id|fecha) */
+  cellPriority?: Map<string, CellPriority> | null;
+  harmPriority?: {
+    colorBy: "priority" | "source";
+    onColorBy: (v: "priority" | "source") => void;
+    agree: Agreement;
+    onAgree: (v: Agreement) => void;
+    concordance: Concordance | null;
+    loading: boolean;
+  };
   rawInfo?: {
     loading: boolean;
     available: boolean;
@@ -256,6 +267,8 @@ export default function MapSelector(props: Props) {
         liveFires={props.liveFires}
         rawPoints={props.rawPoints}
         rawColorBy={props.rawInfo?.colorBy ?? "sensor"}
+        cellPriority={props.cellPriority ?? null}
+        harmColorBy={props.harmPriority?.colorBy ?? "source"}
         goes={
           layers.goes && !goesError && !fireEvent
             ? {
@@ -330,6 +343,9 @@ export default function MapSelector(props: Props) {
                     </label>
                   ))}
                 </div>
+              )}
+              {props.mode === "harmonized" && props.harmPriority && (
+                <HarmPriorityControls hp={props.harmPriority} />
               )}
               {props.rawInfo && props.rawInfo.available && (
                 <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[10.5px] text-slate-300">
@@ -794,7 +810,27 @@ export default function MapSelector(props: Props) {
             </p>
           </div>
         )}
-        {layers.hotspots && !props.rawPoints && (
+        {layers.hotspots && !props.rawPoints && props.harmPriority?.colorBy === "priority" && (
+          <div className="space-y-0.5">
+            <p className="text-slate-400">Celda armonizada: prioridad por sensor</p>
+            <p className="flex items-center gap-1.5">
+              <span className="inline-block h-3.5 w-3.5 rounded-full" style={{ background: PRIORITY_COLORS[3], border: `2.5px solid ${PRIORITY_COLORS[3]}` }} />
+              Relleno = MODIS · contorno = VIIRS
+            </p>
+            {([4, 3, 2, 1] as const).map((l) => (
+              <p key={l} className="flex items-center gap-1.5">
+                <span className="inline-block h-2.5 w-2.5 rounded-full border border-slate-900" style={{ background: PRIORITY_COLORS[l] }} /> {PRIORITY_LABEL[l]}
+              </p>
+            ))}
+            <p className="flex items-center gap-1.5">
+              <span className="inline-block h-3 w-3 rounded-full border-2 border-dashed border-slate-500 bg-slate-800" /> Sin dato de ese sensor
+            </p>
+            <p className="max-w-[11rem] text-[9.5px] leading-tight text-slate-500">
+              Mismo color adentro y en el borde = ambos sensores lo ubican en el mismo escalón de su propia escala.
+            </p>
+          </div>
+        )}
+        {layers.hotspots && !props.rawPoints && props.harmPriority?.colorBy !== "priority" && (
           <div className="space-y-0.5">
             <p className="text-slate-400">Celda armonizada de 1 km vista por…</p>
             <p className="flex items-center gap-1.5">
@@ -835,5 +871,92 @@ export default function MapSelector(props: Props) {
         )}
       </div>
     </section>
+  );
+}
+
+
+/** Controles de la vista armonizada: color por prioridad y matriz de concordancia MODIS × VIIRS. */
+function HarmPriorityControls({ hp }: { hp: NonNullable<Props["harmPriority"]> }) {
+  const [open, setOpen] = useState(false);
+  const c = hp.concordance;
+  return (
+    <div className="mt-1 space-y-1 text-[10.5px] text-slate-300">
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+        <span className="text-slate-500">Color:</span>
+        {(
+          [
+            ["priority", "Prioridad"],
+            ["source", "Sensor"],
+          ] as const
+        ).map(([k, l]) => (
+          <button
+            key={k}
+            type="button"
+            onClick={() => hp.onColorBy(k)}
+            className={`rounded px-1.5 py-0.5 ${hp.colorBy === k ? "bg-slate-700 text-slate-50" : "text-slate-400 hover:text-slate-200"}`}
+          >
+            {l}
+          </button>
+        ))}
+        <select
+          value={hp.agree}
+          onChange={(e) => hp.onAgree(e.target.value as Agreement)}
+          className="rounded border border-slate-700 bg-slate-900 px-1 py-0.5 text-[10.5px] text-slate-200"
+          aria-label="Concordancia entre sensores"
+        >
+          <option value="all">Todas las celdas</option>
+          <option value="same">Ambos, misma prioridad</option>
+          <option value="diff">Ambos, prioridad distinta</option>
+        </select>
+      </div>
+      {hp.loading ? (
+        <p className="text-slate-500">Cargando prioridades por sensor…</p>
+      ) : c && c.n > 0 ? (
+        <div>
+          <button type="button" onClick={() => setOpen((o) => !o)} className="text-left text-slate-300 hover:text-slate-100">
+            Concordancia en {c.n.toLocaleString("es-AR")} celdas vistas por ambos: <b>{c.exactPct.toFixed(0)} %</b> mismo nivel ·{" "}
+            {c.within1Pct.toFixed(0)} % a ±1 · kappa {c.kappa != null ? c.kappa.toFixed(2) : "—"} {open ? "▴" : "▾"}
+          </button>
+          {open && (
+            <div className="mt-1">
+              <table className="border-collapse font-mono text-[10px]">
+                <thead>
+                  <tr>
+                    <th className="pr-1 text-left font-normal text-slate-500">MODIS ↓ · VIIRS →</th>
+                    {([1, 2, 3, 4] as const).map((j) => (
+                      <th key={j} className="px-1 font-normal" style={{ color: PRIORITY_COLORS[j] }}>
+                        {PRIORITY_LABEL[j].slice(0, 3)}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {([1, 2, 3, 4] as const).map((i) => (
+                    <tr key={i}>
+                      <td className="pr-1" style={{ color: PRIORITY_COLORS[i] }}>
+                        {PRIORITY_LABEL[i]}
+                      </td>
+                      {([1, 2, 3, 4] as const).map((j) => (
+                        <td
+                          key={j}
+                          className={`px-1 text-right ${i === j ? "bg-slate-700/70 text-slate-50" : "text-slate-400"}`}
+                        >
+                          {c.matrix[i - 1][j - 1]}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <p className="mt-0.5 max-w-xs text-[9.5px] leading-tight text-slate-500">
+                Cada sensor usa su propia escala: la diagonal indica que ambos ubican el fuego en el mismo escalón relativo.
+                En la celda se toma el nivel máximo de cada sensor (VIIRS suele tener varios píxeles por celda).
+                {c.missing ? ` ${c.missing} celdas sin prioridad de algún sensor.` : ""}
+              </p>
+            </div>
+          )}
+        </div>
+      ) : null}
+    </div>
   );
 }

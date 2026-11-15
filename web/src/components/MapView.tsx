@@ -29,6 +29,7 @@ import { compassLabel, destination } from "@/lib/spread";
 import { HARM_SOURCE_COLORS, PRIORITY_COLORS, PRIORITY_LABEL, RAW_COLORS, RISK_COLORS } from "@/lib/colors";
 import { ageHours, ageLabel, localTime, type LiveFire } from "@/lib/firmsLive";
 import type { RawDetection } from "@/types/fire";
+import { priorityOf, type CellPriority } from "@/lib/cellPriority";
 import { GOES_MAX_NATIVE_ZOOM, goesTileUrl, type GoesProduct } from "@/lib/goes";
 
 export interface GoesOverlay {
@@ -65,6 +66,9 @@ export interface MapViewProps {
   rawPoints?: RawDetection[] | null;
   /** Color de las detecciones originales: por sensor o por prioridad de atención */
   rawColorBy?: "sensor" | "priority";
+  /** Vista armonizada: prioridad de cada sensor dentro de la celda (relleno MODIS, contorno VIIRS) */
+  cellPriority?: Map<string, CellPriority> | null;
+  harmColorBy?: "priority" | "source";
   goes: GoesOverlay | null;
   scenes?: SceneOverlay | null;
   /** Encuadrar el mapa en estos límites (cambia `key` para volver a hacerlo) */
@@ -195,7 +199,7 @@ function FocusBounds({ focus }: { focus: { bounds: [[number, number], [number, n
 
 const PLATFORM_LABEL: Record<string, string> = { SNPP: "Suomi-NPP", N20: "NOAA-20", N21: "NOAA-21", Terra: "Terra", Aqua: "Aqua" };
 
-export default function MapView({ bbox, hotspots, spread, susceptibility, iot, wind, liveFires, rawPoints, rawColorBy = "sensor", goes, scenes, focus, show }: MapViewProps) {
+export default function MapView({ bbox, hotspots, spread, susceptibility, iot, wind, liveFires, rawPoints, rawColorBy = "sensor", cellPriority = null, harmColorBy = "source", goes, scenes, focus, show }: MapViewProps) {
   const parks = useProtectedAreas(show.park);
   const drawn = useMemo(
     () =>
@@ -397,17 +401,31 @@ export default function MapView({ bbox, hotspots, spread, susceptibility, iot, w
         !rawPoints &&
         drawn.map((h) => {
           const industrial = h.thermal_type === "VOLCANIC_INDUSTRIAL";
+          const pr = cellPriority ? priorityOf(cellPriority, h) : null;
+          const byPrio = harmColorBy === "priority" && pr != null && !industrial;
+          const baseR = (2.5 + Math.min(4, Math.log2(1 + h.raw_detections_count))) * (0.6 + 0.4 * Math.min(1, h.harmonized_weight));
           return (
             <CircleMarker
               key={`${h.grid_cell_id}-${h.acq_date}`}
               center={[h.lat, h.lon]}
-              radius={(2.5 + Math.min(4, Math.log2(1 + h.raw_detections_count))) * (0.6 + 0.4 * Math.min(1, h.harmonized_weight))}
-              pathOptions={{
-                color: industrial ? "#c084fc" : "#0f172a",
-                weight: industrial ? 1.5 : 0.6,
-                fillColor: industrial ? "#a855f7" : HARM_SOURCE_COLORS[h.sensor_source],
-                fillOpacity: 0.9,
-              }}
+              radius={byPrio ? Math.max(baseR, 4) + 1.5 : baseR}
+              pathOptions={
+                byPrio
+                  ? {
+                      // relleno = prioridad MODIS · contorno = prioridad VIIRS · gris punteado = ese sensor no lo vio
+                      fillColor: pr.m ? PRIORITY_COLORS[pr.m] : "#1e293b",
+                      fillOpacity: pr.m ? 0.9 : 0.6,
+                      color: pr.v ? PRIORITY_COLORS[pr.v] : "#64748b",
+                      weight: pr.v ? 3 : 1.5,
+                      dashArray: pr.v ? undefined : "2 2",
+                    }
+                  : {
+                      color: industrial ? "#c084fc" : "#0f172a",
+                      weight: industrial ? 1.5 : 0.6,
+                      fillColor: industrial ? "#a855f7" : HARM_SOURCE_COLORS[h.sensor_source],
+                      fillOpacity: 0.9,
+                    }
+              }
             >
               <Popup>
                 <strong>
@@ -418,6 +436,14 @@ export default function MapView({ bbox, hotspots, spread, susceptibility, iot, w
                   k="Sensor"
                   v={h.sensor_source === "BOTH" ? "MODIS y VIIRS" : h.sensor_source === "VIIRS" ? "Solo VIIRS (peso α)" : "Solo MODIS"}
                 />
+                {pr && (pr.m || pr.v) ? (
+                  <Row
+                    k="Prioridad MODIS / VIIRS"
+                    v={`${pr.m ? PRIORITY_LABEL[pr.m] : "—"} / ${pr.v ? PRIORITY_LABEL[pr.v] : "—"}${
+                      pr.m && pr.v ? (pr.m === pr.v ? " · coinciden" : " · difieren") : ""
+                    }`}
+                  />
+                ) : null}
                 <Row k="Peso armonizado" v={h.harmonized_weight.toFixed(3)} />
                 <Row k="Detecciones crudas" v={String(h.raw_detections_count)} />
                 <Row k="FRP máx" v={h.max_frp != null ? `${h.max_frp.toFixed(1)} MW` : "—"} />

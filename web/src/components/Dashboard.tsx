@@ -34,6 +34,7 @@ import { fetchLiveFires, summarizeLive, type LiveFiresResult } from "@/lib/firms
 import { anomalyPct, hasSensorSeries, monthlyBaseline, quantile } from "@/lib/stats";
 import { computeSpreadVectors, dominantBearing, compassLabel } from "@/lib/spread";
 import { buildSusceptibilityFromGrid } from "@/lib/susceptibility";
+import { buildCellPriority, concordance, passesAgreement, priorityOf, type Agreement } from "@/lib/cellPriority";
 import { THRESHOLDS, type AreaConditions } from "@/lib/prevention";
 import { readUrlState, writeUrlState, type Section } from "@/lib/urlState";
 import TopBar from "./TopBar";
@@ -85,6 +86,9 @@ export default function Dashboard() {
   const [minPriority, setMinPriority] = useState<0 | 2 | 3 | 4>(0);
   /** Vista armonizada: qué celdas mostrar según el sensor que las vio */
   const [harmSources, setHarmSources] = useState<Record<"BOTH" | "MODIS" | "VIIRS", boolean>>({ BOTH: true, MODIS: true, VIIRS: true });
+  /** Vista armonizada: color por prioridad (relleno MODIS, contorno VIIRS) o por sensor, y filtro de concordancia */
+  const [harmColorBy, setHarmColorBy] = useState<"priority" | "source">("priority");
+  const [harmAgree, setHarmAgree] = useState<Agreement>("all");
   const [methodologyOpen, setMethodologyOpen] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
@@ -185,11 +189,13 @@ export default function Dashboard() {
 
   // Detecciones originales del año elegido, solo si la vista no es la armonizada
   useEffect(() => {
-    if (!ready || mode === "harmonized") return;
+    if (!ready) return;
     let cancelled = false;
     const sensor = mode === "modis" ? "MODIS" : mode === "viirs" ? "VIIRS" : null;
     const t = setTimeout(() => setRawRes(null), 0);
-    void getRawDetections(bbox, `${selectedYear}-01-01`, `${selectedYear}-12-31`, sensor, excludeNonFire).then((r) => {
+    // En la vista armonizada se usan para conocer la prioridad de cada sensor dentro de cada celda
+    const max = mode === "harmonized" ? 80000 : 15000;
+    void getRawDetections(bbox, `${selectedYear}-01-01`, `${selectedYear}-12-31`, sensor, excludeNonFire, max).then((r) => {
       if (!cancelled) setRawRes(r);
     });
     return () => {
@@ -277,6 +283,22 @@ export default function Dashboard() {
     return c;
   }, [monthRows]);
   const spread = useMemo(() => computeSpreadVectors(mapRows), [mapRows]);
+  /** Prioridad MODIS y VIIRS dentro de cada celda armonizada (desde las detecciones originales) */
+  const cellPrio = useMemo(
+    () => buildCellPriority(mode === "harmonized" ? rawRes?.rows : null),
+    [mode, rawRes],
+  );
+  const harmDrawRows = useMemo(
+    () =>
+      mode === "harmonized" && harmAgree !== "all"
+        ? mapRows.filter((h) => passesAgreement(priorityOf(cellPrio, h), h, harmAgree))
+        : mapRows,
+    [mode, mapRows, harmAgree, cellPrio],
+  );
+  const harmConcordance = useMemo(
+    () => (mode === "harmonized" && cellPrio.size ? concordance(monthRows, cellPrio) : null),
+    [mode, monthRows, cellPrio],
+  );
   const rawPoints = useMemo(() => {
     if (mode === "harmonized" || !rawRes?.available) return null;
     return rawRes.rows
@@ -635,14 +657,23 @@ export default function Dashboard() {
               bearing != null ? `Avance dominante hacia ${compassLabel(bearing)} (${bearing.toFixed(0)}°) en ${spread.length} eventos` : undefined
             }
             bbox={bbox}
-            hotspots={mapRows}
+            hotspots={harmDrawRows}
+            cellPriority={mode === "harmonized" ? cellPrio : null}
+            harmPriority={{
+              colorBy: harmColorBy,
+              onColorBy: setHarmColorBy,
+              agree: harmAgree,
+              onAgree: setHarmAgree,
+              concordance: harmConcordance,
+              loading: mode === "harmonized" && rawRes == null,
+            }}
             spread={spread}
             susceptibility={susceptibility}
             iot={iot}
             wind={windOverlay}
             layers={layers}
             onToggleLayer={(k) => setLayers((l) => ({ ...l, [k]: !l[k] }))}
-            hotspotCount={rawPoints ? rawPoints.length : mapRows.length}
+            hotspotCount={rawPoints ? rawPoints.length : harmDrawRows.length}
             countUnit={rawPoints ? "detecciones originales" : "celdas-día"}
             rawPoints={rawPoints}
             harmSources={harmSources}
