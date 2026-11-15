@@ -131,6 +131,44 @@ function Row({ k, v }: { k: string; v: string }) {
   );
 }
 
+/** Comparativa de prioridad por sensor dentro de una celda armonizada (una fila por sensor). */
+function PriorityCompare({ m, v }: { m: 1 | 2 | 3 | 4 | null; v: 1 | 2 | 3 | 4 | null }) {
+  const line = (sensor: string, lv: 1 | 2 | 3 | 4, ring: boolean) => (
+    <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "2px 0" }}>
+      <span style={{ width: 44, color: "#94a3b8" }}>{sensor}</span>
+      <span
+        style={{
+          width: 11,
+          height: 11,
+          borderRadius: 9999,
+          flexShrink: 0,
+          background: ring ? "transparent" : PRIORITY_COLORS[lv],
+          border: ring ? `2.5px solid ${PRIORITY_COLORS[lv]}` : "1px solid #0f172a",
+        }}
+      />
+      <span style={{ fontWeight: 700, color: PRIORITY_COLORS[lv] }}>{PRIORITY_LABEL[lv]}</span>
+    </div>
+  );
+  const diff = m && v ? Math.abs(m - v) : null;
+  return (
+    <div style={{ margin: "6px 0", padding: "6px 8px", borderRadius: 6, background: "#0f172a", border: "1px solid #1e293b" }}>
+      <div style={{ fontSize: 10, letterSpacing: 0.4, textTransform: "uppercase", color: "#64748b", marginBottom: 2 }}>
+        Prioridad de atención
+      </div>
+      {m ? line("MODIS", m, false) : null}
+      {v ? line("VIIRS", v, true) : null}
+      {diff != null && (
+        <div style={{ marginTop: 3, fontWeight: 600, color: diff === 0 ? "#4ade80" : "#fbbf24" }}>
+          {diff === 0 ? "✓ Coinciden" : `≠ Difieren en ${diff} nivel${diff > 1 ? "es" : ""}`}
+        </div>
+      )}
+      {(!m || !v) && (
+        <div style={{ marginTop: 3, color: "#94a3b8" }}>{m ? "Detectado solo por MODIS" : "Detectado solo por VIIRS"}</div>
+      )}
+    </div>
+  );
+}
+
 /** Formato grados-minutos-segundos para radio / GPS de brigadas. */
 function dms(v: number, pos: string, neg: string): string {
   const a = Math.abs(v);
@@ -412,12 +450,12 @@ export default function MapView({ bbox, hotspots, spread, susceptibility, iot, w
               pathOptions={
                 byPrio
                   ? {
-                      // relleno = prioridad MODIS · contorno = prioridad VIIRS · gris punteado = ese sensor no lo vio
-                      fillColor: pr.m ? PRIORITY_COLORS[pr.m] : "#1e293b",
-                      fillOpacity: pr.m ? 0.9 : 0.6,
-                      color: pr.v ? PRIORITY_COLORS[pr.v] : "#64748b",
-                      weight: pr.v ? 3 : 1.5,
-                      dashArray: pr.v ? undefined : "2 2",
+                      // relleno = prioridad MODIS · contorno = prioridad VIIRS
+                      // solo MODIS → círculo relleno con borde fino · solo VIIRS → anillo de su color
+                      fillColor: PRIORITY_COLORS[(pr.m ?? pr.v ?? 1) as 1 | 2 | 3 | 4],
+                      fillOpacity: pr.m ? 0.9 : 0.15,
+                      color: pr.v ? PRIORITY_COLORS[pr.v] : "#0f172a",
+                      weight: pr.v ? 3 : 0.8,
                     }
                   : {
                       color: industrial ? "#c084fc" : "#0f172a",
@@ -436,14 +474,7 @@ export default function MapView({ bbox, hotspots, spread, susceptibility, iot, w
                   k="Sensor"
                   v={h.sensor_source === "BOTH" ? "MODIS y VIIRS" : h.sensor_source === "VIIRS" ? "Solo VIIRS (peso α)" : "Solo MODIS"}
                 />
-                {pr && (pr.m || pr.v) ? (
-                  <Row
-                    k="Prioridad MODIS / VIIRS"
-                    v={`${pr.m ? PRIORITY_LABEL[pr.m] : "—"} / ${pr.v ? PRIORITY_LABEL[pr.v] : "—"}${
-                      pr.m && pr.v ? (pr.m === pr.v ? " · coinciden" : " · difieren") : ""
-                    }`}
-                  />
-                ) : null}
+                {pr && (pr.m || pr.v) ? <PriorityCompare m={pr.m} v={pr.v} /> : null}
                 <Row k="Peso armonizado" v={h.harmonized_weight.toFixed(3)} />
                 <Row k="Detecciones crudas" v={String(h.raw_detections_count)} />
                 <Row k="FRP máx" v={h.max_frp != null ? `${h.max_frp.toFixed(1)} MW` : "—"} />

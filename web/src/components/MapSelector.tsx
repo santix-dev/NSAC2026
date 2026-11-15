@@ -813,20 +813,38 @@ export default function MapSelector(props: Props) {
         {layers.hotspots && !props.rawPoints && props.harmPriority?.colorBy === "priority" && (
           <div className="space-y-0.5">
             <p className="text-slate-400">Celda armonizada: prioridad por sensor</p>
-            <p className="flex items-center gap-1.5">
-              <span className="inline-block h-3.5 w-3.5 rounded-full" style={{ background: PRIORITY_COLORS[3], border: `2.5px solid ${PRIORITY_COLORS[3]}` }} />
-              Relleno = MODIS · contorno = VIIRS
-            </p>
-            {([4, 3, 2, 1] as const).map((l) => (
-              <p key={l} className="flex items-center gap-1.5">
-                <span className="inline-block h-2.5 w-2.5 rounded-full border border-slate-900" style={{ background: PRIORITY_COLORS[l] }} /> {PRIORITY_LABEL[l]}
-              </p>
-            ))}
-            <p className="flex items-center gap-1.5">
-              <span className="inline-block h-3 w-3 rounded-full border-2 border-dashed border-slate-500 bg-slate-800" /> Sin dato de ese sensor
-            </p>
-            <p className="max-w-[11rem] text-[9.5px] leading-tight text-slate-500">
-              Mismo color adentro y en el borde = ambos sensores lo ubican en el mismo escalón de su propia escala.
+            <table className="border-separate border-spacing-x-1.5 border-spacing-y-0.5 text-[10.5px]">
+              <thead>
+                <tr className="text-[9.5px] text-slate-500">
+                  <th className="text-left font-normal">Escala</th>
+                  <th className="font-normal">Solo MODIS</th>
+                  <th className="font-normal">Solo VIIRS</th>
+                  <th className="font-normal">Ambos</th>
+                </tr>
+              </thead>
+              <tbody>
+                {([4, 3, 2, 1] as const).map((l) => (
+                  <tr key={l}>
+                    <td style={{ color: PRIORITY_COLORS[l] }}>{PRIORITY_LABEL[l]}</td>
+                    <td className="text-center">
+                      <span className="inline-block h-3 w-3 rounded-full border border-slate-900" style={{ background: PRIORITY_COLORS[l] }} />
+                    </td>
+                    <td className="text-center">
+                      <span className="inline-block h-3 w-3 rounded-full" style={{ border: `2.5px solid ${PRIORITY_COLORS[l]}` }} />
+                    </td>
+                    <td className="text-center">
+                      <span
+                        className="inline-block h-3.5 w-3.5 rounded-full"
+                        style={{ background: PRIORITY_COLORS[l], border: `2.5px solid ${PRIORITY_COLORS[l]}`, boxShadow: "inset 0 0 0 1px #0f172a" }}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <p className="max-w-[12rem] text-[9.5px] leading-tight text-slate-500">
+              Solo MODIS = círculo relleno · Solo VIIRS = anillo · Ambos = relleno MODIS + anillo VIIRS (mismo color = coinciden).
+              Cada sensor usa su propia escala.
             </p>
           </div>
         )}
