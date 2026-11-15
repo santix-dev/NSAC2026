@@ -11,6 +11,7 @@ import type {
   Palette,
   RecurrenceCell,
   Region,
+  RawDetectionsResult,
   RegionMonthEnv,
   SeriesMode,
 } from "@/types/fire";
@@ -20,6 +21,7 @@ import {
   getCalibrationAlpha,
   getEnvGrid,
   getHotspots,
+  getRawDetections,
   getRecurrence,
   getRegionMonthEnv,
   getRegions,
@@ -76,6 +78,9 @@ export default function Dashboard() {
   const [loadingHs, setLoadingHs] = useState(true);
   const [live, setLive] = useState<LiveReadingsResult | null>(null);
   const [liveFires, setLiveFires] = useState<LiveFiresResult | null>(null);
+  /** Detecciones originales (sin armonizar) para las vistas MODIS / VIIRS / Cruda del mapa */
+  const [rawRes, setRawRes] = useState<RawDetectionsResult | null>(null);
+  const [includeExtra, setIncludeExtra] = useState(false);
   const [methodologyOpen, setMethodologyOpen] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
@@ -174,6 +179,21 @@ export default function Dashboard() {
     };
   }, []);
 
+  // Detecciones originales del año elegido, solo si la vista no es la armonizada
+  useEffect(() => {
+    if (!ready || mode === "harmonized") return;
+    let cancelled = false;
+    const sensor = mode === "modis" ? "MODIS" : mode === "viirs" ? "VIIRS" : null;
+    const t = setTimeout(() => setRawRes(null), 0);
+    void getRawDetections(bbox, `${selectedYear}-01-01`, `${selectedYear}-12-31`, sensor, excludeNonFire).then((r) => {
+      if (!cancelled) setRawRes(r);
+    });
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, [ready, mode, bbox, selectedYear, excludeNonFire]);
+
   // Focos en tiempo casi real del área visible (FIRMS NRT, caché de 15 min en el servidor)
   useEffect(() => {
     if (!ready) return;
@@ -248,6 +268,12 @@ export default function Dashboard() {
     [monthRows, mode],
   );
   const spread = useMemo(() => computeSpreadVectors(mapRows), [mapRows]);
+  const rawPoints = useMemo(() => {
+    if (mode === "harmonized" || !rawRes?.available) return null;
+    return rawRes.rows.filter(
+      (r) => (includeExtra || r.in_calendar) && (!selectedMonth || Number(r.acq_date.slice(5, 7)) === selectedMonth),
+    );
+  }, [mode, rawRes, includeExtra, selectedMonth]);
   const susceptibility = useMemo(
     () => buildSusceptibilityFromGrid(envGrid, recurrence, RECURRENCE_CELL_DEG),
     [envGrid, recurrence],
@@ -602,7 +628,20 @@ export default function Dashboard() {
             wind={windOverlay}
             layers={layers}
             onToggleLayer={(k) => setLayers((l) => ({ ...l, [k]: !l[k] }))}
-            hotspotCount={mapRows.length}
+            hotspotCount={rawPoints ? rawPoints.length : mapRows.length}
+            countUnit={rawPoints ? "detecciones originales" : "celdas-día"}
+            rawPoints={rawPoints}
+            rawInfo={
+              mode === "harmonized"
+                ? null
+                : {
+                    loading: rawRes == null,
+                    available: rawRes?.available ?? true,
+                    truncated: rawRes?.truncated ?? false,
+                    includeExtra,
+                    onIncludeExtra: setIncludeExtra,
+                  }
+            }
             truncated={hotspots?.truncated ?? false}
             loading={loadingHs}
             isfLabel={isfLabel}

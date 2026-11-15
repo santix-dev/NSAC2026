@@ -5,3 +5,4 @@ __pycache__/
 raw_data/*.txt
 aux_data/rasters/
 aux_data/*.csv
+raw_detections.csv

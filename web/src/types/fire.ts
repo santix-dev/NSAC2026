@@ -140,3 +140,26 @@ export interface MapLayers {
   park: boolean;
   goes: boolean;
 }
+
+/** Detección original de FIRMS (sin grilla ni pesos), en su posición real. */
+export interface RawDetection {
+  acq_date: string;
+  acq_time: string | null; // HHMM UTC
+  lat: number;
+  lon: number;
+  sensor: "MODIS" | "VIIRS";
+  platform: string | null; // Terra, Aqua, SNPP, N20, N21
+  confidence: string | null;
+  frp: number | null;
+  thermal_type: ThermalType;
+  /** true = entra en la serie armonizada (MODIS + plataforma VIIRS de referencia) */
+  in_calendar: boolean;
+}
+
+export interface RawDetectionsResult {
+  rows: RawDetection[];
+  truncated: boolean;
+  source: DataSource;
+  /** false si la base todavía no tiene la tabla de detecciones originales */
+  available: boolean;
+}

@@ -44,3 +44,6 @@ export const RISK_COLORS = {
   Alto: "#fb8c00",
   Crítico: "#d7191c",
 } as const;
+
+/** Detecciones originales por sensor (naranja / cian: distinguibles con daltonismo rojo-verde) */
+export const RAW_COLORS = { MODIS: "#f97316", VIIRS: "#22d3ee" } as const;

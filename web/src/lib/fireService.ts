@@ -12,12 +12,14 @@ import type {
   EnvGridCell,
   HotspotRecord,
   HotspotsResult,
+  RawDetection,
+  RawDetectionsResult,
   RecurrenceCell,
   Region,
   RegionMonthEnv,
 } from "@/types/fire";
 import { bboxIntersects, FALLBACK_REGIONS, hasCoverage, inBBox, YEARS } from "./regions";
-import { loadSnapshot } from "./snapshot";
+import { loadSnapshot, loadSnapshotRaw } from "./snapshot";
 import { getSupabase, isSupabaseConfigured } from "./supabase";
 
 export { isSupabaseConfigured };
@@ -324,6 +326,50 @@ export async function getHotspots(
     return { rows, truncated: rows.length >= maxRows, source: "supabase" };
   } catch (err) {
     return snapshot(fallbackNote(err));
+  }
+}
+
+/**
+ * Detecciones originales de FIRMS (sin armonizar) en su posición real, por sensor.
+ * sensor = null → ambos. Si la base no tiene todavía la tabla, usa la copia estática; si tampoco
+ * existe, available = false (la web lo avisa en vez de dibujar otra cosa).
+ */
+export async function getRawDetections(
+  bbox: BBox,
+  startDate: string,
+  endDate: string,
+  sensor: "MODIS" | "VIIRS" | null,
+  excludeNonFire: boolean,
+  maxRows = 15000,
+): Promise<RawDetectionsResult> {
+  const snapshot = async (): Promise<RawDetectionsResult> => {
+    const all = await loadSnapshotRaw();
+    if (!all) return { rows: [], truncated: false, source: "snapshot", available: false };
+    const rows = all.filter(
+      (r) =>
+        r.acq_date >= startDate &&
+        r.acq_date <= endDate &&
+        (!sensor || r.sensor === sensor) &&
+        (!excludeNonFire || r.thermal_type === "VEGETATION") &&
+        inBBox(r.lat, r.lon, bbox),
+    );
+    return { rows: rows.slice(0, maxRows), truncated: rows.length > maxRows, source: "snapshot", available: true };
+  };
+  if (!isSupabaseConfigured()) return snapshot();
+  try {
+    const rows = await rpcAll<RawDetection>(
+      "get_raw_detections",
+      { ...bboxParams(bbox), start_date: startDate, end_date: endDate, sensor_filter: sensor, exclude_non_fire: excludeNonFire },
+      maxRows,
+    );
+    if (rows.length === 0) {
+      // la tabla puede estar vacía si todavía no se subió: probar la copia estática
+      const snap = await snapshot();
+      if (snap.available && snap.rows.length) return snap;
+    }
+    return { rows, truncated: rows.length >= maxRows, source: "supabase", available: true };
+  } catch {
+    return snapshot();
   }
 }
 

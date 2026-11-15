@@ -26,8 +26,9 @@ import { fmt, type IotReading } from "@/lib/iot";
 import type { SpreadVector } from "@/lib/spread";
 import type { SusceptibilityCell } from "@/lib/susceptibility";
 import { compassLabel, destination } from "@/lib/spread";
-import { interpolate, RISK_COLORS, YLORRD } from "@/lib/colors";
+import { interpolate, RAW_COLORS, RISK_COLORS, YLORRD } from "@/lib/colors";
 import { ageHours, ageLabel, localTime, type LiveFire } from "@/lib/firmsLive";
+import type { RawDetection } from "@/types/fire";
 import { GOES_MAX_NATIVE_ZOOM, goesTileUrl, type GoesProduct } from "@/lib/goes";
 
 export interface GoesOverlay {
@@ -60,6 +61,8 @@ export interface MapViewProps {
   iot: { station: IotStation; reading: IotReading }[];
   wind: WindOverlay | null;
   liveFires: LiveFire[];
+  /** Detecciones originales (sin armonizar). Si viene, reemplaza a las celdas armonizadas en el mapa. */
+  rawPoints?: RawDetection[] | null;
   goes: GoesOverlay | null;
   scenes?: SceneOverlay | null;
   /** Encuadrar el mapa en estos límites (cambia `key` para volver a hacerlo) */
@@ -192,7 +195,9 @@ function FocusBounds({ focus }: { focus: { bounds: [[number, number], [number, n
   return null;
 }
 
-export default function MapView({ bbox, hotspots, spread, susceptibility, iot, wind, liveFires, goes, scenes, focus, show }: MapViewProps) {
+const PLATFORM_LABEL: Record<string, string> = { SNPP: "Suomi-NPP", N20: "NOAA-20", N21: "NOAA-21", Terra: "Terra", Aqua: "Aqua" };
+
+export default function MapView({ bbox, hotspots, spread, susceptibility, iot, wind, liveFires, rawPoints, goes, scenes, focus, show }: MapViewProps) {
   const parks = useProtectedAreas(show.park);
   const drawn = useMemo(
     () =>
@@ -335,6 +340,52 @@ export default function MapView({ bbox, hotspots, spread, susceptibility, iot, w
         ))}
 
       {show.hotspots &&
+        rawPoints &&
+        rawPoints.map((d, i) => {
+          const industrial = d.thermal_type === "VOLCANIC_INDUSTRIAL";
+          const t = (d.acq_time ?? "").padStart(4, "0");
+          const iso = `${d.acq_date}T${t.slice(0, 2)}:${t.slice(2)}:00Z`;
+          return (
+            <CircleMarker
+              key={`raw-${i}-${d.acq_date}-${d.lat}-${d.lon}`}
+              center={[d.lat, d.lon]}
+              radius={d.sensor === "MODIS" ? 4.5 : 3}
+              pathOptions={{
+                color: industrial ? "#c084fc" : d.in_calendar ? "#0f172a" : "#e2e8f0",
+                weight: industrial ? 1.5 : 0.7,
+                dashArray: d.in_calendar ? undefined : "2 2",
+                fillColor: industrial ? "#a855f7" : RAW_COLORS[d.sensor],
+                fillOpacity: d.in_calendar ? 0.85 : 0.45,
+              }}
+            >
+              <Popup>
+                <strong>
+                  Detección original {d.sensor} · {d.acq_date} {t.slice(0, 2)}:{t.slice(2)} UTC
+                </strong>
+                <Coords
+                  lat={d.lat}
+                  lon={d.lon}
+                  note={`Centro del píxel FIRMS (${d.sensor === "MODIS" ? "1 km" : "375 m"}), posición real sin grilla`}
+                />
+                <Row k="Satélite" v={`${d.sensor} ${PLATFORM_LABEL[d.platform ?? ""] ?? d.platform ?? ""}`} />
+                <Row k="Hora local (AR)" v={localTime(iso)} />
+                <Row k="Confianza" v={d.confidence ?? "—"} />
+                <Row k="FRP" v={d.frp != null ? `${d.frp.toFixed(1)} MW` : "—"} />
+                <Row k="Tipo térmico" v={industrial ? "Volcánico/Industrial" : "Vegetación"} />
+                <Row
+                  k="En la serie armonizada"
+                  v={d.in_calendar ? "Sí" : "No (plataforma extra: solo registro)"}
+                />
+                <p style={{ marginTop: 6, color: "#94a3b8" }}>
+                  NASA FIRMS, tras el filtro de calidad. Sin armonizar: cada punto es una detección del satélite.
+                </p>
+              </Popup>
+            </CircleMarker>
+          );
+        })}
+
+      {show.hotspots &&
+        !rawPoints &&
         drawn.map((h) => {
           const industrial = h.thermal_type === "VOLCANIC_INDUSTRIAL";
           return (

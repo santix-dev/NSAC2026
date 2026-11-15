@@ -6,7 +6,7 @@ La web consulta Supabase; si la base no responde, lee estos archivos estáticos 
 reales que se cargaron en Supabase), en lugar de generar datos de prueba.
 
 Entradas:  etl/harmonized_output.csv, etl/aux_data/region_month_env.csv, etl/aux_data/env_grid_clim.csv
-Salidas:   web/public/data/{hotspots.csv, region_month_env.csv, env_grid_clim.csv, meta.json}
+Salidas:   web/public/data/{hotspots.csv, raw_detections.csv, region_month_env.csv, env_grid_clim.csv, meta.json}
 
 Uso (después de harmonize.py y build_aux.py):
     python etl/export_web_snapshot.py
@@ -44,6 +44,14 @@ def main() -> int:
     h.to_csv(OUT / "hotspots.csv", index=False, float_format="%.6g")
 
     files = {"hotspots.csv": len(h)}
+    raw_src = ETL / "raw_detections.csv"
+    if raw_src.exists():
+        r = pd.read_csv(raw_src, dtype={"acq_time": str, "confidence": str})
+        cols = ["acq_date", "acq_time", "lat", "lon", "sensor", "platform", "confidence", "frp", "thermal_type", "in_calendar"]
+        r[cols].to_csv(OUT / "raw_detections.csv", index=False, float_format="%.6g")
+        files["raw_detections.csv"] = len(r)
+    else:
+        print("  ⚠ falta etl/raw_detections.csv (harmonize.py); en modo respaldo no se verán las detecciones originales")
     for name in ("region_month_env.csv", "env_grid_clim.csv"):
         p = ETL / "aux_data" / name
         if p.exists():

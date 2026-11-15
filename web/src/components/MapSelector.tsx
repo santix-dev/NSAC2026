@@ -34,7 +34,7 @@ import { ChevronDown, Flame, Layers, Loader2, Navigation, Radio, Route, Satellit
 import type { MapLayers, SeriesMode } from "@/types/fire";
 import SeriesToggle from "./SeriesToggle";
 import type { MapViewProps } from "./MapView";
-import { RISK_COLORS, YLORRD } from "@/lib/colors";
+import { RAW_COLORS, RISK_COLORS, YLORRD } from "@/lib/colors";
 import { compassLabel } from "@/lib/spread";
 
 const MapView = dynamic(() => import("./MapView"), {
@@ -56,6 +56,14 @@ interface Props extends Omit<MapViewProps, "show" | "goes"> {
   liveSummary?: string;
   /** Fecha elegida en la app: con mes, la imagen GOES sigue ese mes; sin mes, últimas 6 h. */
   goesDate: { year: number; month: number | null; preferredDay?: string; center: [number, number] };
+  countUnit?: string;
+  rawInfo?: {
+    loading: boolean;
+    available: boolean;
+    truncated: boolean;
+    includeExtra: boolean;
+    onIncludeExtra: (v: boolean) => void;
+  } | null;
   /** Serie de focos que se dibuja: armonizada, solo MODIS, solo VIIRS o cruda */
   mode: SeriesMode;
   onModeChange: (m: SeriesMode) => void;
@@ -239,6 +247,7 @@ export default function MapSelector(props: Props) {
         iot={props.iot}
         wind={wind}
         liveFires={props.liveFires}
+        rawPoints={props.rawPoints}
         goes={
           layers.goes && !goesError && !fireEvent
             ? {
@@ -270,7 +279,7 @@ export default function MapSelector(props: Props) {
           <p className="truncate text-sm font-semibold text-slate-100">{props.headline}</p>
           <p className="flex items-center gap-1.5 text-[11px] text-slate-400">
             {props.loading && <Loader2 className="h-3 w-3 animate-spin" aria-hidden />}
-            {props.scenarioLabel} · {props.hotspotCount.toLocaleString("es-AR")} celdas-día
+            {props.scenarioLabel} · {props.hotspotCount.toLocaleString("es-AR")} {props.countUnit ?? "celdas-día"}
             {props.truncated && " (límite 10.000)"}
           </p>
           {props.spreadSummary && layers.spread && <p className="text-[11px] text-slate-500">{props.spreadSummary}</p>}
@@ -278,12 +287,30 @@ export default function MapSelector(props: Props) {
             <div className="mt-1.5">
               <SeriesToggle mode={props.mode} onChange={props.onModeChange} compact />
               <p className="mt-0.5 text-[10px] text-slate-500">
-                {props.mode === "modis"
-                  ? "Mapa: celdas con detección MODIS (1 km)."
-                  : props.mode === "viirs"
-                    ? "Mapa: celdas con detección VIIRS (375 m), desde nov-2012."
-                    : "Mapa: todas las celdas (MODIS, VIIRS o ambos)."}
+                {props.mode === "harmonized"
+                  ? "Mapa: celdas de 1 km armonizadas (MODIS + VIIRS con peso α)."
+                  : props.rawInfo?.loading
+                    ? "Cargando detecciones originales…"
+                    : props.rawInfo && !props.rawInfo.available
+                      ? "Las detecciones originales todavía no se cargaron en la base (upload_supabase.py --raw-only)."
+                      : props.mode === "modis"
+                        ? "Mapa: detecciones originales MODIS (píxel 1 km), en su posición real."
+                        : props.mode === "viirs"
+                          ? "Mapa: detecciones originales VIIRS (píxel 375 m), en su posición real."
+                          : "Mapa: todas las detecciones originales, sin armonizar."}
+                {props.rawInfo?.truncated ? " Se muestran las primeras 15.000; elegí un mes para ver todo." : ""}
               </p>
+              {props.rawInfo && props.mode !== "modis" && props.rawInfo.available && (
+                <label className="mt-0.5 flex cursor-pointer items-center gap-1 text-[10px] text-slate-400">
+                  <input
+                    type="checkbox"
+                    checked={props.rawInfo.includeExtra}
+                    onChange={(e) => props.rawInfo!.onIncludeExtra(e.target.checked)}
+                    className="h-3 w-3 accent-cyan-400"
+                  />
+                  Incluir NOAA-20/21 que no entran en la serie (borde punteado)
+                </label>
+              )}
             </div>
           )}
           {props.liveSummary && layers.live && <p className="text-[11px] text-rose-300">{props.liveSummary}</p>}
@@ -678,7 +705,18 @@ export default function MapSelector(props: Props) {
             </div>
           </div>
         )}
-        {layers.hotspots && (
+        {layers.hotspots && props.rawPoints && (
+          <div className="space-y-0.5">
+            <p className="text-slate-400">Detecciones originales</p>
+            <p className="flex items-center gap-1.5">
+              <span className="inline-block h-3 w-3 rounded-full border border-slate-900" style={{ background: RAW_COLORS.MODIS }} /> MODIS (1 km)
+            </p>
+            <p className="flex items-center gap-1.5">
+              <span className="inline-block h-2.5 w-2.5 rounded-full border border-slate-900" style={{ background: RAW_COLORS.VIIRS }} /> VIIRS (375 m)
+            </p>
+          </div>
+        )}
+        {layers.hotspots && !props.rawPoints && (
           <div>
             <p className="mb-1 text-slate-400">Potencia del fuego (FRP, MW)</p>
             <div className="h-2 w-40 rounded" style={{ background: `linear-gradient(90deg, ${YLORRD.slice(3).join(",")})` }} />

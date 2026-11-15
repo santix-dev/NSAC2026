@@ -161,7 +161,12 @@ def _platform(df: pd.DataFrame, sensor: pd.Series, filename: str) -> pd.Series:
         sat = sat.fillna(hint)
     else:
         sat = pd.Series(hint, index=df.index)
-    return pd.Series(np.where(sensor.to_numpy() == "MODIS", "MODIS", sat.to_numpy()), index=df.index)
+    modis_sat = (
+        df["satellite"].astype(str).str.strip().str.upper().map({"T": "Terra", "TERRA": "Terra", "A": "Aqua", "AQUA": "Aqua"}).fillna("MODIS")
+        if "satellite" in df.columns
+        else pd.Series("MODIS", index=df.index)
+    )
+    return pd.Series(np.where(sensor.to_numpy() == "MODIS", modis_sat.to_numpy(), sat.to_numpy()), index=df.index)
 
 
 def load_firms_csv(path: Path) -> pd.DataFrame:
@@ -230,7 +235,7 @@ def load_raw_directory(raw_dir: Path) -> pd.DataFrame:
         frames.append(frame)
     if repeated:
         print(f"  • {repeated:,} detecciones ya presentes en otro archivo se descartan")
-    return pd.concat(frames, ignore_index=True).drop(columns="acq_time")
+    return pd.concat(frames, ignore_index=True)
 
 
 def assign_region(df: pd.DataFrame) -> pd.DataFrame:
@@ -263,6 +268,7 @@ class PipelineStats:
     snpp_end: str = ""
     viirs_reference: dict = field(default_factory=dict)
     excluded_viirs: dict = field(default_factory=dict)
+    raw_detections: object = None  # DataFrame de detecciones originales (sin armonizar) para el mapa
     modis_window_events: int = 0
     viirs_window_events: int = 0
     env_source: dict = field(default_factory=dict)
@@ -288,6 +294,35 @@ def select_viirs_reference(df: pd.DataFrame, stats: PipelineStats) -> tuple[pd.D
     stats.excluded_viirs = df.loc[viirs & ~ref_viirs, "platform"].value_counts().to_dict()
     stats.snpp_end = snpp_end.date().isoformat() if snpp_end is not None else ""
     return df.loc[keep].copy(), df.loc[n20 | (df["sensor"] == "MODIS")].copy(), snpp_end
+
+
+RAW_COLUMNS = ["region", "acq_date", "acq_time", "lat", "lon", "sensor", "platform", "confidence", "frp",
+               "thermal_type", "in_calendar"]
+
+
+def build_raw_detections(df_all: pd.DataFrame, ref: pd.DataFrame) -> pd.DataFrame:
+    """Detecciones originales tras el control de calidad, en su posición real (sin grilla ni pesos).
+    in_calendar = True si entran en la serie armonizada (MODIS + plataforma VIIRS de referencia);
+    False para NOAA-20 en el período de S-NPP y NOAA-21 (solo registro)."""
+    ref = ref.copy()
+    ref["in_calendar"] = True
+    rest = df_all.loc[~df_all.index.isin(ref.index)].copy()
+    if len(rest):
+        cell = lambda d: (np.floor(d["lat"] * GRID_SCALE).astype(np.int64).astype(str) + "_"  # noqa: E731
+                          + np.floor(d["lon"] * GRID_SCALE).astype(np.int64).astype(str))
+        fixed = set(cell(ref)[ref["thermal_type"] != VEGETATION])
+        rest["thermal_type"] = np.where(cell(rest).isin(fixed), VOLCANIC_INDUSTRIAL, VEGETATION)
+        rest["in_calendar"] = False
+    raw = pd.concat([ref, rest], ignore_index=True)
+    for c in RAW_COLUMNS:
+        if c not in raw:
+            raw[c] = None
+    raw = raw[RAW_COLUMNS].sort_values(["region", "acq_date", "acq_time"])
+    raw["acq_date"] = pd.to_datetime(raw["acq_date"]).dt.strftime("%Y-%m-%d")
+    raw["lat"] = raw["lat"].round(5)
+    raw["lon"] = raw["lon"].round(5)
+    raw["frp"] = pd.to_numeric(raw["frp"], errors="coerce").round(2)
+    return raw.reset_index(drop=True)
 
 
 def stage1_quality_filter(df: pd.DataFrame, stats: PipelineStats) -> pd.DataFrame:
@@ -642,6 +677,7 @@ def run_pipeline(
           f"fuera del calendario: {stats.excluded_viirs or '—'}")
     print(f"▶ Etapa 2: enmascaramiento geológico/industrial (persistencia por {'celda 0.01°' if stationary_scale == 'cell' else 'punto 0.001°'})")
     df = stage2_stationary_mask(df, stats, stationary_scale)
+    stats.raw_detections = build_raw_detections(df_all, df)
     print("▶ Etapa 3: grilla unificada 0.01° × día")
     cells = stage3_grid_aggregation(df, stats)
     print(f"▶ Etapa 4: calibración en Córdoba {CALIBRATION_START_YEAR}-{CALIBRATION_END_YEAR} → transferencia a Patagonia")
@@ -910,6 +946,10 @@ def main(argv=None) -> int:
     out, stats = run_pipeline(raw, args.aux_dir, args.stationary_scale, args.harmonization)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     out.to_csv(args.output, index=False)
+    if stats.raw_detections is not None:
+        raw_path = args.output.parent / "raw_detections.csv"
+        stats.raw_detections.to_csv(raw_path, index=False)
+        print(f"✔ {len(stats.raw_detections):,} detecciones originales (sin armonizar) en {raw_path}")
     print_summary(out, stats)
     calib = {
         "alpha": stats.alpha, "alpha_n20": stats.alpha_n20, "beta_snpp_n20": stats.beta_snpp_n20,

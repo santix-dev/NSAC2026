@@ -14,6 +14,7 @@ export interface Snapshot {
 
 const STRING_COLS = new Set([
   "grid_cell_id", "region", "acq_date", "sensor_source", "thermal_type", "env_source", "cell_id",
+  "acq_time", "sensor", "platform", "confidence", "in_calendar",
 ]);
 
 function parseCsv<T>(text: string): T[] {
@@ -72,4 +73,20 @@ export function loadSnapshot(): Promise<Snapshot> {
     });
   }
   return cache;
+}
+
+let rawCache: Promise<import("@/types/fire").RawDetection[] | null> | null = null;
+
+/** Detecciones originales de la copia estática (se carga aparte y solo si se piden). */
+export function loadSnapshotRaw(): Promise<import("@/types/fire").RawDetection[] | null> {
+  if (!rawCache) {
+    rawCache = getText("/data/raw_detections.csv").then((t) => {
+      if (!t) return null;
+      return parseCsv<Record<string, unknown>>(t).map((r) => ({
+        ...(r as unknown as import("@/types/fire").RawDetection),
+        in_calendar: String(r.in_calendar) === "True" || String(r.in_calendar) === "true" || r.in_calendar === 1,
+      }));
+    });
+  }
+  return rawCache;
 }

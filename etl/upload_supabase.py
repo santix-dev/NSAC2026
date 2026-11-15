@@ -170,7 +170,35 @@ def parse_args(argv=None) -> argparse.Namespace:
     p.add_argument("--yes", action="store_true", help="No pedir confirmación con --replace")
     p.add_argument("--aux-dir", type=Path, default=ETL_DIR / "aux_data", help="Carpeta de las tablas auxiliares")
     p.add_argument("--aux-only", action="store_true", help="Subir solo las tablas auxiliares (región-mes y grilla ISF)")
+    p.add_argument("--raw-only", action="store_true", help="Subir solo las detecciones originales (raw_detections.csv)")
     return p.parse_args(argv)
+
+
+RAW_TABLE = "raw_detections"
+
+
+def upload_raw_detections(client, csv_path: Path, args) -> int:
+    """Reemplaza la tabla de detecciones originales (sin armonizar) con etl/raw_detections.csv."""
+    if not csv_path.exists():
+        print(f"  · {csv_path.name} no existe (python etl/harmonize.py lo genera); se omite '{RAW_TABLE}'")
+        return 0
+    df = pd.read_csv(csv_path, dtype={"acq_time": str, "confidence": str})
+    df["acq_time"] = df["acq_time"].str.zfill(4)
+    recs = df.astype(object).where(df.notna(), None).to_dict(orient="records")
+    print(f"▶ {len(recs):,} detecciones originales → '{RAW_TABLE}' (reemplazo completo)")
+    client.table(RAW_TABLE).delete().gte("id", 0).execute()
+    failures = 0
+    n = math.ceil(len(recs) / args.batch_size)
+    with tqdm(total=len(recs), unit="fila") as bar:
+        for b in range(n):
+            rows = recs[b * args.batch_size : (b + 1) * args.batch_size]
+            try:
+                insert_with_retry(client, rows, args.max_retries, args.retry_delay, table=RAW_TABLE)
+            except Exception as exc:
+                failures += 1
+                tqdm.write(f"  ✗ {RAW_TABLE} lote {b}: {exc}")
+            bar.update(len(rows))
+    return failures
 
 
 def main(argv=None) -> int:
@@ -190,6 +218,8 @@ def main(argv=None) -> int:
 
     if args.aux_only:
         return 1 if upload_aux_tables(client, args.aux_dir, args) else 0
+    if args.raw_only:
+        return 1 if upload_raw_detections(client, args.csv.parent / "raw_detections.csv", args) else 0
 
     if args.replace:
         existing = client.table(TABLE).select("id", count="exact").limit(1).execute().count or 0
@@ -219,6 +249,9 @@ def main(argv=None) -> int:
 
     print(f"✔ {uploaded:,} filas insertadas en '{TABLE}'")
     aux_failures = upload_aux_tables(client, args.aux_dir, args)
+    raw_failures = upload_raw_detections(client, args.csv.parent / "raw_detections.csv", args)
+    if raw_failures:
+        print(f"✗ {raw_failures} lote(s) de detecciones originales fallidos; reintentá con: python etl/upload_supabase.py --raw-only")
     if aux_failures:
         print(f"✗ {aux_failures} lote(s) auxiliares fallidos; reintentá con: python etl/upload_supabase.py --aux-only")
     if failed:
