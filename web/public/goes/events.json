@@ -1,6 +1,6 @@
 {
- "generated_at": "2026-11-15T00:25:21+00:00",
- "source": "Google Earth Engine: NOAA GOES-16/19 ABI MCMIPF; NASA MODIS MOD09GA/MYD09GA",
+ "generated_at": "2026-11-15T01:01:03+00:00",
+ "source": "Google Earth Engine: USGS Landsat 8/9 C2 TOA, ESA Sentinel-2 L1C, NASA MODIS MOD09GA/MYD09GA",
  "events": [
   {
    "id": "cholila-2015",
@@ -11,55 +11,207 @@
     "2015-02-23",
     "2015-02-25"
    ],
-   "note": "pre-GOES-16: imágenes diarias MODIS Terra/Aqua",
-   "bounds": [
+   "center": [
+    -42.403,
+    -71.7968
+   ],
+   "fire_bounds": [
     [
-     -44.1,
-     -72.8
+     -42.615,
+     -72.105
     ],
     [
-     -40.9,
-     -70.2
+     -42.005,
+     -71.355
     ]
    ],
-   "sensors": [
-    "MODIS Aqua (500 m)",
-    "MODIS Terra (500 m)"
-   ],
-   "frames": {
-    "natural": [
-     {
-      "time": "2015-02-18T13:30:00Z",
-      "file": "natural_20150218T1330Z.jpg",
-      "sat": "MODIS Terra"
-     },
-     {
-      "time": "2015-02-18T16:30:00Z",
-      "file": "natural_20150218T1630Z.jpg",
-      "sat": "MODIS Aqua"
-     },
-     {
-      "time": "2015-02-23T13:30:00Z",
-      "file": "natural_20150223T1330Z.jpg",
-      "sat": "MODIS Terra"
-     },
-     {
-      "time": "2015-02-23T16:30:00Z",
-      "file": "natural_20150223T1630Z.jpg",
-      "sat": "MODIS Aqua"
-     },
-     {
-      "time": "2015-02-25T13:30:00Z",
-      "file": "natural_20150225T1330Z.jpg",
-      "sat": "MODIS Terra"
-     },
-     {
-      "time": "2015-02-25T16:30:00Z",
-      "file": "natural_20150225T1630Z.jpg",
-      "sat": "MODIS Aqua"
+   "scenes": [
+    {
+     "time": "2015-02-22T14:29:00Z",
+     "day": "2015-02-22",
+     "sensor": "Landsat 8",
+     "resolution": "30 m",
+     "hot_px": 106,
+     "cloud": 0.19,
+     "detections": 347,
+     "products": {
+      "swir": {
+       "file": "landsat8_20150222T1429Z_swir.jpg",
+       "bounds": [
+        [
+         -42.615,
+         -72.105
+        ],
+        [
+         -42.005,
+         -71.355
+        ]
+       ]
+      },
+      "natural": {
+       "file": "landsat8_20150222T1429Z_natural.jpg",
+       "bounds": [
+        [
+         -42.615,
+         -72.105
+        ],
+        [
+         -42.005,
+         -71.355
+        ]
+       ]
+      }
      }
-    ]
-   }
+    },
+    {
+     "time": "2015-02-23T17:30:00Z",
+     "day": "2015-02-23",
+     "sensor": "MODIS Aqua",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0.03,
+     "detections": 815,
+     "products": {
+      "swir": {
+       "file": "modisaqua_20150223T1730Z_swir.jpg",
+       "bounds": [
+        [
+         -42.885000000000005,
+         -72.555
+        ],
+        [
+         -41.735,
+         -70.72500000000001
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisaqua_20150223T1730Z_natural.jpg",
+       "bounds": [
+        [
+         -42.885000000000005,
+         -72.555
+        ],
+        [
+         -41.735,
+         -70.72500000000001
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2015-02-24T14:30:00Z",
+     "day": "2015-02-24",
+     "sensor": "MODIS Terra",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0.02,
+     "detections": 132,
+     "products": {
+      "swir": {
+       "file": "modisterra_20150224T1430Z_swir.jpg",
+       "bounds": [
+        [
+         -42.885000000000005,
+         -72.555
+        ],
+        [
+         -41.735,
+         -70.72500000000001
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisterra_20150224T1430Z_natural.jpg",
+       "bounds": [
+        [
+         -42.885000000000005,
+         -72.555
+        ],
+        [
+         -41.735,
+         -70.72500000000001
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2015-02-25T14:30:00Z",
+     "day": "2015-02-25",
+     "sensor": "MODIS Terra",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0,
+     "detections": 698,
+     "products": {
+      "swir": {
+       "file": "modisterra_20150225T1430Z_swir.jpg",
+       "bounds": [
+        [
+         -42.885000000000005,
+         -72.555
+        ],
+        [
+         -41.735,
+         -70.72500000000001
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisterra_20150225T1430Z_natural.jpg",
+       "bounds": [
+        [
+         -42.885000000000005,
+         -72.555
+        ],
+        [
+         -41.735,
+         -70.72500000000001
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2015-02-26T14:30:00Z",
+     "day": "2015-02-26",
+     "sensor": "MODIS Terra",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0.01,
+     "detections": 428,
+     "products": {
+      "swir": {
+       "file": "modisterra_20150226T1430Z_swir.jpg",
+       "bounds": [
+        [
+         -42.885000000000005,
+         -72.555
+        ],
+        [
+         -41.735,
+         -70.72500000000001
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisterra_20150226T1430Z_natural.jpg",
+       "bounds": [
+        [
+         -42.885000000000005,
+         -72.555
+        ],
+        [
+         -41.735,
+         -70.72500000000001
+        ]
+       ]
+      }
+     }
+    }
+   ]
   },
   {
    "id": "comarca-2021",
@@ -69,1029 +221,1700 @@
     "2021-03-09",
     "2021-03-10"
    ],
-   "note": null,
-   "bounds": [
+   "center": [
+    -42.0186,
+    -71.2475
+   ],
+   "fire_bounds": [
     [
-     -44.1,
-     -72.8
+     -42.235,
+     -71.595
     ],
     [
-     -40.9,
-     -70.2
+     -41.835,
+     -71.055
     ]
    ],
-   "sensors": [
-    "GOES-16 ABI (2 km)"
-   ],
-   "frames": {
-    "natural": [
-     {
-      "time": "2021-03-09T11:00:00Z",
-      "file": "natural_20210309T1100Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-09T12:00:00Z",
-      "file": "natural_20210309T1200Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-09T13:00:00Z",
-      "file": "natural_20210309T1300Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-09T14:00:00Z",
-      "file": "natural_20210309T1400Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-09T15:00:00Z",
-      "file": "natural_20210309T1500Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-09T16:00:00Z",
-      "file": "natural_20210309T1600Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-09T17:00:00Z",
-      "file": "natural_20210309T1700Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-09T18:00:00Z",
-      "file": "natural_20210309T1800Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-09T19:00:00Z",
-      "file": "natural_20210309T1900Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-09T20:00:00Z",
-      "file": "natural_20210309T2000Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-09T21:00:00Z",
-      "file": "natural_20210309T2100Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-09T22:00:00Z",
-      "file": "natural_20210309T2200Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-09T23:00:00Z",
-      "file": "natural_20210309T2300Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-10T11:00:00Z",
-      "file": "natural_20210310T1100Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-10T12:00:00Z",
-      "file": "natural_20210310T1200Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-10T13:00:00Z",
-      "file": "natural_20210310T1300Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-10T14:00:00Z",
-      "file": "natural_20210310T1400Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-10T15:00:00Z",
-      "file": "natural_20210310T1500Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-10T16:00:00Z",
-      "file": "natural_20210310T1600Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-10T17:00:00Z",
-      "file": "natural_20210310T1700Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-10T18:00:00Z",
-      "file": "natural_20210310T1800Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-10T19:00:00Z",
-      "file": "natural_20210310T1900Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-10T20:00:00Z",
-      "file": "natural_20210310T2000Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-10T21:00:00Z",
-      "file": "natural_20210310T2100Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-10T22:00:00Z",
-      "file": "natural_20210310T2200Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-10T23:00:00Z",
-      "file": "natural_20210310T2300Z.jpg",
-      "sat": "GOES-16"
+   "scenes": [
+    {
+     "time": "2021-03-06T14:44:00Z",
+     "day": "2021-03-06",
+     "sensor": "Sentinel-2",
+     "resolution": "10–20 m",
+     "hot_px": 1,
+     "cloud": 0.16,
+     "detections": 0,
+     "products": {
+      "swir": {
+       "file": "sentinel2_20210306T1444Z_swir.jpg",
+       "bounds": [
+        [
+         -42.235,
+         -71.595
+        ],
+        [
+         -41.835,
+         -71.055
+        ]
+       ]
+      },
+      "natural": {
+       "file": "sentinel2_20210306T1444Z_natural.jpg",
+       "bounds": [
+        [
+         -42.235,
+         -71.595
+        ],
+        [
+         -41.835,
+         -71.055
+        ]
+       ]
+      }
      }
-    ],
-    "firetemp": [
-     {
-      "time": "2021-03-09T11:00:00Z",
-      "file": "firetemp_20210309T1100Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-09T12:00:00Z",
-      "file": "firetemp_20210309T1200Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-09T13:00:00Z",
-      "file": "firetemp_20210309T1300Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-09T14:00:00Z",
-      "file": "firetemp_20210309T1400Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-09T15:00:00Z",
-      "file": "firetemp_20210309T1500Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-09T16:00:00Z",
-      "file": "firetemp_20210309T1600Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-09T17:00:00Z",
-      "file": "firetemp_20210309T1700Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-09T18:00:00Z",
-      "file": "firetemp_20210309T1800Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-09T19:00:00Z",
-      "file": "firetemp_20210309T1900Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-09T20:00:00Z",
-      "file": "firetemp_20210309T2000Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-09T21:00:00Z",
-      "file": "firetemp_20210309T2100Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-09T22:00:00Z",
-      "file": "firetemp_20210309T2200Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-09T23:00:00Z",
-      "file": "firetemp_20210309T2300Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-10T11:00:00Z",
-      "file": "firetemp_20210310T1100Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-10T12:00:00Z",
-      "file": "firetemp_20210310T1200Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-10T13:00:00Z",
-      "file": "firetemp_20210310T1300Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-10T14:00:00Z",
-      "file": "firetemp_20210310T1400Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-10T15:00:00Z",
-      "file": "firetemp_20210310T1500Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-10T16:00:00Z",
-      "file": "firetemp_20210310T1600Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-10T17:00:00Z",
-      "file": "firetemp_20210310T1700Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-10T18:00:00Z",
-      "file": "firetemp_20210310T1800Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-10T19:00:00Z",
-      "file": "firetemp_20210310T1900Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-10T20:00:00Z",
-      "file": "firetemp_20210310T2000Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-10T21:00:00Z",
-      "file": "firetemp_20210310T2100Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-10T22:00:00Z",
-      "file": "firetemp_20210310T2200Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2021-03-10T23:00:00Z",
-      "file": "firetemp_20210310T2300Z.jpg",
-      "sat": "GOES-16"
+    },
+    {
+     "time": "2021-03-08T14:30:00Z",
+     "day": "2021-03-08",
+     "sensor": "MODIS Terra",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0.2,
+     "detections": 90,
+     "products": {
+      "swir": {
+       "file": "modisterra_20210308T1430Z_swir.jpg",
+       "bounds": [
+        [
+         -42.505,
+         -72.045
+        ],
+        [
+         -41.565,
+         -70.42500000000001
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisterra_20210308T1430Z_natural.jpg",
+       "bounds": [
+        [
+         -42.505,
+         -72.045
+        ],
+        [
+         -41.565,
+         -70.42500000000001
+        ]
+       ]
+      }
      }
-    ]
-   }
+    },
+    {
+     "time": "2021-03-09T17:30:00Z",
+     "day": "2021-03-09",
+     "sensor": "MODIS Aqua",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0.0,
+     "detections": 421,
+     "products": {
+      "swir": {
+       "file": "modisaqua_20210309T1730Z_swir.jpg",
+       "bounds": [
+        [
+         -42.505,
+         -72.045
+        ],
+        [
+         -41.565,
+         -70.42500000000001
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisaqua_20210309T1730Z_natural.jpg",
+       "bounds": [
+        [
+         -42.505,
+         -72.045
+        ],
+        [
+         -41.565,
+         -70.42500000000001
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2021-03-10T17:30:00Z",
+     "day": "2021-03-10",
+     "sensor": "MODIS Aqua",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0.72,
+     "detections": 257,
+     "products": {
+      "swir": {
+       "file": "modisaqua_20210310T1730Z_swir.jpg",
+       "bounds": [
+        [
+         -42.505,
+         -72.045
+        ],
+        [
+         -41.565,
+         -70.42500000000001
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisaqua_20210310T1730Z_natural.jpg",
+       "bounds": [
+        [
+         -42.505,
+         -72.045
+        ],
+        [
+         -41.565,
+         -70.42500000000001
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2021-03-11T17:30:00Z",
+     "day": "2021-03-11",
+     "sensor": "MODIS Aqua",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0.55,
+     "detections": 0,
+     "products": {
+      "swir": {
+       "file": "modisaqua_20210311T1730Z_swir.jpg",
+       "bounds": [
+        [
+         -42.505,
+         -72.045
+        ],
+        [
+         -41.565,
+         -70.42500000000001
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisaqua_20210311T1730Z_natural.jpg",
+       "bounds": [
+        [
+         -42.505,
+         -72.045
+        ],
+        [
+         -41.565,
+         -70.42500000000001
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2021-03-16T14:44:00Z",
+     "day": "2021-03-16",
+     "sensor": "Sentinel-2",
+     "resolution": "10–20 m",
+     "hot_px": 0,
+     "cloud": 0.13,
+     "detections": 3,
+     "products": {
+      "swir": {
+       "file": "sentinel2_20210316T1444Z_swir.jpg",
+       "bounds": [
+        [
+         -42.235,
+         -71.595
+        ],
+        [
+         -41.835,
+         -71.055
+        ]
+       ]
+      },
+      "natural": {
+       "file": "sentinel2_20210316T1444Z_natural.jpg",
+       "bounds": [
+        [
+         -42.235,
+         -71.595
+        ],
+        [
+         -41.835,
+         -71.055
+        ]
+       ]
+      }
+     }
+    }
+   ]
   },
   {
-   "id": "patagonia-2025-02",
-   "name": "Incendios de febrero 2025 (Patagonia Andina)",
+   "id": "patagonia-2025-02-n",
+   "name": "Incendio de inicios de febrero 2025 (norte de la Comarca)",
    "region": "PATAGONIA",
    "days": [
     "2025-02-01",
+    "2025-02-02"
+   ],
+   "center": [
+    -41.7234,
+    -71.5944
+   ],
+   "fire_bounds": [
+    [
+     -42.005,
+     -71.825
+    ],
+    [
+     -41.425,
+     -71.335
+    ]
+   ],
+   "scenes": [
+    {
+     "time": "2025-01-29T14:44:00Z",
+     "day": "2025-01-29",
+     "sensor": "Sentinel-2",
+     "resolution": "10–20 m",
+     "hot_px": 16,
+     "cloud": 0.03,
+     "detections": 10,
+     "products": {
+      "swir": {
+       "file": "sentinel2_20250129T1444Z_swir.jpg",
+       "bounds": [
+        [
+         -42.005,
+         -71.825
+        ],
+        [
+         -41.425,
+         -71.335
+        ]
+       ]
+      },
+      "natural": {
+       "file": "sentinel2_20250129T1444Z_natural.jpg",
+       "bounds": [
+        [
+         -42.005,
+         -71.825
+        ],
+        [
+         -41.425,
+         -71.335
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2025-01-31T17:30:00Z",
+     "day": "2025-01-31",
+     "sensor": "MODIS Aqua",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0.02,
+     "detections": 57,
+     "products": {
+      "swir": {
+       "file": "modisaqua_20250131T1730Z_swir.jpg",
+       "bounds": [
+        [
+         -42.275000000000006,
+         -72.275
+        ],
+        [
+         -41.154999999999994,
+         -70.705
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisaqua_20250131T1730Z_natural.jpg",
+       "bounds": [
+        [
+         -42.275000000000006,
+         -72.275
+        ],
+        [
+         -41.154999999999994,
+         -70.705
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2025-02-01T14:29:00Z",
+     "day": "2025-02-01",
+     "sensor": "Landsat 8",
+     "resolution": "30 m",
+     "hot_px": 21,
+     "cloud": 0.08,
+     "detections": 142,
+     "products": {
+      "swir": {
+       "file": "landsat8_20250201T1429Z_swir.jpg",
+       "bounds": [
+        [
+         -42.005,
+         -71.825
+        ],
+        [
+         -41.425,
+         -71.335
+        ]
+       ]
+      },
+      "natural": {
+       "file": "landsat8_20250201T1429Z_natural.jpg",
+       "bounds": [
+        [
+         -42.005,
+         -71.825
+        ],
+        [
+         -41.425,
+         -71.335
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2025-02-01T17:30:00Z",
+     "day": "2025-02-01",
+     "sensor": "MODIS Aqua",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0.02,
+     "detections": 142,
+     "products": {
+      "swir": {
+       "file": "modisaqua_20250201T1730Z_swir.jpg",
+       "bounds": [
+        [
+         -42.275000000000006,
+         -72.275
+        ],
+        [
+         -41.154999999999994,
+         -70.705
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisaqua_20250201T1730Z_natural.jpg",
+       "bounds": [
+        [
+         -42.275000000000006,
+         -72.275
+        ],
+        [
+         -41.154999999999994,
+         -70.705
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2025-02-03T14:44:00Z",
+     "day": "2025-02-03",
+     "sensor": "Sentinel-2",
+     "resolution": "10–20 m",
+     "hot_px": 7,
+     "cloud": 0.72,
+     "detections": 19,
+     "products": {
+      "swir": {
+       "file": "sentinel2_20250203T1444Z_swir.jpg",
+       "bounds": [
+        [
+         -42.005,
+         -71.825
+        ],
+        [
+         -41.425,
+         -71.335
+        ]
+       ]
+      },
+      "natural": {
+       "file": "sentinel2_20250203T1444Z_natural.jpg",
+       "bounds": [
+        [
+         -42.005,
+         -71.825
+        ],
+        [
+         -41.425,
+         -71.335
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2025-02-07T17:30:00Z",
+     "day": "2025-02-07",
+     "sensor": "MODIS Aqua",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0.2,
+     "detections": 67,
+     "products": {
+      "swir": {
+       "file": "modisaqua_20250207T1730Z_swir.jpg",
+       "bounds": [
+        [
+         -42.275000000000006,
+         -72.275
+        ],
+        [
+         -41.154999999999994,
+         -70.705
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisaqua_20250207T1730Z_natural.jpg",
+       "bounds": [
+        [
+         -42.275000000000006,
+         -72.275
+        ],
+        [
+         -41.154999999999994,
+         -70.705
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2025-02-08T14:44:00Z",
+     "day": "2025-02-08",
+     "sensor": "Sentinel-2",
+     "resolution": "10–20 m",
+     "hot_px": 32,
+     "cloud": 0.0,
+     "detections": 48,
+     "products": {
+      "swir": {
+       "file": "sentinel2_20250208T1444Z_swir.jpg",
+       "bounds": [
+        [
+         -42.005,
+         -71.825
+        ],
+        [
+         -41.425,
+         -71.335
+        ]
+       ]
+      },
+      "natural": {
+       "file": "sentinel2_20250208T1444Z_natural.jpg",
+       "bounds": [
+        [
+         -42.005,
+         -71.825
+        ],
+        [
+         -41.425,
+         -71.335
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2025-02-08T17:30:00Z",
+     "day": "2025-02-08",
+     "sensor": "MODIS Aqua",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0.01,
+     "detections": 48,
+     "products": {
+      "swir": {
+       "file": "modisaqua_20250208T1730Z_swir.jpg",
+       "bounds": [
+        [
+         -42.275000000000006,
+         -72.275
+        ],
+        [
+         -41.154999999999994,
+         -70.705
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisaqua_20250208T1730Z_natural.jpg",
+       "bounds": [
+        [
+         -42.275000000000006,
+         -72.275
+        ],
+        [
+         -41.154999999999994,
+         -70.705
+        ]
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "patagonia-2025-02-s",
+   "name": "Incendio de fines de febrero 2025 (sur de la región)",
+   "region": "PATAGONIA",
+   "days": [
+    "2025-02-23",
     "2025-02-24"
    ],
-   "note": null,
-   "bounds": [
+   "center": [
+    -42.9973,
+    -71.3547
+   ],
+   "fire_bounds": [
     [
-     -44.1,
-     -72.8
+     -43.165,
+     -71.735
     ],
     [
-     -40.9,
-     -70.2
+     -42.815,
+     -70.955
     ]
    ],
-   "sensors": [
-    "GOES-16 ABI (2 km)"
-   ],
-   "frames": {
-    "natural": [
-     {
-      "time": "2025-02-01T11:00:00Z",
-      "file": "natural_20250201T1100Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-01T12:00:00Z",
-      "file": "natural_20250201T1200Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-01T13:00:00Z",
-      "file": "natural_20250201T1300Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-01T14:00:00Z",
-      "file": "natural_20250201T1400Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-01T15:00:00Z",
-      "file": "natural_20250201T1500Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-01T16:00:00Z",
-      "file": "natural_20250201T1600Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-01T17:00:00Z",
-      "file": "natural_20250201T1700Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-01T21:00:00Z",
-      "file": "natural_20250201T2100Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-01T22:00:00Z",
-      "file": "natural_20250201T2200Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-01T23:00:00Z",
-      "file": "natural_20250201T2300Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-24T11:00:00Z",
-      "file": "natural_20250224T1100Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-24T12:00:00Z",
-      "file": "natural_20250224T1200Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-24T13:00:00Z",
-      "file": "natural_20250224T1300Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-24T14:00:00Z",
-      "file": "natural_20250224T1400Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-24T15:00:00Z",
-      "file": "natural_20250224T1500Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-24T16:00:00Z",
-      "file": "natural_20250224T1600Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-24T17:00:00Z",
-      "file": "natural_20250224T1700Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-24T18:00:00Z",
-      "file": "natural_20250224T1800Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-24T19:00:00Z",
-      "file": "natural_20250224T1900Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-24T20:00:00Z",
-      "file": "natural_20250224T2000Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-24T21:00:00Z",
-      "file": "natural_20250224T2100Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-24T22:00:00Z",
-      "file": "natural_20250224T2200Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-24T23:00:00Z",
-      "file": "natural_20250224T2300Z.jpg",
-      "sat": "GOES-16"
+   "scenes": [
+    {
+     "time": "2025-02-17T14:30:00Z",
+     "day": "2025-02-17",
+     "sensor": "Landsat 8",
+     "resolution": "30 m",
+     "hot_px": 2,
+     "cloud": 0.0,
+     "detections": 67,
+     "products": {
+      "swir": {
+       "file": "landsat8_20250217T1430Z_swir.jpg",
+       "bounds": [
+        [
+         -43.165,
+         -71.735
+        ],
+        [
+         -42.815,
+         -70.955
+        ]
+       ]
+      },
+      "natural": {
+       "file": "landsat8_20250217T1430Z_natural.jpg",
+       "bounds": [
+        [
+         -43.165,
+         -71.735
+        ],
+        [
+         -42.815,
+         -70.955
+        ]
+       ]
+      }
      }
-    ],
-    "firetemp": [
-     {
-      "time": "2025-02-01T11:00:00Z",
-      "file": "firetemp_20250201T1100Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-01T12:00:00Z",
-      "file": "firetemp_20250201T1200Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-01T13:00:00Z",
-      "file": "firetemp_20250201T1300Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-01T14:00:00Z",
-      "file": "firetemp_20250201T1400Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-01T15:00:00Z",
-      "file": "firetemp_20250201T1500Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-01T16:00:00Z",
-      "file": "firetemp_20250201T1600Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-01T17:00:00Z",
-      "file": "firetemp_20250201T1700Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-01T21:00:00Z",
-      "file": "firetemp_20250201T2100Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-01T22:00:00Z",
-      "file": "firetemp_20250201T2200Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-01T23:00:00Z",
-      "file": "firetemp_20250201T2300Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-24T11:00:00Z",
-      "file": "firetemp_20250224T1100Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-24T12:00:00Z",
-      "file": "firetemp_20250224T1200Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-24T13:00:00Z",
-      "file": "firetemp_20250224T1300Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-24T14:00:00Z",
-      "file": "firetemp_20250224T1400Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-24T15:00:00Z",
-      "file": "firetemp_20250224T1500Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-24T16:00:00Z",
-      "file": "firetemp_20250224T1600Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-24T17:00:00Z",
-      "file": "firetemp_20250224T1700Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-24T18:00:00Z",
-      "file": "firetemp_20250224T1800Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-24T19:00:00Z",
-      "file": "firetemp_20250224T1900Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-24T20:00:00Z",
-      "file": "firetemp_20250224T2000Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-24T21:00:00Z",
-      "file": "firetemp_20250224T2100Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-24T22:00:00Z",
-      "file": "firetemp_20250224T2200Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2025-02-24T23:00:00Z",
-      "file": "firetemp_20250224T2300Z.jpg",
-      "sat": "GOES-16"
+    },
+    {
+     "time": "2025-02-17T14:30:00Z",
+     "day": "2025-02-17",
+     "sensor": "MODIS Terra",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0.02,
+     "detections": 67,
+     "products": {
+      "swir": {
+       "file": "modisterra_20250217T1430Z_swir.jpg",
+       "bounds": [
+        [
+         -43.435,
+         -72.185
+        ],
+        [
+         -42.544999999999995,
+         -70.325
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisterra_20250217T1430Z_natural.jpg",
+       "bounds": [
+        [
+         -43.435,
+         -72.185
+        ],
+        [
+         -42.544999999999995,
+         -70.325
+        ]
+       ]
+      }
      }
-    ]
-   }
+    },
+    {
+     "time": "2025-02-23T14:45:00Z",
+     "day": "2025-02-23",
+     "sensor": "Sentinel-2",
+     "resolution": "10–20 m",
+     "hot_px": 64,
+     "cloud": 0.22,
+     "detections": 109,
+     "products": {
+      "swir": {
+       "file": "sentinel2_20250223T1445Z_swir.jpg",
+       "bounds": [
+        [
+         -43.165,
+         -71.735
+        ],
+        [
+         -42.815,
+         -70.955
+        ]
+       ]
+      },
+      "natural": {
+       "file": "sentinel2_20250223T1445Z_natural.jpg",
+       "bounds": [
+        [
+         -43.165,
+         -71.735
+        ],
+        [
+         -42.815,
+         -70.955
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2025-02-23T17:30:00Z",
+     "day": "2025-02-23",
+     "sensor": "MODIS Aqua",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0.45,
+     "detections": 109,
+     "products": {
+      "swir": {
+       "file": "modisaqua_20250223T1730Z_swir.jpg",
+       "bounds": [
+        [
+         -43.435,
+         -72.185
+        ],
+        [
+         -42.544999999999995,
+         -70.325
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisaqua_20250223T1730Z_natural.jpg",
+       "bounds": [
+        [
+         -43.435,
+         -72.185
+        ],
+        [
+         -42.544999999999995,
+         -70.325
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2025-02-24T17:30:00Z",
+     "day": "2025-02-24",
+     "sensor": "MODIS Aqua",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0.39,
+     "detections": 144,
+     "products": {
+      "swir": {
+       "file": "modisaqua_20250224T1730Z_swir.jpg",
+       "bounds": [
+        [
+         -43.435,
+         -72.185
+        ],
+        [
+         -42.544999999999995,
+         -70.325
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisaqua_20250224T1730Z_natural.jpg",
+       "bounds": [
+        [
+         -43.435,
+         -72.185
+        ],
+        [
+         -42.544999999999995,
+         -70.325
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2025-02-25T14:30:00Z",
+     "day": "2025-02-25",
+     "sensor": "Landsat 9",
+     "resolution": "30 m",
+     "hot_px": 46,
+     "cloud": 0.84,
+     "detections": 66,
+     "products": {
+      "swir": {
+       "file": "landsat9_20250225T1430Z_swir.jpg",
+       "bounds": [
+        [
+         -43.165,
+         -71.735
+        ],
+        [
+         -42.815,
+         -70.955
+        ]
+       ]
+      },
+      "natural": {
+       "file": "landsat9_20250225T1430Z_natural.jpg",
+       "bounds": [
+        [
+         -43.165,
+         -71.735
+        ],
+        [
+         -42.815,
+         -70.955
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2025-02-26T14:23:00Z",
+     "day": "2025-02-26",
+     "sensor": "Landsat 8",
+     "resolution": "30 m",
+     "hot_px": 30,
+     "cloud": 0.03,
+     "detections": 42,
+     "products": {
+      "swir": {
+       "file": "landsat8_20250226T1423Z_swir.jpg",
+       "bounds": [
+        [
+         -43.165,
+         -71.735
+        ],
+        [
+         -42.815,
+         -70.955
+        ]
+       ]
+      },
+      "natural": {
+       "file": "landsat8_20250226T1423Z_natural.jpg",
+       "bounds": [
+        [
+         -43.165,
+         -71.735
+        ],
+        [
+         -42.815,
+         -70.955
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2025-02-26T14:30:00Z",
+     "day": "2025-02-26",
+     "sensor": "MODIS Terra",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0.04,
+     "detections": 42,
+     "products": {
+      "swir": {
+       "file": "modisterra_20250226T1430Z_swir.jpg",
+       "bounds": [
+        [
+         -43.435,
+         -72.185
+        ],
+        [
+         -42.544999999999995,
+         -70.325
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisterra_20250226T1430Z_natural.jpg",
+       "bounds": [
+        [
+         -43.435,
+         -72.185
+        ],
+        [
+         -42.544999999999995,
+         -70.325
+        ]
+       ]
+      }
+     }
+    }
+   ]
   },
   {
    "id": "patagonia-2025-12",
-   "name": "Incendios de diciembre 2025 (Patagonia Andina)",
+   "name": "Incendio de diciembre 2025 (Patagonia Andina)",
    "region": "PATAGONIA",
    "days": [
     "2025-12-09"
    ],
-   "note": null,
-   "bounds": [
+   "center": [
+    -42.337,
+    -71.8721
+   ],
+   "fire_bounds": [
     [
-     -44.1,
-     -72.8
+     -42.46,
+     -72.085
     ],
     [
-     -40.9,
-     -70.2
+     -42.16,
+     -71.705
     ]
    ],
-   "sensors": [
-    "GOES-19 ABI (2 km)"
-   ],
-   "frames": {
-    "natural": [
-     {
-      "time": "2025-12-09T11:00:00Z",
-      "file": "natural_20251209T1100Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2025-12-09T12:00:00Z",
-      "file": "natural_20251209T1200Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2025-12-09T13:00:00Z",
-      "file": "natural_20251209T1300Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2025-12-09T14:00:00Z",
-      "file": "natural_20251209T1400Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2025-12-09T15:00:00Z",
-      "file": "natural_20251209T1500Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2025-12-09T16:00:00Z",
-      "file": "natural_20251209T1600Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2025-12-09T17:00:00Z",
-      "file": "natural_20251209T1700Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2025-12-09T18:00:00Z",
-      "file": "natural_20251209T1800Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2025-12-09T19:00:00Z",
-      "file": "natural_20251209T1900Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2025-12-09T20:00:00Z",
-      "file": "natural_20251209T2000Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2025-12-09T21:00:00Z",
-      "file": "natural_20251209T2100Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2025-12-09T22:00:00Z",
-      "file": "natural_20251209T2200Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2025-12-09T23:00:00Z",
-      "file": "natural_20251209T2300Z.jpg",
-      "sat": "GOES-19"
+   "scenes": [
+    {
+     "time": "2025-12-05T14:44:00Z",
+     "day": "2025-12-05",
+     "sensor": "Sentinel-2",
+     "resolution": "10–20 m",
+     "hot_px": 117,
+     "cloud": 0.45,
+     "detections": 101,
+     "products": {
+      "swir": {
+       "file": "sentinel2_20251205T1444Z_swir.jpg",
+       "bounds": [
+        [
+         -42.46,
+         -72.085
+        ],
+        [
+         -42.16,
+         -71.705
+        ]
+       ]
+      },
+      "natural": {
+       "file": "sentinel2_20251205T1444Z_natural.jpg",
+       "bounds": [
+        [
+         -42.46,
+         -72.085
+        ],
+        [
+         -42.16,
+         -71.705
+        ]
+       ]
+      }
      }
-    ],
-    "firetemp": [
-     {
-      "time": "2025-12-09T11:00:00Z",
-      "file": "firetemp_20251209T1100Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2025-12-09T12:00:00Z",
-      "file": "firetemp_20251209T1200Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2025-12-09T13:00:00Z",
-      "file": "firetemp_20251209T1300Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2025-12-09T14:00:00Z",
-      "file": "firetemp_20251209T1400Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2025-12-09T15:00:00Z",
-      "file": "firetemp_20251209T1500Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2025-12-09T16:00:00Z",
-      "file": "firetemp_20251209T1600Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2025-12-09T17:00:00Z",
-      "file": "firetemp_20251209T1700Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2025-12-09T18:00:00Z",
-      "file": "firetemp_20251209T1800Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2025-12-09T19:00:00Z",
-      "file": "firetemp_20251209T1900Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2025-12-09T20:00:00Z",
-      "file": "firetemp_20251209T2000Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2025-12-09T21:00:00Z",
-      "file": "firetemp_20251209T2100Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2025-12-09T22:00:00Z",
-      "file": "firetemp_20251209T2200Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2025-12-09T23:00:00Z",
-      "file": "firetemp_20251209T2300Z.jpg",
-      "sat": "GOES-19"
+    },
+    {
+     "time": "2025-12-06T17:30:00Z",
+     "day": "2025-12-06",
+     "sensor": "MODIS Aqua",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0.05,
+     "detections": 103,
+     "products": {
+      "swir": {
+       "file": "modisaqua_20251206T1730Z_swir.jpg",
+       "bounds": [
+        [
+         -42.730000000000004,
+         -72.535
+        ],
+        [
+         -41.88999999999999,
+         -71.075
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisaqua_20251206T1730Z_natural.jpg",
+       "bounds": [
+        [
+         -42.730000000000004,
+         -72.535
+        ],
+        [
+         -41.88999999999999,
+         -71.075
+        ]
+       ]
+      }
      }
-    ]
-   }
+    },
+    {
+     "time": "2025-12-07T17:30:00Z",
+     "day": "2025-12-07",
+     "sensor": "MODIS Aqua",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0.01,
+     "detections": 138,
+     "products": {
+      "swir": {
+       "file": "modisaqua_20251207T1730Z_swir.jpg",
+       "bounds": [
+        [
+         -42.730000000000004,
+         -72.535
+        ],
+        [
+         -41.88999999999999,
+         -71.075
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisaqua_20251207T1730Z_natural.jpg",
+       "bounds": [
+        [
+         -42.730000000000004,
+         -72.535
+        ],
+        [
+         -41.88999999999999,
+         -71.075
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2025-12-08T17:30:00Z",
+     "day": "2025-12-08",
+     "sensor": "MODIS Aqua",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0,
+     "detections": 87,
+     "products": {
+      "swir": {
+       "file": "modisaqua_20251208T1730Z_swir.jpg",
+       "bounds": [
+        [
+         -42.730000000000004,
+         -72.535
+        ],
+        [
+         -41.88999999999999,
+         -71.075
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisaqua_20251208T1730Z_natural.jpg",
+       "bounds": [
+        [
+         -42.730000000000004,
+         -72.535
+        ],
+        [
+         -41.88999999999999,
+         -71.075
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2025-12-09T14:30:00Z",
+     "day": "2025-12-09",
+     "sensor": "MODIS Terra",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0.24,
+     "detections": 132,
+     "products": {
+      "swir": {
+       "file": "modisterra_20251209T1430Z_swir.jpg",
+       "bounds": [
+        [
+         -42.730000000000004,
+         -72.535
+        ],
+        [
+         -41.88999999999999,
+         -71.075
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisterra_20251209T1430Z_natural.jpg",
+       "bounds": [
+        [
+         -42.730000000000004,
+         -72.535
+        ],
+        [
+         -41.88999999999999,
+         -71.075
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2025-12-10T14:30:00Z",
+     "day": "2025-12-10",
+     "sensor": "Landsat 9",
+     "resolution": "30 m",
+     "hot_px": 57,
+     "cloud": 0.2,
+     "detections": 103,
+     "products": {
+      "swir": {
+       "file": "landsat9_20251210T1430Z_swir.jpg",
+       "bounds": [
+        [
+         -42.46,
+         -72.085
+        ],
+        [
+         -42.16,
+         -71.705
+        ]
+       ]
+      },
+      "natural": {
+       "file": "landsat9_20251210T1430Z_natural.jpg",
+       "bounds": [
+        [
+         -42.46,
+         -72.085
+        ],
+        [
+         -42.16,
+         -71.705
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2025-12-10T14:44:00Z",
+     "day": "2025-12-10",
+     "sensor": "Sentinel-2",
+     "resolution": "10–20 m",
+     "hot_px": 55,
+     "cloud": 0.11,
+     "detections": 103,
+     "products": {
+      "swir": {
+       "file": "sentinel2_20251210T1444Z_swir.jpg",
+       "bounds": [
+        [
+         -42.46,
+         -72.085
+        ],
+        [
+         -42.16,
+         -71.705
+        ]
+       ]
+      },
+      "natural": {
+       "file": "sentinel2_20251210T1444Z_natural.jpg",
+       "bounds": [
+        [
+         -42.46,
+         -72.085
+        ],
+        [
+         -42.16,
+         -71.705
+        ]
+       ]
+      }
+     }
+    }
+   ]
   },
   {
    "id": "patagonia-2026-01",
-   "name": "Incendios de enero 2026 (Patagonia Andina)",
+   "name": "Incendios de enero 2026 (Comarca Andina)",
    "region": "PATAGONIA",
    "days": [
     "2026-01-10",
     "2026-01-26"
    ],
-   "note": null,
-   "bounds": [
+   "center": [
+    -42.446,
+    -71.4842
+   ],
+   "fire_bounds": [
     [
-     -44.1,
-     -72.8
+     -42.875,
+     -71.995
     ],
     [
-     -40.9,
-     -70.2
+     -42.025,
+     -71.125
     ]
    ],
-   "sensors": [
-    "GOES-19 ABI (2 km)"
-   ],
-   "frames": {
-    "natural": [
-     {
-      "time": "2026-01-10T11:00:00Z",
-      "file": "natural_20260110T1100Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-10T12:00:00Z",
-      "file": "natural_20260110T1200Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-10T13:00:00Z",
-      "file": "natural_20260110T1300Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-10T14:00:00Z",
-      "file": "natural_20260110T1400Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-10T15:00:00Z",
-      "file": "natural_20260110T1500Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-10T16:00:00Z",
-      "file": "natural_20260110T1600Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-10T17:00:00Z",
-      "file": "natural_20260110T1700Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-10T18:00:00Z",
-      "file": "natural_20260110T1800Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-10T19:00:00Z",
-      "file": "natural_20260110T1900Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-10T20:00:00Z",
-      "file": "natural_20260110T2000Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-10T21:00:00Z",
-      "file": "natural_20260110T2100Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-10T22:00:00Z",
-      "file": "natural_20260110T2200Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-10T23:00:00Z",
-      "file": "natural_20260110T2300Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-26T11:00:00Z",
-      "file": "natural_20260126T1100Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-26T12:00:00Z",
-      "file": "natural_20260126T1200Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-26T13:00:00Z",
-      "file": "natural_20260126T1300Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-26T14:00:00Z",
-      "file": "natural_20260126T1400Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-26T15:00:00Z",
-      "file": "natural_20260126T1500Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-26T16:00:00Z",
-      "file": "natural_20260126T1600Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-26T17:00:00Z",
-      "file": "natural_20260126T1700Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-26T18:00:00Z",
-      "file": "natural_20260126T1800Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-26T19:00:00Z",
-      "file": "natural_20260126T1900Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-26T20:00:00Z",
-      "file": "natural_20260126T2000Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-26T21:00:00Z",
-      "file": "natural_20260126T2100Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-26T22:00:00Z",
-      "file": "natural_20260126T2200Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-26T23:00:00Z",
-      "file": "natural_20260126T2300Z.jpg",
-      "sat": "GOES-19"
+   "scenes": [
+    {
+     "time": "2026-01-07T14:30:00Z",
+     "day": "2026-01-07",
+     "sensor": "MODIS Terra",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0.13,
+     "detections": 735,
+     "products": {
+      "swir": {
+       "file": "modisterra_20260107T1430Z_swir.jpg",
+       "bounds": [
+        [
+         -43.145,
+         -72.44500000000001
+        ],
+        [
+         -41.754999999999995,
+         -70.495
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisterra_20260107T1430Z_natural.jpg",
+       "bounds": [
+        [
+         -43.145,
+         -72.44500000000001
+        ],
+        [
+         -41.754999999999995,
+         -70.495
+        ]
+       ]
+      }
      }
-    ],
-    "firetemp": [
-     {
-      "time": "2026-01-10T11:00:00Z",
-      "file": "firetemp_20260110T1100Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-10T12:00:00Z",
-      "file": "firetemp_20260110T1200Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-10T13:00:00Z",
-      "file": "firetemp_20260110T1300Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-10T14:00:00Z",
-      "file": "firetemp_20260110T1400Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-10T15:00:00Z",
-      "file": "firetemp_20260110T1500Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-10T16:00:00Z",
-      "file": "firetemp_20260110T1600Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-10T17:00:00Z",
-      "file": "firetemp_20260110T1700Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-10T18:00:00Z",
-      "file": "firetemp_20260110T1800Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-10T19:00:00Z",
-      "file": "firetemp_20260110T1900Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-10T20:00:00Z",
-      "file": "firetemp_20260110T2000Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-10T21:00:00Z",
-      "file": "firetemp_20260110T2100Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-10T22:00:00Z",
-      "file": "firetemp_20260110T2200Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-10T23:00:00Z",
-      "file": "firetemp_20260110T2300Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-26T11:00:00Z",
-      "file": "firetemp_20260126T1100Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-26T12:00:00Z",
-      "file": "firetemp_20260126T1200Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-26T13:00:00Z",
-      "file": "firetemp_20260126T1300Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-26T14:00:00Z",
-      "file": "firetemp_20260126T1400Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-26T15:00:00Z",
-      "file": "firetemp_20260126T1500Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-26T16:00:00Z",
-      "file": "firetemp_20260126T1600Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-26T17:00:00Z",
-      "file": "firetemp_20260126T1700Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-26T18:00:00Z",
-      "file": "firetemp_20260126T1800Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-26T19:00:00Z",
-      "file": "firetemp_20260126T1900Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-26T20:00:00Z",
-      "file": "firetemp_20260126T2000Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-26T21:00:00Z",
-      "file": "firetemp_20260126T2100Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-26T22:00:00Z",
-      "file": "firetemp_20260126T2200Z.jpg",
-      "sat": "GOES-19"
-     },
-     {
-      "time": "2026-01-26T23:00:00Z",
-      "file": "firetemp_20260126T2300Z.jpg",
-      "sat": "GOES-19"
+    },
+    {
+     "time": "2026-01-08T14:30:00Z",
+     "day": "2026-01-08",
+     "sensor": "MODIS Terra",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0.02,
+     "detections": 487,
+     "products": {
+      "swir": {
+       "file": "modisterra_20260108T1430Z_swir.jpg",
+       "bounds": [
+        [
+         -43.145,
+         -72.44500000000001
+        ],
+        [
+         -41.754999999999995,
+         -70.495
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisterra_20260108T1430Z_natural.jpg",
+       "bounds": [
+        [
+         -43.145,
+         -72.44500000000001
+        ],
+        [
+         -41.754999999999995,
+         -70.495
+        ]
+       ]
+      }
      }
-    ]
-   }
+    },
+    {
+     "time": "2026-01-09T14:44:00Z",
+     "day": "2026-01-09",
+     "sensor": "Sentinel-2",
+     "resolution": "10–20 m",
+     "hot_px": 247,
+     "cloud": 0.09,
+     "detections": 582,
+     "products": {
+      "swir": {
+       "file": "sentinel2_20260109T1444Z_swir.jpg",
+       "bounds": [
+        [
+         -42.875,
+         -71.995
+        ],
+        [
+         -42.025,
+         -71.125
+        ]
+       ]
+      },
+      "natural": {
+       "file": "sentinel2_20260109T1444Z_natural.jpg",
+       "bounds": [
+        [
+         -42.875,
+         -71.995
+        ],
+        [
+         -42.025,
+         -71.125
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2026-01-10T14:30:00Z",
+     "day": "2026-01-10",
+     "sensor": "MODIS Terra",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0.27,
+     "detections": 856,
+     "products": {
+      "swir": {
+       "file": "modisterra_20260110T1430Z_swir.jpg",
+       "bounds": [
+        [
+         -43.145,
+         -72.44500000000001
+        ],
+        [
+         -41.754999999999995,
+         -70.495
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisterra_20260110T1430Z_natural.jpg",
+       "bounds": [
+        [
+         -43.145,
+         -72.44500000000001
+        ],
+        [
+         -41.754999999999995,
+         -70.495
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2026-01-11T14:30:00Z",
+     "day": "2026-01-11",
+     "sensor": "Landsat 9",
+     "resolution": "30 m",
+     "hot_px": 445,
+     "cloud": 0.29,
+     "detections": 434,
+     "products": {
+      "swir": {
+       "file": "landsat9_20260111T1430Z_swir.jpg",
+       "bounds": [
+        [
+         -42.875,
+         -71.995
+        ],
+        [
+         -42.025,
+         -71.125
+        ]
+       ]
+      },
+      "natural": {
+       "file": "landsat9_20260111T1430Z_natural.jpg",
+       "bounds": [
+        [
+         -42.875,
+         -71.995
+        ],
+        [
+         -42.025,
+         -71.125
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2026-01-11T14:44:00Z",
+     "day": "2026-01-11",
+     "sensor": "Sentinel-2",
+     "resolution": "10–20 m",
+     "hot_px": 580,
+     "cloud": 0.3,
+     "detections": 434,
+     "products": {
+      "swir": {
+       "file": "sentinel2_20260111T1444Z_swir.jpg",
+       "bounds": [
+        [
+         -42.875,
+         -71.995
+        ],
+        [
+         -42.025,
+         -71.125
+        ]
+       ]
+      },
+      "natural": {
+       "file": "sentinel2_20260111T1444Z_natural.jpg",
+       "bounds": [
+        [
+         -42.875,
+         -71.995
+        ],
+        [
+         -42.025,
+         -71.125
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2026-01-25T14:30:00Z",
+     "day": "2026-01-25",
+     "sensor": "MODIS Terra",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0.17,
+     "detections": 757,
+     "products": {
+      "swir": {
+       "file": "modisterra_20260125T1430Z_swir.jpg",
+       "bounds": [
+        [
+         -43.145,
+         -72.44500000000001
+        ],
+        [
+         -41.754999999999995,
+         -70.495
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisterra_20260125T1430Z_natural.jpg",
+       "bounds": [
+        [
+         -43.145,
+         -72.44500000000001
+        ],
+        [
+         -41.754999999999995,
+         -70.495
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2026-01-27T14:30:00Z",
+     "day": "2026-01-27",
+     "sensor": "Landsat 9",
+     "resolution": "30 m",
+     "hot_px": 371,
+     "cloud": 0.79,
+     "detections": 333,
+     "products": {
+      "swir": {
+       "file": "landsat9_20260127T1430Z_swir.jpg",
+       "bounds": [
+        [
+         -42.875,
+         -71.995
+        ],
+        [
+         -42.025,
+         -71.125
+        ]
+       ]
+      },
+      "natural": {
+       "file": "landsat9_20260127T1430Z_natural.jpg",
+       "bounds": [
+        [
+         -42.875,
+         -71.995
+        ],
+        [
+         -42.025,
+         -71.125
+        ]
+       ]
+      }
+     }
+    }
+   ]
   },
   {
    "id": "cordoba-2013",
    "name": "Incendios de septiembre 2013 (Sierras de Córdoba)",
    "region": "CORDOBA",
    "days": [
+    "2013-09-09",
     "2013-09-10"
    ],
-   "note": "pre-GOES-16: imágenes diarias MODIS",
-   "bounds": [
+   "center": [
+    -31.7778,
+    -64.6537
+   ],
+   "fire_bounds": [
     [
-     -33.2,
-     -65.8
+     -32.205,
+     -65.205
     ],
     [
-     -30.2,
-     -63.4
+     -31.375,
+     -64.215
     ]
    ],
-   "sensors": [
-    "MODIS Aqua (500 m)",
-    "MODIS Terra (500 m)"
-   ],
-   "frames": {
-    "natural": [
-     {
-      "time": "2013-09-10T13:30:00Z",
-      "file": "natural_20130910T1330Z.jpg",
-      "sat": "MODIS Terra"
-     },
-     {
-      "time": "2013-09-10T16:30:00Z",
-      "file": "natural_20130910T1630Z.jpg",
-      "sat": "MODIS Aqua"
+   "scenes": [
+    {
+     "time": "2013-09-07T14:10:00Z",
+     "day": "2013-09-07",
+     "sensor": "Landsat 8",
+     "resolution": "30 m",
+     "hot_px": 8,
+     "cloud": 0.08,
+     "detections": 5,
+     "products": {
+      "swir": {
+       "file": "landsat8_20130907T1410Z_swir.jpg",
+       "bounds": [
+        [
+         -32.205,
+         -65.205
+        ],
+        [
+         -31.375,
+         -64.215
+        ]
+       ]
+      },
+      "natural": {
+       "file": "landsat8_20130907T1410Z_natural.jpg",
+       "bounds": [
+        [
+         -32.205,
+         -65.205
+        ],
+        [
+         -31.375,
+         -64.215
+        ]
+       ]
+      }
      }
-    ]
-   }
+    },
+    {
+     "time": "2013-09-08T14:30:00Z",
+     "day": "2013-09-08",
+     "sensor": "MODIS Terra",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0.0,
+     "detections": 91,
+     "products": {
+      "swir": {
+       "file": "modisterra_20130908T1430Z_swir.jpg",
+       "bounds": [
+        [
+         -32.475,
+         -65.655
+        ],
+        [
+         -31.105,
+         -63.585
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisterra_20130908T1430Z_natural.jpg",
+       "bounds": [
+        [
+         -32.475,
+         -65.655
+        ],
+        [
+         -31.105,
+         -63.585
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2013-09-09T17:30:00Z",
+     "day": "2013-09-09",
+     "sensor": "MODIS Aqua",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0.4,
+     "detections": 520,
+     "products": {
+      "swir": {
+       "file": "modisaqua_20130909T1730Z_swir.jpg",
+       "bounds": [
+        [
+         -32.475,
+         -65.655
+        ],
+        [
+         -31.105,
+         -63.585
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisaqua_20130909T1730Z_natural.jpg",
+       "bounds": [
+        [
+         -32.475,
+         -65.655
+        ],
+        [
+         -31.105,
+         -63.585
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2013-09-10T14:30:00Z",
+     "day": "2013-09-10",
+     "sensor": "MODIS Terra",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0.01,
+     "detections": 2733,
+     "products": {
+      "swir": {
+       "file": "modisterra_20130910T1430Z_swir.jpg",
+       "bounds": [
+        [
+         -32.475,
+         -65.655
+        ],
+        [
+         -31.105,
+         -63.585
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisterra_20130910T1430Z_natural.jpg",
+       "bounds": [
+        [
+         -32.475,
+         -65.655
+        ],
+        [
+         -31.105,
+         -63.585
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2013-09-11T14:30:00Z",
+     "day": "2013-09-11",
+     "sensor": "MODIS Terra",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0.01,
+     "detections": 75,
+     "products": {
+      "swir": {
+       "file": "modisterra_20130911T1430Z_swir.jpg",
+       "bounds": [
+        [
+         -32.475,
+         -65.655
+        ],
+        [
+         -31.105,
+         -63.585
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisterra_20130911T1430Z_natural.jpg",
+       "bounds": [
+        [
+         -32.475,
+         -65.655
+        ],
+        [
+         -31.105,
+         -63.585
+        ]
+       ]
+      }
+     }
+    }
+   ]
   },
   {
    "id": "cordoba-2020",
@@ -1101,444 +1924,639 @@
     "2020-09-28",
     "2020-10-02"
    ],
-   "note": null,
-   "bounds": [
+   "center": [
+    -31.1524,
+    -64.797
+   ],
+   "fire_bounds": [
     [
-     -33.2,
-     -65.8
+     -31.575,
+     -65.065
     ],
     [
-     -30.2,
-     -63.4
+     -30.775,
+     -64.245
     ]
    ],
-   "sensors": [
-    "GOES-16 ABI (2 km)"
-   ],
-   "frames": {
-    "natural": [
-     {
-      "time": "2020-09-28T11:00:00Z",
-      "file": "natural_20200928T1100Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-09-28T12:00:00Z",
-      "file": "natural_20200928T1200Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-09-28T13:00:00Z",
-      "file": "natural_20200928T1300Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-09-28T14:00:00Z",
-      "file": "natural_20200928T1400Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-09-28T15:00:00Z",
-      "file": "natural_20200928T1500Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-09-28T16:00:00Z",
-      "file": "natural_20200928T1600Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-09-28T17:00:00Z",
-      "file": "natural_20200928T1700Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-09-28T18:00:00Z",
-      "file": "natural_20200928T1800Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-09-28T19:00:00Z",
-      "file": "natural_20200928T1900Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-09-28T20:00:00Z",
-      "file": "natural_20200928T2000Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-09-28T21:00:00Z",
-      "file": "natural_20200928T2100Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-09-28T22:00:00Z",
-      "file": "natural_20200928T2200Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-09-28T23:00:00Z",
-      "file": "natural_20200928T2300Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-10-02T11:00:00Z",
-      "file": "natural_20201002T1100Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-10-02T12:00:00Z",
-      "file": "natural_20201002T1200Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-10-02T13:00:00Z",
-      "file": "natural_20201002T1300Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-10-02T14:00:00Z",
-      "file": "natural_20201002T1400Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-10-02T15:00:00Z",
-      "file": "natural_20201002T1500Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-10-02T16:00:00Z",
-      "file": "natural_20201002T1600Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-10-02T17:00:00Z",
-      "file": "natural_20201002T1700Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-10-02T18:00:00Z",
-      "file": "natural_20201002T1800Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-10-02T19:00:00Z",
-      "file": "natural_20201002T1900Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-10-02T20:00:00Z",
-      "file": "natural_20201002T2000Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-10-02T21:00:00Z",
-      "file": "natural_20201002T2100Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-10-02T22:00:00Z",
-      "file": "natural_20201002T2200Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-10-02T23:00:00Z",
-      "file": "natural_20201002T2300Z.jpg",
-      "sat": "GOES-16"
+   "scenes": [
+    {
+     "time": "2020-09-24T14:31:00Z",
+     "day": "2020-09-24",
+     "sensor": "Sentinel-2",
+     "resolution": "10–20 m",
+     "hot_px": 1134,
+     "cloud": 0.86,
+     "detections": 294,
+     "products": {
+      "swir": {
+       "file": "sentinel2_20200924T1431Z_swir.jpg",
+       "bounds": [
+        [
+         -31.575,
+         -65.065
+        ],
+        [
+         -30.775,
+         -64.245
+        ]
+       ]
+      },
+      "natural": {
+       "file": "sentinel2_20200924T1431Z_natural.jpg",
+       "bounds": [
+        [
+         -31.575,
+         -65.065
+        ],
+        [
+         -30.775,
+         -64.245
+        ]
+       ]
+      }
      }
-    ],
-    "firetemp": [
-     {
-      "time": "2020-09-28T11:00:00Z",
-      "file": "firetemp_20200928T1100Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-09-28T12:00:00Z",
-      "file": "firetemp_20200928T1200Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-09-28T13:00:00Z",
-      "file": "firetemp_20200928T1300Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-09-28T14:00:00Z",
-      "file": "firetemp_20200928T1400Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-09-28T15:00:00Z",
-      "file": "firetemp_20200928T1500Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-09-28T16:00:00Z",
-      "file": "firetemp_20200928T1600Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-09-28T17:00:00Z",
-      "file": "firetemp_20200928T1700Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-09-28T18:00:00Z",
-      "file": "firetemp_20200928T1800Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-09-28T19:00:00Z",
-      "file": "firetemp_20200928T1900Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-09-28T20:00:00Z",
-      "file": "firetemp_20200928T2000Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-09-28T21:00:00Z",
-      "file": "firetemp_20200928T2100Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-09-28T22:00:00Z",
-      "file": "firetemp_20200928T2200Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-09-28T23:00:00Z",
-      "file": "firetemp_20200928T2300Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-10-02T11:00:00Z",
-      "file": "firetemp_20201002T1100Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-10-02T12:00:00Z",
-      "file": "firetemp_20201002T1200Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-10-02T13:00:00Z",
-      "file": "firetemp_20201002T1300Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-10-02T14:00:00Z",
-      "file": "firetemp_20201002T1400Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-10-02T15:00:00Z",
-      "file": "firetemp_20201002T1500Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-10-02T16:00:00Z",
-      "file": "firetemp_20201002T1600Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-10-02T17:00:00Z",
-      "file": "firetemp_20201002T1700Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-10-02T18:00:00Z",
-      "file": "firetemp_20201002T1800Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-10-02T19:00:00Z",
-      "file": "firetemp_20201002T1900Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-10-02T20:00:00Z",
-      "file": "firetemp_20201002T2000Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-10-02T21:00:00Z",
-      "file": "firetemp_20201002T2100Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-10-02T22:00:00Z",
-      "file": "firetemp_20201002T2200Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2020-10-02T23:00:00Z",
-      "file": "firetemp_20201002T2300Z.jpg",
-      "sat": "GOES-16"
+    },
+    {
+     "time": "2020-09-26T14:08:00Z",
+     "day": "2020-09-26",
+     "sensor": "Landsat 8",
+     "resolution": "30 m",
+     "hot_px": 123,
+     "cloud": 0.37,
+     "detections": 208,
+     "products": {
+      "swir": {
+       "file": "landsat8_20200926T1408Z_swir.jpg",
+       "bounds": [
+        [
+         -31.575,
+         -65.065
+        ],
+        [
+         -30.775,
+         -64.245
+        ]
+       ]
+      },
+      "natural": {
+       "file": "landsat8_20200926T1408Z_natural.jpg",
+       "bounds": [
+        [
+         -31.575,
+         -65.065
+        ],
+        [
+         -30.775,
+         -64.245
+        ]
+       ]
+      }
      }
-    ]
-   }
+    },
+    {
+     "time": "2020-09-27T14:30:00Z",
+     "day": "2020-09-27",
+     "sensor": "MODIS Terra",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0.02,
+     "detections": 425,
+     "products": {
+      "swir": {
+       "file": "modisterra_20200927T1430Z_swir.jpg",
+       "bounds": [
+        [
+         -31.845,
+         -65.515
+        ],
+        [
+         -30.505,
+         -63.615
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisterra_20200927T1430Z_natural.jpg",
+       "bounds": [
+        [
+         -31.845,
+         -65.515
+        ],
+        [
+         -30.505,
+         -63.615
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2020-09-28T17:30:00Z",
+     "day": "2020-09-28",
+     "sensor": "MODIS Aqua",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0.0,
+     "detections": 689,
+     "products": {
+      "swir": {
+       "file": "modisaqua_20200928T1730Z_swir.jpg",
+       "bounds": [
+        [
+         -31.845,
+         -65.515
+        ],
+        [
+         -30.505,
+         -63.615
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisaqua_20200928T1730Z_natural.jpg",
+       "bounds": [
+        [
+         -31.845,
+         -65.515
+        ],
+        [
+         -30.505,
+         -63.615
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2020-09-29T14:30:00Z",
+     "day": "2020-09-29",
+     "sensor": "MODIS Terra",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0,
+     "detections": 450,
+     "products": {
+      "swir": {
+       "file": "modisterra_20200929T1430Z_swir.jpg",
+       "bounds": [
+        [
+         -31.845,
+         -65.515
+        ],
+        [
+         -30.505,
+         -63.615
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisterra_20200929T1430Z_natural.jpg",
+       "bounds": [
+        [
+         -31.845,
+         -65.515
+        ],
+        [
+         -30.505,
+         -63.615
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2020-09-29T14:31:00Z",
+     "day": "2020-09-29",
+     "sensor": "Sentinel-2",
+     "resolution": "10–20 m",
+     "hot_px": 504,
+     "cloud": 0.0,
+     "detections": 450,
+     "products": {
+      "swir": {
+       "file": "sentinel2_20200929T1431Z_swir.jpg",
+       "bounds": [
+        [
+         -31.575,
+         -65.065
+        ],
+        [
+         -30.775,
+         -64.245
+        ]
+       ]
+      },
+      "natural": {
+       "file": "sentinel2_20200929T1431Z_natural.jpg",
+       "bounds": [
+        [
+         -31.575,
+         -65.065
+        ],
+        [
+         -30.775,
+         -64.245
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2020-10-02T14:30:00Z",
+     "day": "2020-10-02",
+     "sensor": "MODIS Terra",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0.01,
+     "detections": 561,
+     "products": {
+      "swir": {
+       "file": "modisterra_20201002T1430Z_swir.jpg",
+       "bounds": [
+        [
+         -31.845,
+         -65.515
+        ],
+        [
+         -30.505,
+         -63.615
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisterra_20201002T1430Z_natural.jpg",
+       "bounds": [
+        [
+         -31.845,
+         -65.515
+        ],
+        [
+         -30.505,
+         -63.615
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2020-10-03T14:14:00Z",
+     "day": "2020-10-03",
+     "sensor": "Landsat 8",
+     "resolution": "30 m",
+     "hot_px": 108,
+     "cloud": 0.07,
+     "detections": 388,
+     "products": {
+      "swir": {
+       "file": "landsat8_20201003T1414Z_swir.jpg",
+       "bounds": [
+        [
+         -31.575,
+         -65.065
+        ],
+        [
+         -30.775,
+         -64.245
+        ]
+       ]
+      },
+      "natural": {
+       "file": "landsat8_20201003T1414Z_natural.jpg",
+       "bounds": [
+        [
+         -31.575,
+         -65.065
+        ],
+        [
+         -30.775,
+         -64.245
+        ]
+       ]
+      }
+     }
+    }
+   ]
   },
   {
    "id": "cordoba-2024",
    "name": "Incendios de septiembre 2024 (Sierras de Córdoba)",
    "region": "CORDOBA",
    "days": [
-    "2024-09-22"
+    "2024-09-22",
+    "2024-09-23"
    ],
-   "note": null,
-   "bounds": [
+   "center": [
+    -31.0966,
+    -64.5261
+   ],
+   "fire_bounds": [
     [
-     -33.2,
-     -65.8
+     -31.525,
+     -64.925
     ],
     [
-     -30.2,
-     -63.4
+     -30.725,
+     -64.055
     ]
    ],
-   "sensors": [
-    "GOES-16 ABI (2 km)"
-   ],
-   "frames": {
-    "natural": [
-     {
-      "time": "2024-09-22T11:00:00Z",
-      "file": "natural_20240922T1100Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2024-09-22T12:00:00Z",
-      "file": "natural_20240922T1200Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2024-09-22T13:00:00Z",
-      "file": "natural_20240922T1300Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2024-09-22T14:00:00Z",
-      "file": "natural_20240922T1400Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2024-09-22T15:00:00Z",
-      "file": "natural_20240922T1500Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2024-09-22T16:00:00Z",
-      "file": "natural_20240922T1600Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2024-09-22T17:00:00Z",
-      "file": "natural_20240922T1700Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2024-09-22T18:00:00Z",
-      "file": "natural_20240922T1800Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2024-09-22T19:00:00Z",
-      "file": "natural_20240922T1900Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2024-09-22T20:00:00Z",
-      "file": "natural_20240922T2000Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2024-09-22T21:00:00Z",
-      "file": "natural_20240922T2100Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2024-09-22T22:00:00Z",
-      "file": "natural_20240922T2200Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2024-09-22T23:00:00Z",
-      "file": "natural_20240922T2300Z.jpg",
-      "sat": "GOES-16"
+   "scenes": [
+    {
+     "time": "2024-09-20T14:14:00Z",
+     "day": "2024-09-20",
+     "sensor": "Landsat 9",
+     "resolution": "30 m",
+     "hot_px": 402,
+     "cloud": 0.04,
+     "detections": 178,
+     "products": {
+      "swir": {
+       "file": "landsat9_20240920T1414Z_swir.jpg",
+       "bounds": [
+        [
+         -31.525,
+         -64.925
+        ],
+        [
+         -30.725,
+         -64.055
+        ]
+       ]
+      },
+      "natural": {
+       "file": "landsat9_20240920T1414Z_natural.jpg",
+       "bounds": [
+        [
+         -31.525,
+         -64.925
+        ],
+        [
+         -30.725,
+         -64.055
+        ]
+       ]
+      }
      }
-    ],
-    "firetemp": [
-     {
-      "time": "2024-09-22T11:00:00Z",
-      "file": "firetemp_20240922T1100Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2024-09-22T12:00:00Z",
-      "file": "firetemp_20240922T1200Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2024-09-22T13:00:00Z",
-      "file": "firetemp_20240922T1300Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2024-09-22T14:00:00Z",
-      "file": "firetemp_20240922T1400Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2024-09-22T15:00:00Z",
-      "file": "firetemp_20240922T1500Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2024-09-22T16:00:00Z",
-      "file": "firetemp_20240922T1600Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2024-09-22T17:00:00Z",
-      "file": "firetemp_20240922T1700Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2024-09-22T18:00:00Z",
-      "file": "firetemp_20240922T1800Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2024-09-22T19:00:00Z",
-      "file": "firetemp_20240922T1900Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2024-09-22T20:00:00Z",
-      "file": "firetemp_20240922T2000Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2024-09-22T21:00:00Z",
-      "file": "firetemp_20240922T2100Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2024-09-22T22:00:00Z",
-      "file": "firetemp_20240922T2200Z.jpg",
-      "sat": "GOES-16"
-     },
-     {
-      "time": "2024-09-22T23:00:00Z",
-      "file": "firetemp_20240922T2300Z.jpg",
-      "sat": "GOES-16"
+    },
+    {
+     "time": "2024-09-20T14:21:00Z",
+     "day": "2024-09-20",
+     "sensor": "Sentinel-2",
+     "resolution": "10–20 m",
+     "hot_px": 634,
+     "cloud": 0.0,
+     "detections": 178,
+     "products": {
+      "swir": {
+       "file": "sentinel2_20240920T1421Z_swir.jpg",
+       "bounds": [
+        [
+         -31.525,
+         -64.925
+        ],
+        [
+         -30.725,
+         -64.055
+        ]
+       ]
+      },
+      "natural": {
+       "file": "sentinel2_20240920T1421Z_natural.jpg",
+       "bounds": [
+        [
+         -31.525,
+         -64.925
+        ],
+        [
+         -30.725,
+         -64.055
+        ]
+       ]
+      }
      }
-    ]
-   }
+    },
+    {
+     "time": "2024-09-21T14:08:00Z",
+     "day": "2024-09-21",
+     "sensor": "Landsat 8",
+     "resolution": "30 m",
+     "hot_px": 228,
+     "cloud": 0.01,
+     "detections": 402,
+     "products": {
+      "swir": {
+       "file": "landsat8_20240921T1408Z_swir.jpg",
+       "bounds": [
+        [
+         -31.525,
+         -64.925
+        ],
+        [
+         -30.725,
+         -64.055
+        ]
+       ]
+      },
+      "natural": {
+       "file": "landsat8_20240921T1408Z_natural.jpg",
+       "bounds": [
+        [
+         -31.525,
+         -64.925
+        ],
+        [
+         -30.725,
+         -64.055
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2024-09-21T17:30:00Z",
+     "day": "2024-09-21",
+     "sensor": "MODIS Aqua",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0.17,
+     "detections": 402,
+     "products": {
+      "swir": {
+       "file": "modisaqua_20240921T1730Z_swir.jpg",
+       "bounds": [
+        [
+         -31.794999999999998,
+         -65.375
+        ],
+        [
+         -30.455000000000002,
+         -63.425000000000004
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisaqua_20240921T1730Z_natural.jpg",
+       "bounds": [
+        [
+         -31.794999999999998,
+         -65.375
+        ],
+        [
+         -30.455000000000002,
+         -63.425000000000004
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2024-09-22T14:30:00Z",
+     "day": "2024-09-22",
+     "sensor": "MODIS Terra",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0.0,
+     "detections": 397,
+     "products": {
+      "swir": {
+       "file": "modisterra_20240922T1430Z_swir.jpg",
+       "bounds": [
+        [
+         -31.794999999999998,
+         -65.375
+        ],
+        [
+         -30.455000000000002,
+         -63.425000000000004
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisterra_20240922T1430Z_natural.jpg",
+       "bounds": [
+        [
+         -31.794999999999998,
+         -65.375
+        ],
+        [
+         -30.455000000000002,
+         -63.425000000000004
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2024-09-23T14:31:00Z",
+     "day": "2024-09-23",
+     "sensor": "Sentinel-2",
+     "resolution": "10–20 m",
+     "hot_px": 379,
+     "cloud": 0.56,
+     "detections": 564,
+     "products": {
+      "swir": {
+       "file": "sentinel2_20240923T1431Z_swir.jpg",
+       "bounds": [
+        [
+         -31.525,
+         -64.925
+        ],
+        [
+         -30.725,
+         -64.055
+        ]
+       ]
+      },
+      "natural": {
+       "file": "sentinel2_20240923T1431Z_natural.jpg",
+       "bounds": [
+        [
+         -31.525,
+         -64.925
+        ],
+        [
+         -30.725,
+         -64.055
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2024-09-23T17:30:00Z",
+     "day": "2024-09-23",
+     "sensor": "MODIS Aqua",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0.0,
+     "detections": 564,
+     "products": {
+      "swir": {
+       "file": "modisaqua_20240923T1730Z_swir.jpg",
+       "bounds": [
+        [
+         -31.794999999999998,
+         -65.375
+        ],
+        [
+         -30.455000000000002,
+         -63.425000000000004
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisaqua_20240923T1730Z_natural.jpg",
+       "bounds": [
+        [
+         -31.794999999999998,
+         -65.375
+        ],
+        [
+         -30.455000000000002,
+         -63.425000000000004
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "time": "2024-09-24T14:30:00Z",
+     "day": "2024-09-24",
+     "sensor": "MODIS Terra",
+     "resolution": "500 m",
+     "hot_px": null,
+     "cloud": 0.0,
+     "detections": 473,
+     "products": {
+      "swir": {
+       "file": "modisterra_20240924T1430Z_swir.jpg",
+       "bounds": [
+        [
+         -31.794999999999998,
+         -65.375
+        ],
+        [
+         -30.455000000000002,
+         -63.425000000000004
+        ]
+       ]
+      },
+      "natural": {
+       "file": "modisterra_20240924T1430Z_natural.jpg",
+       "bounds": [
+        [
+         -31.794999999999998,
+         -65.375
+        ],
+        [
+         -30.455000000000002,
+         -63.425000000000004
+        ]
+       ]
+      }
+     }
+    }
+   ]
   }
  ]
 }

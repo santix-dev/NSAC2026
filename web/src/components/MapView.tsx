@@ -35,8 +35,13 @@ export interface GoesOverlay {
   times: string[];
   index: number;
   opacity: number;
-  /** Incendio histórico exportado con Earth Engine: imágenes estáticas en lugar de mosaicos GIBS */
-  images?: { bounds: [[number, number], [number, number]]; urls: string[] };
+}
+
+/** Escenas de un incendio histórico (Landsat / Sentinel-2 / MODIS), cada una con sus límites. */
+export interface SceneOverlay {
+  index: number;
+  opacity: number;
+  items: { url: string; bounds: [[number, number], [number, number]] }[];
 }
 
 export interface WindOverlay {
@@ -56,6 +61,9 @@ export interface MapViewProps {
   wind: WindOverlay | null;
   liveFires: LiveFire[];
   goes: GoesOverlay | null;
+  scenes?: SceneOverlay | null;
+  /** Encuadrar el mapa en estos límites (cambia `key` para volver a hacerlo) */
+  focus?: { bounds: [[number, number], [number, number]]; key: number } | null;
   show: {
     live: boolean;
     hotspots: boolean;
@@ -176,7 +184,15 @@ function useProtectedAreas(enabled: boolean): FeatureCollection | null {
   return fc;
 }
 
-export default function MapView({ bbox, hotspots, spread, susceptibility, iot, wind, liveFires, goes, show }: MapViewProps) {
+function FocusBounds({ focus }: { focus: { bounds: [[number, number], [number, number]]; key: number } }) {
+  const map = useMap();
+  useEffect(() => {
+    map.flyToBounds(focus.bounds, { padding: [30, 30], duration: 0.8 });
+  }, [map, focus.key, focus.bounds]);
+  return null;
+}
+
+export default function MapView({ bbox, hotspots, spread, susceptibility, iot, wind, liveFires, goes, scenes, focus, show }: MapViewProps) {
   const parks = useProtectedAreas(show.park);
   const drawn = useMemo(
     () =>
@@ -203,17 +219,7 @@ export default function MapView({ bbox, hotspots, spread, susceptibility, iot, w
 
       {show.goes && goes && goes.times.length > 0 && (
         <Pane name="goes" style={{ zIndex: 350 }}>
-          {goes.images
-            ? goes.images.urls.map((u, i) => (
-                <ImageOverlay
-                  key={u}
-                  url={u}
-                  bounds={goes.images!.bounds}
-                  opacity={i === goes.index ? goes.opacity : 0}
-                  attribution="NOAA GOES / NASA MODIS vía Google Earth Engine"
-                />
-              ))
-            : goes.times.map((t, i) => (
+          {goes.times.map((t, i) => (
             <TileLayer
               key={`${goes.product}-${t}`}
               url={goesTileUrl(goes.product, t)}
@@ -221,9 +227,28 @@ export default function MapView({ bbox, hotspots, spread, susceptibility, iot, w
               opacity={i === goes.index ? goes.opacity : 0}
               attribution="GOES-19 ABI · NOAA / NASA GIBS"
             />
-              ))}
+          ))}
         </Pane>
       )}
+
+      {show.goes && scenes && scenes.items.length > 0 && (
+        <Pane name="scenes" style={{ zIndex: 360 }}>
+          {scenes.items.map((it, i) =>
+            // solo se montan la escena actual y las vecinas (precarga) para no bajar todas
+            Math.abs(i - scenes.index) <= 1 && it.url ? (
+              <ImageOverlay
+                key={it.url}
+                url={it.url}
+                bounds={it.bounds}
+                opacity={i === scenes.index ? scenes.opacity : 0}
+                attribution="USGS Landsat · ESA Sentinel-2 · NASA MODIS vía Google Earth Engine"
+              />
+            ) : null,
+          )}
+        </Pane>
+      )}
+
+      {focus && <FocusBounds focus={focus} />}
 
       {show.park && parks && (
         <GeoJSON

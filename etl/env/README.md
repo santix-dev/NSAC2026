@@ -23,18 +23,24 @@ python etl/env/build_aux.py                               # -> etl/aux_data/terr
 python etl/harmonize.py                                   # re-procesa: env_source = 'AUX'
 ```
 
-## Imágenes satelitales de incendios históricos (GOES-16/19 y MODIS)
+## Imágenes de incendios históricos (fuego y humo visibles)
 
-NASA GIBS solo guarda ~90 días de GOES-Este, así que para los incendios clave se exportan imágenes
-offline con Earth Engine (eventos en `etl/env/goes_events.json`, editable):
+GOES tiene píxeles de 2 km (3–4 km en Patagonia): un incendio puntual casi no se distingue y NASA GIBS
+solo guarda ~90 días. Para los incendios clave, `fire_imagery.py` **rastrea** cada incendio con
+Earth Engine y elige las imágenes donde se ve:
+
+1. Ubica el incendio con los focos armonizados (`etl/harmonized_output.csv`): recuadro ajustado y días activos.
+2. Revisa todas las pasadas en ±6 días de **Landsat 8/9** (30 m) y **Sentinel-2** (10–20 m, desde jun-2015)
+   y mide píxeles de fuego activo (criterio de Schroeder et al. 2016), nubes y cobertura.
+3. Revisa **MODIS Terra/Aqua** (500 m) en los días con más focos y menos nubes, para la columna de humo.
+4. Exporta las mejores en dos versiones: **onda corta** (SWIR2–NIR–rojo: el frente de fuego en
+   naranja/amarillo, el humo casi transparente) y **color natural** (humo).
 
 ```bash
-python etl/env/goes_events.py --project ispstars          # ~8 eventos, unos minutos; reanudable
-python etl/env/goes_events.py --project ispstars --only cordoba-2020 --force
+python etl/env/fire_imagery.py --project ispstars             # requiere haber corrido harmonize.py
+python etl/env/fire_imagery.py --project ispstars --only cholila-2015 --force
 ```
 
-- Desde jul-2017: GOES-16 (hasta 07-04-2025) o GOES-19 ABI, 1 imagen por hora de 8 a 20 h (hora AR),
-  en color natural (verde sintético) y "Fire Temperature RGB".
-- Antes (Cholila 2015, Córdoba 2013): MODIS Terra y Aqua, 2 imágenes por día.
-- Salida: `web/public/goes/<evento>/*.jpg` + `web/public/goes/events.json`. Se sube con git y la web
-  la muestra al elegir ese año y mes (capa "Imagen satelital (humo)").
+Eventos en `etl/env/fire_events.json` (un incendio por evento; editable). Salida:
+`web/public/goes/<evento>/*.jpg` + `web/public/goes/events.json`. La web los muestra al elegir ese
+año y mes con la capa "Imagen satelital (humo)", y acerca el mapa al incendio.

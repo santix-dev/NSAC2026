@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { CloudSun, Pause, Play, Trees } from "lucide-react";
 import {
   fetchGoesMonth,
@@ -12,8 +12,18 @@ import {
   type GoesProduct,
 } from "@/lib/goes";
 import { MONTHS_LONG } from "@/lib/regions";
-import { arDay } from "@/lib/goes";
-import { eventFrameUrl, eventProductKey, eventsFor, eventsNear, loadGoesEvents, type GoesEvent } from "@/lib/goesEvents";
+import {
+  eventsFor,
+  eventsNear,
+  loadFireEvents,
+  SCENE_PRODUCTS,
+  sceneBounds,
+  sceneLabel,
+  sceneUrl,
+  type FireEvent,
+  type SceneProduct,
+} from "@/lib/goesEvents";
+import { ChevronLeft, ChevronRight, Crosshair } from "lucide-react";
 import dynamic from "next/dynamic";
 import { ChevronDown, Flame, Layers, Loader2, Navigation, Radio, Route, Satellite, ShieldAlert, Wind } from "lucide-react";
 import type { MapLayers } from "@/types/fire";
@@ -76,9 +86,11 @@ export default function MapSelector(props: Props) {
   const [goesPlaying, setGoesPlaying] = useState(false);
   const [goesError, setGoesError] = useState<string | null>(null);
   /** Incendio histórico exportado con Earth Engine que cubre la fecha elegida */
-  const [goesEvent, setGoesEvent] = useState<GoesEvent | null>(null);
-  const [eventUrls, setEventUrls] = useState<Map<string, string>>(new Map());
-  const [nearEvents, setNearEvents] = useState<GoesEvent[]>([]);
+  // Incendios históricos con escenas elegidas offline (Landsat / Sentinel-2 / MODIS)
+  const [allEvents, setAllEvents] = useState<FireEvent[]>([]);
+  const [eventId, setEventId] = useState<string | null>(null);
+  const [sceneIdx, setSceneIdx] = useState(0);
+  const [sceneProduct, setSceneProduct] = useState<SceneProduct>("swir");
   const { year: gYear, month: gMonth, preferredDay, center } = props.goesDate;
   const historic = gMonth != null;
 
@@ -92,8 +104,6 @@ export default function MapSelector(props: Props) {
         if (!historic) {
           const t = await fetchGoesTimes(goesProduct);
           if (cancelled) return;
-          setGoesEvent(null);
-          setEventUrls(new Map());
           setGoesDays(new Map());
           setGoesDay(null);
           setGoesTimes(t);
@@ -101,31 +111,9 @@ export default function MapSelector(props: Props) {
           setGoesError(t.length ? null : "Sin imagen GOES reciente en NASA GIBS");
           return;
         }
-        // 1) incendio histórico exportado (Earth Engine) para ese mes y zona
-        const events = await loadGoesEvents();
+        // Archivo de NASA GIBS (~90 días)
+        const days = await fetchGoesMonth(goesProduct, gYear, gMonth!);
         if (cancelled) return;
-        setNearEvents(eventsNear(events, center));
-        const ev = eventsFor(events, gYear, gMonth!, center)[0];
-        let days: Map<string, string[]>;
-        if (ev) {
-          const frames = ev.frames[eventProductKey(goesProduct)] ?? ev.frames.natural ?? [];
-          days = new Map();
-          const urls = new Map<string, string>();
-          for (const f of frames) {
-            const d = arDay(f.time);
-            if (!days.has(d)) days.set(d, []);
-            days.get(d)!.push(f.time);
-            urls.set(f.time, eventFrameUrl(ev, f));
-          }
-          setGoesEvent(ev);
-          setEventUrls(urls);
-        } else {
-          // 2) archivo de NASA GIBS (~90 días)
-          setGoesEvent(null);
-          setEventUrls(new Map());
-          days = await fetchGoesMonth(goesProduct, gYear, gMonth!);
-          if (cancelled) return;
-        }
         setGoesDays(days);
         const keys = [...days.keys()];
         if (!keys.length) {
@@ -160,7 +148,7 @@ export default function MapSelector(props: Props) {
       setGoesError(null);
     }, 0);
     // Los metadatos de GIBS listan horarios ya purgados: se verifica un mosaico real
-    if (t[idx] && !goesEvent)
+    if (t[idx])
       void goesTileExists(goesProduct, t[idx], center[0], center[1]).then((ok) => {
         if (!cancelled && !ok) setGoesError("Sin imagen GOES para esta fecha (ya no está en el archivo de NASA GIBS).");
       });
@@ -168,7 +156,48 @@ export default function MapSelector(props: Props) {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [historic, goesDay, goesDays, goesProduct, center, goesEvent]);
+  }, [historic, goesDay, goesDays, goesProduct, center]);
+
+  // ---- incendios históricos: catálogo y evento del mes elegido
+  useEffect(() => {
+    if (!layers.goes) return;
+    let cancelled = false;
+    void loadFireEvents().then((e) => !cancelled && setAllEvents(e));
+    return () => {
+      cancelled = true;
+    };
+  }, [layers.goes]);
+  const monthEvents = useMemo(
+    () => (historic ? eventsFor(allEvents, gYear, gMonth!, center) : []),
+    [allEvents, historic, gYear, gMonth, center],
+  );
+  const nearEvents = useMemo(() => eventsNear(allEvents, center), [allEvents, center]);
+  const fireEvent = monthEvents.find((e) => e.id === eventId) ?? monthEvents[0] ?? null;
+  const scenes = useMemo(() => {
+    if (!fireEvent) return [];
+    const key = `${gYear}-${String(gMonth).padStart(2, "0")}`;
+    const inMonth = fireEvent.scenes.filter((s) => s.day.startsWith(key));
+    return inMonth.length ? inMonth : fireEvent.scenes;
+  }, [fireEvent, gYear, gMonth]);
+  // Escena inicial: la que más fuego muestra (o la del día pico)
+  useEffect(() => {
+    if (!scenes.length) return;
+    let best = scenes.findIndex((s) => s.day === preferredDay);
+    const hottest = scenes.reduce((b, s, i) => ((s.hot_px ?? 0) > (scenes[b].hot_px ?? 0) ? i : b), 0);
+    if ((scenes[hottest].hot_px ?? 0) > 0) best = hottest;
+    const t = setTimeout(() => setSceneIdx(Math.max(0, best)), 0);
+    return () => clearTimeout(t);
+  }, [scenes, preferredDay]);
+  const scene = scenes[Math.min(sceneIdx, scenes.length - 1)] ?? null;
+  const [focus, setFocus] = useState<{ bounds: [[number, number], [number, number]]; key: number } | null>(null);
+  // Al aparecer un incendio histórico, el mapa se acerca solo a su recuadro
+  const fireId = fireEvent?.id;
+  const fireBounds = fireEvent?.fire_bounds;
+  useEffect(() => {
+    if (!fireId || !fireBounds) return;
+    const t = setTimeout(() => setFocus({ bounds: fireBounds, key: Date.now() }), 0);
+    return () => clearTimeout(t);
+  }, [fireId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!goesPlaying || goesTimes.length < 2) return;
@@ -188,18 +217,25 @@ export default function MapSelector(props: Props) {
         wind={wind}
         liveFires={props.liveFires}
         goes={
-          layers.goes && !goesError
+          layers.goes && !goesError && !fireEvent
             ? {
                 product: goesProduct,
                 times: goesTimes,
                 index: goesIndex,
                 opacity: goesOpacity,
-                images: goesEvent
-                  ? { bounds: goesEvent.bounds, urls: goesTimes.map((t) => eventUrls.get(t) ?? "") }
-                  : undefined,
               }
             : null
         }
+        scenes={
+          layers.goes && fireEvent && scenes.length
+            ? {
+                index: Math.min(sceneIdx, scenes.length - 1),
+                opacity: goesOpacity,
+                items: scenes.map((s) => ({ url: sceneUrl(fireEvent, s, sceneProduct) ?? "", bounds: sceneBounds(s, sceneProduct)! })),
+              }
+            : null
+        }
+        focus={focus}
         show={layers}
       />
 
@@ -270,8 +306,108 @@ export default function MapSelector(props: Props) {
         )}
       </fieldset>
 
+      {/* Incendio histórico: escenas que muestran el fuego / humo */}
+      {layers.goes && fireEvent && scene && (
+        <div className="absolute bottom-6 left-1/2 z-[1000] w-[min(460px,calc(100%-1.5rem))] -translate-x-1/2 rounded-lg border border-slate-800 bg-slate-950/90 px-3 py-2 text-[11px] text-slate-300 shadow-xl backdrop-blur">
+          <div className="flex items-center gap-2">
+            {monthEvents.length > 1 ? (
+              <select
+                value={fireEvent.id}
+                onChange={(e) => setEventId(e.target.value)}
+                className="min-w-0 flex-1 truncate rounded border border-slate-700 bg-slate-900 px-1.5 py-0.5 text-[11px] font-semibold text-slate-100"
+                aria-label="Incendio"
+              >
+                {monthEvents.map((e) => (
+                  <option key={e.id} value={e.id}>
+                    {e.name}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <p className="min-w-0 flex-1 truncate text-[12px] font-semibold text-slate-100">{fireEvent.name}</p>
+            )}
+            <button
+              type="button"
+              onClick={() => setFocus({ bounds: fireEvent.fire_bounds, key: Date.now() })}
+              className="flex shrink-0 items-center gap-1 rounded-md border border-orange-700/70 bg-orange-500/10 px-2 py-0.5 text-[11px] text-orange-200 hover:bg-orange-500/20"
+            >
+              <Crosshair className="h-3.5 w-3.5" aria-hidden /> Ir al incendio
+            </button>
+          </div>
+          <div className="mt-1.5 flex items-center gap-1.5">
+            <button
+              type="button"
+              disabled={sceneIdx <= 0}
+              onClick={() => setSceneIdx((i) => Math.max(0, i - 1))}
+              className="rounded border border-slate-700 p-0.5 hover:bg-slate-800 disabled:opacity-30"
+              aria-label="Imagen anterior"
+            >
+              <ChevronLeft className="h-3.5 w-3.5" />
+            </button>
+            <select
+              value={Math.min(sceneIdx, scenes.length - 1)}
+              onChange={(e) => setSceneIdx(+e.target.value)}
+              className="min-w-0 flex-1 rounded border border-slate-700 bg-slate-900 px-1.5 py-0.5 text-[11px] text-slate-200"
+              aria-label="Imagen"
+            >
+              {scenes.map((s, i) => (
+                <option key={s.time + s.sensor} value={i}>
+                  {sceneLabel(s)}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              disabled={sceneIdx >= scenes.length - 1}
+              onClick={() => setSceneIdx((i) => Math.min(scenes.length - 1, i + 1))}
+              className="rounded border border-slate-700 p-0.5 hover:bg-slate-800 disabled:opacity-30"
+              aria-label="Imagen siguiente"
+            >
+              <ChevronRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
+          <div className="mt-1.5 flex flex-wrap items-center gap-2">
+            <div className="flex rounded border border-slate-700 p-0.5" role="group" aria-label="Producto">
+              {(Object.keys(SCENE_PRODUCTS) as SceneProduct[]).map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  aria-pressed={sceneProduct === p}
+                  onClick={() => setSceneProduct(p)}
+                  className={`rounded px-2 py-0.5 text-[11px] ${sceneProduct === p ? "bg-slate-700 text-white" : "text-slate-400 hover:text-slate-200"}`}
+                >
+                  {SCENE_PRODUCTS[p].label}
+                </button>
+              ))}
+            </div>
+            <label className="flex items-center gap-1 text-slate-400">
+              Opacidad
+              <input type="range" min={0.2} max={1} step={0.1} value={goesOpacity} onChange={(e) => setGoesOpacity(+e.target.value)} className="w-16 accent-sky-400" />
+            </label>
+            <label className="ml-auto flex cursor-pointer items-center gap-1 text-slate-400" title="Los puntos de focos tapan la imagen">
+              <input
+                type="checkbox"
+                checked={!layers.hotspots}
+                onChange={() => {
+                  onToggleLayer("hotspots");
+                  if (layers.hotspots === layers.spread) onToggleLayer("spread");
+                }}
+                className="h-3 w-3 accent-orange-500"
+              />
+              Ver imagen limpia
+            </label>
+          </div>
+          <p className="mt-1 text-[10px] text-slate-500">
+            {SCENE_PRODUCTS[sceneProduct].hint}.{" "}
+            {scene.hot_px ? `${scene.hot_px.toLocaleString("es-AR")} píxeles de fuego activo · ` : ""}
+            {scene.detections ? `${scene.detections} detecciones FIRMS ese día · ` : ""}nubes {Math.round(scene.cloud * 100)} % ·{" "}
+            {scenes.length} imágenes elegidas por mostrar fuego o humo (Earth Engine).
+          </p>
+        </div>
+      )}
+
       {/* GOES-19: reproductor */}
-      {layers.goes && (
+      {layers.goes && !fireEvent && (
         <div className="absolute bottom-6 left-1/2 z-[1000] w-[min(420px,calc(100%-1.5rem))] -translate-x-1/2 rounded-lg border border-slate-800 bg-slate-950/90 px-3 py-2 text-[11px] text-slate-300 shadow-xl backdrop-blur">
           <div className="flex items-center gap-2">
             <button
@@ -340,7 +476,7 @@ export default function MapSelector(props: Props) {
               />
             </label>
             <span className="ml-auto text-[10px] text-slate-500">
-              {goesEvent ? "Earth Engine (NOAA / NASA)" : "GOES-19 ABI · NASA GIBS"} · hora AR
+              GOES-19 ABI · NASA GIBS · hora AR
             </span>
           </div>
           <p className="mt-1 text-[10px] text-slate-500">
@@ -348,10 +484,6 @@ export default function MapSelector(props: Props) {
               <span className="text-amber-300">
                 {goesError} <span className="text-slate-500">{GOES_HISTORY_NOTE}</span>
               </span>
-            ) : goesEvent ? (
-              `${goesEvent.name} · ${goesEvent.sensors.join(", ")} vía Earth Engine${
-                goesProduct === "FireTemp" && !goesEvent.frames.firetemp ? " (solo color natural: no había GOES en esa fecha)" : ""
-              }. ${goesTimes.length} imágenes del día.`
             ) : historic ? (
               `${GOES_PRODUCTS[goesProduct].hint}. ${MONTHS_LONG[gMonth! - 1]} ${gYear}: ${goesDays.size} días con imagen; ${goesTimes.length} imágenes del día (cada 30 min).`
             ) : (

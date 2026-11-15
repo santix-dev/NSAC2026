@@ -1,59 +1,75 @@
 /**
- * Imágenes de incendios históricos exportadas offline con Earth Engine (etl/env/goes_events.py):
- * GOES-16/19 ABI (desde jul-2017) o MODIS Terra/Aqua (antes). Se sirven como archivos estáticos
- * desde /goes/<evento>/ y se dibujan como superposición de imagen en el mapa.
+ * Imágenes de incendios históricos elegidas offline con Earth Engine (etl/env/fire_imagery.py):
+ * escenas Landsat 8/9 y Sentinel-2 (fuego activo en onda corta, 10–30 m) y MODIS Terra/Aqua
+ * (columna de humo, 500 m), seleccionadas porque muestran el fuego o el humo de ESE incendio.
+ * Se sirven como archivos estáticos desde /goes/<evento>/.
  */
-import type { GoesProduct } from "./goes";
+export type SceneProduct = "swir" | "natural";
 
-export interface GoesEventFrame {
+export const SCENE_PRODUCTS: Record<SceneProduct, { label: string; hint: string }> = {
+  swir: { label: "Fuego (onda corta)", hint: "Frente activo en naranja/amarillo; el humo casi no tapa" },
+  natural: { label: "Color natural (humo)", hint: "Columna de humo y nubes como las vería el ojo" },
+};
+
+export interface FireScene {
   time: string; // ISO UTC
-  file: string;
-  sat: string;
+  day: string;
+  sensor: string;
+  resolution: string;
+  hot_px: number | null;
+  cloud: number;
+  detections: number;
+  products: Partial<Record<SceneProduct, { file: string; bounds: [[number, number], [number, number]] }>>;
 }
 
-export interface GoesEvent {
+export interface FireEvent {
   id: string;
   name: string;
   region: string;
-  days: string[]; // YYYY-MM-DD (hora AR)
-  note?: string | null;
-  bounds: [[number, number], [number, number]]; // [[sur, oeste], [norte, este]]
-  sensors: string[];
-  frames: Partial<Record<"natural" | "firetemp", GoesEventFrame[]>>;
+  days: string[];
+  center: [number, number];
+  fire_bounds: [[number, number], [number, number]];
+  scenes: FireScene[];
 }
 
-let cache: Promise<GoesEvent[]> | null = null;
+let cache: Promise<FireEvent[]> | null = null;
 
-export function loadGoesEvents(): Promise<GoesEvent[]> {
+export function loadFireEvents(): Promise<FireEvent[]> {
   if (!cache) {
     cache = fetch("/goes/events.json")
       .then((r) => (r.ok ? r.json() : { events: [] }))
-      .then((j) => (j.events ?? []) as GoesEvent[])
+      .then((j) => ((j.events ?? []) as FireEvent[]).filter((e) => Array.isArray(e.scenes) && e.scenes.length > 0))
       .catch(() => []);
   }
   return cache;
 }
 
-export const eventProductKey = (p: GoesProduct): "natural" | "firetemp" => (p === "FireTemp" ? "firetemp" : "natural");
-
-export function eventFrameUrl(ev: GoesEvent, f: GoesEventFrame): string {
-  return `/goes/${ev.id}/${f.file}`;
+export function sceneUrl(ev: FireEvent, s: FireScene, p: SceneProduct): string | null {
+  const f = s.products[p] ?? s.products.natural ?? s.products.swir;
+  return f ? `/goes/${ev.id}/${f.file}` : null;
 }
 
-/** Eventos cuyo día cae en ese año/mes y cuya área toca la vista. */
-export function eventsFor(events: GoesEvent[], year: number, month: number, center: [number, number]): GoesEvent[] {
+export function sceneBounds(s: FireScene, p: SceneProduct): [[number, number], [number, number]] | null {
+  return (s.products[p] ?? s.products.natural ?? s.products.swir)?.bounds ?? null;
+}
+
+const near = (e: FireEvent, c: [number, number], deg = 2.5) =>
+  Math.abs(e.center[0] - c[0]) <= deg && Math.abs(e.center[1] - c[1]) <= deg * 1.4;
+
+/** Incendios con escenas en ese año/mes cerca de la vista. */
+export function eventsFor(events: FireEvent[], year: number, month: number, center: [number, number]): FireEvent[] {
   const key = `${year}-${String(month).padStart(2, "0")}`;
-  return events.filter((e) => {
-    const [[s, w], [n, ea]] = e.bounds;
-    const inView = center[0] >= s - 2 && center[0] <= n + 2 && center[1] >= w - 2 && center[1] <= ea + 2;
-    return inView && e.days.some((d) => d.startsWith(key));
-  });
+  return events.filter((e) => near(e, center) && e.scenes.some((s) => s.day.startsWith(key)));
 }
 
-/** Eventos de la misma zona (para ofrecer saltar a ellos cuando la fecha no tiene imagen). */
-export function eventsNear(events: GoesEvent[], center: [number, number]): GoesEvent[] {
-  return events.filter((e) => {
-    const [[s, w], [n, ea]] = e.bounds;
-    return center[0] >= s - 2 && center[0] <= n + 2 && center[1] >= w - 2 && center[1] <= ea + 2;
-  });
+/** Incendios de la misma zona (para ofrecer saltar a ellos). */
+export function eventsNear(events: FireEvent[], center: [number, number]): FireEvent[] {
+  return events.filter((e) => near(e, center));
+}
+
+export function sceneLabel(s: FireScene): string {
+  const d = new Date(s.time);
+  const day = d.toLocaleDateString("es-AR", { timeZone: "America/Argentina/Buenos_Aires", day: "numeric", month: "short", year: "numeric" });
+  const what = s.hot_px && s.hot_px > 0 ? ` · fuego visible` : s.sensor.startsWith("MODIS") ? " · humo" : "";
+  return `${day} · ${s.sensor} (${s.resolution})${what}`;
 }

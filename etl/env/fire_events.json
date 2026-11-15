@@ -1,0 +1,14 @@
+{
+  "_comment": "Incendios históricos para fire_imagery.py. 'days' = días pico (hora AR) según los focos armonizados del ETL; el script busca imágenes en ±6 días y elige las que muestran el fuego o el humo. Un evento = un incendio (si en el mes hubo dos focos separados, van como eventos distintos). Los nombres son descriptivos; verificar con fuentes oficiales antes de citarlos.",
+  "events": [
+    { "id": "cholila-2015", "name": "Incendio de Cholila (PN Los Alerces)", "region": "PATAGONIA", "days": ["2015-02-18", "2015-02-23", "2015-02-25"] },
+    { "id": "comarca-2021", "name": "Incendio de la Comarca Andina (Las Golondrinas – El Hoyo)", "region": "PATAGONIA", "days": ["2021-03-09", "2021-03-10"] },
+    { "id": "patagonia-2025-02-n", "name": "Incendio de inicios de febrero 2025 (norte de la Comarca)", "region": "PATAGONIA", "days": ["2025-02-01", "2025-02-02"] },
+    { "id": "patagonia-2025-02-s", "name": "Incendio de fines de febrero 2025 (sur de la región)", "region": "PATAGONIA", "days": ["2025-02-23", "2025-02-24"] },
+    { "id": "patagonia-2025-12", "name": "Incendio de diciembre 2025 (Patagonia Andina)", "region": "PATAGONIA", "days": ["2025-12-09"] },
+    { "id": "patagonia-2026-01", "name": "Incendios de enero 2026 (Comarca Andina)", "region": "PATAGONIA", "days": ["2026-01-10", "2026-01-26"] },
+    { "id": "cordoba-2013", "name": "Incendios de septiembre 2013 (Sierras de Córdoba)", "region": "CORDOBA", "days": ["2013-09-09", "2013-09-10"] },
+    { "id": "cordoba-2020", "name": "Incendios de 2020 (Sierras de Córdoba)", "region": "CORDOBA", "days": ["2020-09-28", "2020-10-02"] },
+    { "id": "cordoba-2024", "name": "Incendios de septiembre 2024 (Sierras de Córdoba)", "region": "CORDOBA", "days": ["2024-09-22", "2024-09-23"] }
+  ]
+}
