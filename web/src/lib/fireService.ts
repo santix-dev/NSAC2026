@@ -114,6 +114,7 @@ function completeCalendar(partial: PartialCell[], regionEnv: RegionMonthEnv[]): 
   }
   const perSensor = partial.some((p) => p.modis_cells != null);
   const sensor = (v: number | null | undefined) => (perSensor ? Number(v ?? 0) : null);
+  const perConc = partial.some((p) => p.concordant_cells != null);
   const cells: CalendarCell[] = [];
   for (const year of YEARS) {
     for (let month = 1; month <= 12; month++) {
@@ -146,6 +147,7 @@ function completeCalendar(partial: PartialCell[], regionEnv: RegionMonthEnv[]): 
         modis_cells: sensor(c?.modis_cells),
         viirs_cells: sensor(c?.viirs_cells),
         both_cells: sensor(c?.both_cells),
+        concordant_cells: c?.concordant_cells != null ? Number(c.concordant_cells) : perConc ? 0 : null,
       });
     }
   }
@@ -154,7 +156,7 @@ function completeCalendar(partial: PartialCell[], regionEnv: RegionMonthEnv[]): 
 
 function aggregateCalendar(rows: HotspotRecord[]): PartialCell[] {
   interface Acc {
-    w: number; raw: number; n: number; nM: number; nV: number; nB: number; frp: number; nFrp: number; cloud: number; soil: number;
+    w: number; raw: number; n: number; nM: number; nV: number; nB: number; nC: number; frp: number; nFrp: number; cloud: number; soil: number;
     slope: number; wind: number; sin: number; cos: number; ndvi: number; nEnv: number;
   }
   const acc = new Map<string, Acc>();
@@ -162,7 +164,7 @@ function aggregateCalendar(rows: HotspotRecord[]): PartialCell[] {
     const key = r.acq_date.slice(0, 7);
     let a = acc.get(key);
     if (!a) {
-      a = { w: 0, raw: 0, n: 0, nM: 0, nV: 0, nB: 0, frp: 0, nFrp: 0, cloud: 0, soil: 0, slope: 0, wind: 0, sin: 0, cos: 0, ndvi: 0, nEnv: 0 };
+      a = { w: 0, raw: 0, n: 0, nM: 0, nV: 0, nB: 0, nC: 0, frp: 0, nFrp: 0, cloud: 0, soil: 0, slope: 0, wind: 0, sin: 0, cos: 0, ndvi: 0, nEnv: 0 };
       acc.set(key, a);
     }
     a.w += r.harmonized_weight;
@@ -171,6 +173,7 @@ function aggregateCalendar(rows: HotspotRecord[]): PartialCell[] {
     if (r.sensor_source !== "VIIRS") a.nM++;
     if (r.sensor_source !== "MODIS") a.nV++;
     if (r.sensor_source === "BOTH") a.nB++;
+    if (r.concordant === true || String(r.concordant).toLowerCase() === "true") a.nC++;
     if (r.max_frp != null) {
       a.frp += r.max_frp;
       a.nFrp++;
@@ -205,6 +208,7 @@ function aggregateCalendar(rows: HotspotRecord[]): PartialCell[] {
       modis_cells: a.nM,
       viirs_cells: a.nV,
       both_cells: a.nB,
+      concordant_cells: a.nC,
     };
   });
 }
@@ -228,7 +232,12 @@ export async function getBurningCalendar(bbox: BBox, excludeNonFire: boolean): P
       rpc<PartialCell[]>("get_burning_calendar_env", { ...bboxParams(bbox), exclude_non_fire: excludeNonFire }),
       getRegionMonthEnv(bbox),
     ]);
-    return { cells: completeCalendar(data ?? [], regionEnv), source: "supabase" };
+    // La base todavía no tiene la concordancia cargada (upload_supabase.py): usar la copia estática
+    const rows = data ?? [];
+    if (rows.some((c) => c.active_cells > 0) && !rows.some((c) => c.concordant_cells != null)) {
+      return snapshotCalendar(bbox, excludeNonFire);
+    }
+    return { cells: completeCalendar(rows, regionEnv), source: "supabase" };
   } catch (err) {
     return snapshotCalendar(bbox, excludeNonFire, fallbackNote(err));
   }

@@ -3,9 +3,9 @@
 import type { SeriesMode } from "@/types/fire";
 import { SERIES_INFO } from "@/lib/stats";
 
-const ORDER: SeriesMode[] = ["harmonized", "modis", "viirs", "raw"];
+const ORDER: SeriesMode[] = ["harmonized", "combined", "modis", "viirs", "raw"];
 
-/** Selector de serie: Armonizada · MODIS · VIIRS · Cruda (calendario, gráfico y mapa). */
+/** Selector de serie: Armonizada · Combinación · MODIS · VIIRS · Cruda (calendario, gráfico y mapa). */
 export default function SeriesToggle({
   mode,
   onChange,

@@ -14,7 +14,9 @@ export function quantile(values: number[], q: number): number {
 export function cellValue(c: CalendarCell, mode: SeriesMode): number {
   switch (mode) {
     case "harmonized":
-      return c.harmonized_events;
+      return c.concordant_cells ?? 0;
+    case "combined":
+      return hasViirs(c.year, c.month) ? c.harmonized_events : 0;
     case "modis":
       return c.modis_cells ?? 0;
     case "viirs":
@@ -25,7 +27,8 @@ export function cellValue(c: CalendarCell, mode: SeriesMode): number {
 }
 
 export const SERIES_INFO: Record<SeriesMode, { label: string; short: string; unit: string; desc: string }> = {
-  harmonized: { label: "Armonizada", short: "Armonizada", unit: "eventos armonizados", desc: "MODIS + VIIRS en grilla 1 km con peso α para celdas solo-VIIRS: serie continua 2000–2026." },
+  harmonized: { label: "Armonizada", short: "Armonizada", unit: "celdas concordantes", desc: "Celdas de 1 km detectadas por MODIS y VIIRS el mismo día cuya prioridad (escala propia de cada sensor) es igual o difiere en un nivel. Empieza en nov-2012 (antes no hay VIIRS para comparar)." },
+  combined: { label: "Combinación", short: "Combinación", unit: "eventos combinados", desc: "MODIS + VIIRS en grilla 1 km con peso α para celdas solo-VIIRS (todas las celdas), desde nov-2012." },
   modis: { label: "Solo MODIS", short: "MODIS", unit: "celdas-día MODIS", desc: "Celdas de 1 km con al menos una detección MODIS (Terra/Aqua, 1 km). Serie completa desde nov-2000." },
   viirs: { label: "Solo VIIRS", short: "VIIRS", unit: "celdas-día VIIRS", desc: "Celdas de 1 km con al menos una detección VIIRS (375 m; S-NPP hasta 01-11-2026, NOAA-20 después). Empieza en nov-2012." },
   raw: { label: "Cruda (suma)", short: "Cruda", unit: "detecciones crudas", desc: "Detecciones de ambos sensores sumadas sin armonizar: muestra el salto artificial de 2012." },
@@ -41,9 +44,10 @@ export const VIIRS_START = { year: 2012, month: 11 };
 export const hasViirs = (year: number, month: number) =>
   year > VIIRS_START.year || (year === VIIRS_START.year && month >= VIIRS_START.month);
 
-/** Período de referencia: 2001–2020 (METHODOLOGY.md); para la serie solo-VIIRS, 2013–2024 (VIIRS no existe antes). */
+/** Período de referencia: 2001–2020 (METHODOLOGY.md); para las series que necesitan VIIRS, 2013–2024. */
+export const needsViirs = (mode: SeriesMode) => mode === "viirs" || mode === "harmonized" || mode === "combined";
 export function baselineYears(mode: SeriesMode): [number, number] {
-  return mode === "viirs" ? [2013, 2024] : [BASELINE_START, BASELINE_END];
+  return mode === "viirs" || mode === "harmonized" || mode === "combined" ? [2013, 2024] : [BASELINE_START, BASELINE_END];
 }
 
 /** Línea base mensual P25/P50/P75/P90 sobre el período de referencia. */

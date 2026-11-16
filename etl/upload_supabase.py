@@ -61,6 +61,8 @@ COLUMNS = [
     "wind_max_kmh",
     "env_source",
 ]
+# Migración 009: prioridad por sensor y concordancia (se suben si están en el CSV)
+OPTIONAL_COLUMNS = ["modis_priority", "viirs_priority", "concordant"]
 # Tablas auxiliares reales (etl/env/build_aux.py) — se suben si existen los CSV
 AUX_TABLES = {
     "region_month_env": "region_month_env.csv",
@@ -89,7 +91,12 @@ def load_records(csv_path: Path) -> list[dict]:
     missing = [c for c in COLUMNS if c not in df.columns]
     if missing:
         sys.exit(f"✗ {csv_path.name} no tiene las columnas {missing}")
-    df = df[COLUMNS]
+    df = df[COLUMNS + [c for c in OPTIONAL_COLUMNS if c in df.columns]]
+    for c in ("modis_priority", "viirs_priority"):
+        if c in df:
+            df[c] = pd.to_numeric(df[c], errors="coerce").astype("Int64")
+    if "concordant" in df:
+        df["concordant"] = df["concordant"].astype(str).str.lower().isin(["true", "1"])
 
     # Validaciones contra el esquema de SUPABASE_SCHEMA.md
     errors = []

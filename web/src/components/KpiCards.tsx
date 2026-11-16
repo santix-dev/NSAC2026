@@ -9,6 +9,8 @@ interface Props {
   /** Mes filtrado (1–12) o null = todo el año */
   month?: number | null;
   total: number;
+  /** Celdas-día vistas por ambos sensores (denominador de la concordancia) */
+  both?: number | null;
   rawTotal: number;
   modis?: number | null;
   viirs?: number | null;
@@ -38,11 +40,11 @@ export default function KpiCards(p: Props) {
     <div className="grid grid-cols-2 gap-3">
       <Card
         icon={<Activity className="h-3.5 w-3.5" aria-hidden />}
-        label={`Eventos armonizados ${period}`}
-        value={formatNumber(p.total, 1)}
+        label={`Celdas armonizadas ${period}`}
+        value={formatNumber(p.total)}
         sub={
-          p.modis != null && p.viirs != null
-            ? `MODIS ${formatNumber(p.modis)} · VIIRS ${formatNumber(p.viirs)} celdas-día · ${formatNumber(p.rawTotal)} detecciones`
+          p.both != null && p.modis != null && p.viirs != null
+            ? `concordantes de ${formatNumber(p.both)} vistas por ambos · MODIS ${formatNumber(p.modis)} · VIIRS ${formatNumber(p.viirs)} celdas-día`
             : `${formatNumber(p.rawTotal)} detecciones crudas`
         }
       />
@@ -50,18 +52,18 @@ export default function KpiCards(p: Props) {
         icon={<CalendarRange className="h-3.5 w-3.5" aria-hidden />}
         label={p.month ? "Día pico del mes" : "Mes pico"}
         value={p.peakMonthLabel}
-        sub={`${formatNumber(p.peakValue, 1)} eventos ${p.month ? "ese día" : "en el mes"}`}
+        sub={`${formatNumber(p.peakValue)} celdas concordantes ${p.month ? "ese día" : "en el mes"}`}
       />
       <Card
         icon={<TrendingUp className="h-3.5 w-3.5" aria-hidden />}
         label={p.month ? `Anomalía de ${MONTHS_LONG[p.month - 1].toLowerCase()} vs. mediana` : "Anomalía vs. mediana"}
         value={`${formatSigned(p.anomaly)} %`}
-        sub="(E − P50) / (P50 + 1), base 2001–2020"
+        sub="(E − P50) / (P50 + 1), serie Armonizada, base 2013–2024"
         tone={p.anomaly > 0 ? "text-rose-300" : "text-emerald-300"}
       />
       <Card
         icon={<Scale className="h-3.5 w-3.5" aria-hidden />}
-        label="Factor α (Córdoba → Patagonia)"
+        label="Factor α · serie Combinación"
         value={p.alpha != null ? p.alpha.toFixed(3) : "—"}
         sub={p.calibrationNote}
       />

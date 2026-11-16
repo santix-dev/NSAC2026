@@ -207,5 +207,51 @@ def main(argv=None) -> int:
     return 0
 
 
+
+
+# ---------------------------------------------------------------------------
+# Concordancia por celda armonizada (serie "Armonizada" desde nov-2026)
+# ---------------------------------------------------------------------------
+GRID_SCALE = 100
+
+
+def cell_priority(cells: pd.DataFrame, raw: pd.DataFrame) -> pd.DataFrame:
+    """Agrega a cada celda-día armonizada la prioridad máxima de cada sensor y si concuerdan.
+
+    modis_priority / viirs_priority = nivel máximo (1–4) de las detecciones de ese sensor que entran
+    en la serie (in_calendar) dentro de la celda 0,01° ese día.
+    concordant = la celda la vieron ambos sensores y |MODIS − VIIRS| ≤ 1 nivel.
+    """
+    r = raw[raw["in_calendar"].astype(str).str.lower().isin(["true", "1"]) & raw["priority_level"].notna()].copy()
+    lat = np.floor(pd.to_numeric(r["lat"]).to_numpy() * GRID_SCALE).astype(np.int64).astype(str)
+    lon = np.floor(pd.to_numeric(r["lon"]).to_numpy() * GRID_SCALE).astype(np.int64).astype(str)
+    r["key"] = pd.Series(lat, index=r.index) + "_" + pd.Series(lon, index=r.index) + "|" + pd.to_datetime(r["acq_date"]).dt.strftime("%Y-%m-%d")
+    lv = r.groupby(["key", "sensor"])["priority_level"].max().unstack()
+    out = cells.copy()
+    key = out["grid_cell_id"].astype(str) + "|" + pd.to_datetime(out["acq_date"]).dt.strftime("%Y-%m-%d")
+    out["modis_priority"] = key.map(lv["MODIS"]).astype("Int64") if "MODIS" in lv else pd.NA
+    out["viirs_priority"] = key.map(lv["VIIRS"]).astype("Int64") if "VIIRS" in lv else pd.NA
+    both = (out["sensor_source"] == "BOTH") & out["modis_priority"].notna() & out["viirs_priority"].notna()
+    diff = (out["modis_priority"].astype("Float64") - out["viirs_priority"].astype("Float64")).abs()
+    out["concordant"] = (both & (diff <= 1)).fillna(False).astype(bool)
+    return out
+
+
+def _cli_cells(argv=None) -> int:
+    """python priority_scale.py --cells harmonized_output.csv --raw raw_detections.csv"""
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--cells", type=Path, required=True)
+    ap.add_argument("--raw", type=Path, required=True)
+    a = ap.parse_args(argv)
+    cells = pd.read_csv(a.cells, dtype={"grid_cell_id": str})
+    raw = pd.read_csv(a.raw, dtype={"acq_time": str, "confidence": str})
+    out = cell_priority(cells.drop(columns=["modis_priority", "viirs_priority", "concordant"], errors="ignore"), raw)
+    out.to_csv(a.cells, index=False)
+    print(f"✔ {a.cells.name}: {int(out['concordant'].sum()):,} celdas concordantes de {int((out['sensor_source'] == 'BOTH').sum()):,} vistas por ambos")
+    return 0
+
+
 if __name__ == "__main__":
-    raise SystemExit(main())
+    import sys
+
+    raise SystemExit(_cli_cells(sys.argv[1:]) if "--cells" in sys.argv else main())

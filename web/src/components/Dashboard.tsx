@@ -4,6 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { AlertCircle, X } from "lucide-react";
 import type {
   BBox,
+  CalendarCell,
+  HotspotRecord,
   CalendarResult,
   EnvGridCell,
   HotspotsResult,
@@ -31,7 +33,7 @@ import {
 import { bboxCenter, CUSTOM_REGION, DEFAULT_REGION, FALLBACK_REGIONS, inBBox, IOT_STATIONS, MONTHS_LONG } from "@/lib/regions";
 import { fetchLiveReadings, type LiveReadingsResult } from "@/lib/iot";
 import { fetchLiveFires, summarizeLive, type LiveFiresResult } from "@/lib/firmsLive";
-import { anomalyPct, hasSensorSeries, monthlyBaseline, quantile } from "@/lib/stats";
+import { anomalyPct, baselineYears, cellValue, hasSensorSeries, hasViirs, monthlyBaseline, quantile } from "@/lib/stats";
 import { computeSpreadVectors, dominantBearing, compassLabel } from "@/lib/spread";
 import { buildSusceptibilityFromGrid } from "@/lib/susceptibility";
 import { buildCellPriority, concordance, passesAgreement, priorityOf, type Agreement } from "@/lib/cellPriority";
@@ -88,7 +90,7 @@ export default function Dashboard() {
   const [harmSources, setHarmSources] = useState<Record<"BOTH" | "MODIS" | "VIIRS", boolean>>({ BOTH: true, MODIS: true, VIIRS: true });
   /** Vista armonizada: color por prioridad (relleno MODIS, contorno VIIRS) o por sensor, y filtro de concordancia */
   const [harmColorBy, setHarmColorBy] = useState<"priority" | "source">("priority");
-  const [harmAgree, setHarmAgree] = useState<Agreement>("all");
+  const [harmAgree, setHarmAgree] = useState<Agreement>("near");
   const [methodologyOpen, setMethodologyOpen] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
@@ -189,7 +191,7 @@ export default function Dashboard() {
 
   // Detecciones originales del año elegido, solo si la vista no es la armonizada
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || mode === "combined") return;
     let cancelled = false;
     const sensor = mode === "modis" ? "MODIS" : mode === "viirs" ? "VIIRS" : null;
     const t = setTimeout(() => setRawRes(null), 0);
@@ -238,8 +240,8 @@ export default function Dashboard() {
     let best = 0;
     let month = 0;
     for (const c of yearCells) {
-      if (c.has_coverage && c.harmonized_events > best) {
-        best = c.harmonized_events;
+      if (c.has_coverage && cellValue(c, "harmonized") > best) {
+        best = cellValue(c, "harmonized");
         month = c.month;
       }
     }
@@ -274,7 +276,11 @@ export default function Dashboard() {
         ? monthRows.filter((r) => r.sensor_source !== "VIIRS")
         : mode === "viirs"
           ? monthRows.filter((r) => r.sensor_source !== "MODIS")
-          : monthRows.filter((r) => harmSources[r.sensor_source]),
+          : mode === "combined"
+            ? monthRows.filter((r) => harmSources[r.sensor_source] && hasViirs(Number(r.acq_date.slice(0, 4)), Number(r.acq_date.slice(5, 7))))
+            : mode === "harmonized"
+              ? monthRows
+              : monthRows.filter((r) => harmSources[r.sensor_source]),
     [monthRows, mode, harmSources],
   );
   const harmCounts = useMemo(() => {
@@ -282,25 +288,33 @@ export default function Dashboard() {
     for (const r of monthRows) c[r.sensor_source]++;
     return c;
   }, [monthRows]);
-  const spread = useMemo(() => computeSpreadVectors(mapRows), [mapRows]);
   /** Prioridad MODIS y VIIRS dentro de cada celda armonizada (desde las detecciones originales) */
   const cellPrio = useMemo(
     () => buildCellPriority(mode === "harmonized" ? rawRes?.rows : null),
     [mode, rawRes],
   );
+  /** Celda concordante: la vieron ambos sensores con prioridad igual o ±1 (columna del ETL o, si falta, desde las detecciones) */
+  const isConcordant = useCallback(
+    (h: HotspotRecord) =>
+      h.concordant != null
+        ? h.concordant === true || String(h.concordant).toLowerCase() === "true"
+        : passesAgreement(priorityOf(cellPrio, h), h, "near"),
+    [cellPrio],
+  );
   const harmDrawRows = useMemo(
     () =>
-      mode === "harmonized" && harmAgree !== "all"
-        ? mapRows.filter((h) => passesAgreement(priorityOf(cellPrio, h), h, harmAgree))
+      mode === "harmonized"
+        ? mapRows.filter((h) => (harmAgree === "same" ? passesAgreement(priorityOf(cellPrio, h), h, "same") : isConcordant(h)))
         : mapRows,
-    [mode, mapRows, harmAgree, cellPrio],
+    [mode, mapRows, harmAgree, cellPrio, isConcordant],
   );
+  const spread = useMemo(() => computeSpreadVectors(harmDrawRows), [harmDrawRows]);
   const harmConcordance = useMemo(
     () => (mode === "harmonized" && cellPrio.size ? concordance(monthRows, cellPrio) : null),
     [mode, monthRows, cellPrio],
   );
   const rawPoints = useMemo(() => {
-    if (mode === "harmonized" || !rawRes?.available) return null;
+    if (mode === "harmonized" || mode === "combined" || !rawRes?.available) return null;
     return rawRes.rows
       .filter(
         (r) =>
@@ -374,7 +388,7 @@ export default function Dashboard() {
     const cos = sample.reduce((acc, x) => acc + Math.cos((x.wdir * Math.PI) / 180), 0);
     const cell = yearCells.find((c) => c.month === scenarioMonth);
     const b = baselineH[scenarioMonth - 1];
-    const events = cell?.harmonized_events ?? 0;
+    const events = cell ? cellValue(cell, "harmonized") : 0;
     const wind = mean("wind");
     const maxes = monthRows.map((r) => r.wind_max_kmh).filter((x): x is number => typeof x === "number");
     const regionMax = regionRows.map((r) => r.wind_max_kmh).filter((x): x is number => typeof x === "number");
@@ -429,7 +443,8 @@ export default function Dashboard() {
     if (selectedMonth) {
       const cell = yearCells.find((c) => c.month === selectedMonth);
       const byDay = new Map<string, number>();
-      for (const r of monthRows) if (r.thermal_type === "VEGETATION") byDay.set(r.acq_date, (byDay.get(r.acq_date) ?? 0) + r.harmonized_weight);
+      for (const r of monthRows)
+        if (r.thermal_type === "VEGETATION" && isConcordant(r)) byDay.set(r.acq_date, (byDay.get(r.acq_date) ?? 0) + 1);
       let peakDay = "—";
       let peakValue = 0;
       byDay.forEach((v, d) => {
@@ -438,9 +453,10 @@ export default function Dashboard() {
           peakDay = `${Number(d.slice(8, 10))} ${MONTHS_LONG[selectedMonth - 1].slice(0, 3).toLowerCase()}`;
         }
       });
-      const total = cell?.harmonized_events ?? 0;
+      const total = cell ? cellValue(cell, "harmonized") : 0;
       return {
         total,
+        both: cell?.both_cells ?? null,
         rawTotal: cell?.raw_events ?? 0,
         modis: cell?.modis_cells ?? null,
         viirs: cell?.viirs_cells ?? null,
@@ -449,20 +465,22 @@ export default function Dashboard() {
         anomaly: anomalyPct(total, baselineH[selectedMonth - 1]?.p50 ?? 0),
       };
     }
-    const total = yearCells.reduce((s, c) => s + c.harmonized_events, 0);
+    const total = yearCells.reduce((s, c) => s + cellValue(c, "harmonized"), 0);
     const rawTotal = yearCells.reduce((s, c) => s + c.raw_events, 0);
-    const peak = yearCells.reduce((a, c) => (c.harmonized_events > (a?.harmonized_events ?? -1) ? c : a), yearCells[0]);
+    const hv = (c: CalendarCell | undefined) => (c ? cellValue(c, "harmonized") : -1);
+    const peak = yearCells.reduce((a, c) => (hv(c) > hv(a) ? c : a), yearCells[0]);
     const p50Total = baselineH.reduce((s, b) => s + b.p50, 0);
     return {
       total,
+      both: yearCells.some((c) => c.both_cells != null) ? yearCells.reduce((s, c) => s + (c.both_cells ?? 0), 0) : null,
       rawTotal,
       modis: yearCells.some((c) => c.modis_cells != null) ? yearCells.reduce((s, c) => s + (c.modis_cells ?? 0), 0) : null,
       viirs: yearCells.some((c) => c.viirs_cells != null) ? yearCells.reduce((s, c) => s + (c.viirs_cells ?? 0), 0) : null,
-      peakMonthLabel: peak && peak.harmonized_events > 0 ? MONTHS_LONG[peak.month - 1] : "—",
-      peakValue: peak?.harmonized_events ?? 0,
+      peakMonthLabel: peak && hv(peak) > 0 ? MONTHS_LONG[peak.month - 1] : "—",
+      peakValue: peak ? hv(peak) : 0,
       anomaly: anomalyPct(total, p50Total),
     };
-  }, [yearCells, baselineH, selectedMonth, monthRows]);
+  }, [yearCells, baselineH, selectedMonth, monthRows, isConcordant]);
 
   const bearing = dominantBearing(spread);
   /** Día con más actividad del mes filtrado: la imagen GOES arranca ahí */
@@ -489,8 +507,11 @@ export default function Dashboard() {
       : `Tiempo casi real: sin focos en ${liveFires.days * 24} h`;
   }, [liveFires]);
   const regionNames = regions.map((r) => r.name).join(", ");
+  const preViirs = (mode === "harmonized" || mode === "combined") && !hasViirs(selectedYear, selectedMonth ?? 12);
   const emptyMessage =
-    !loadingCal && calendar && !hasAnyData
+    preViirs
+      ? `La serie ${mode === "harmonized" ? "Armonizada" : "Combinación"} compara MODIS con VIIRS, que empieza en noviembre de 2012. Para ${selectedMonth ? `${MONTHS_LONG[selectedMonth - 1].toLowerCase()} de ` : ""}${selectedYear} usá la serie MODIS.`
+      : !loadingCal && calendar && !hasAnyData
       ? `No hay focos procesados en esta área. Por ahora los datos cubren: ${regionNames}.`
       : !loadingCal && calendar && !conditions
         ? `Sin focos ni datos ambientales para ${selectedYear} en esta área.`
@@ -624,7 +645,7 @@ export default function Dashboard() {
               />
               <details className="group space-y-2">
                 <summary className="cursor-pointer list-none rounded-xl border border-slate-800 bg-slate-900 px-4 py-2.5 text-sm text-slate-200 hover:bg-slate-800/60 [&::-webkit-details-marker]:hidden">
-                  <span className="mr-1 inline-block transition group-open:rotate-90">▸</span> Anomalía mensual {selectedYear} vs. 2001–2020
+                  <span className="mr-1 inline-block transition group-open:rotate-90">▸</span> Anomalía mensual {selectedYear} vs. {baselineYears(mode)[0]}–{baselineYears(mode)[1]}
                 </summary>
                 <div className="mt-2">
                   <AnomalyChart yearCells={yearCells} baseline={baseline} mode={mode} selectedYear={selectedYear} regionLabel={regionLabel} />
@@ -659,7 +680,7 @@ export default function Dashboard() {
             bbox={bbox}
             hotspots={harmDrawRows}
             cellPriority={mode === "harmonized" ? cellPrio : null}
-            harmPriority={{
+            harmPriority={mode !== "harmonized" ? undefined : {
               colorBy: harmColorBy,
               onColorBy: setHarmColorBy,
               agree: harmAgree,
@@ -680,7 +701,7 @@ export default function Dashboard() {
             harmCounts={harmCounts}
             onHarmSources={setHarmSources}
             rawInfo={
-              mode === "harmonized"
+              mode === "harmonized" || mode === "combined"
                 ? null
                 : {
                     loading: rawRes == null,

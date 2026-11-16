@@ -14,7 +14,8 @@ export interface CellPriority {
   m: Level | null;
   v: Level | null;
 }
-export type Agreement = "all" | "same" | "diff";
+/** near = ambos sensores y |MODIS − VIIRS| ≤ 1 nivel (vista armonizada por defecto) */
+export type Agreement = "near" | "same" | "all";
 
 export const cellKey = (lat: number, lon: number, date: string) =>
   `${Math.floor(lat * 100)}_${Math.floor(lon * 100)}|${date}`;
@@ -40,7 +41,7 @@ export const priorityOf = (map: Map<string, CellPriority>, h: HotspotRecord): Ce
 export function passesAgreement(p: CellPriority, h: HotspotRecord, a: Agreement): boolean {
   if (a === "all") return true;
   if (h.sensor_source !== "BOTH" || p.m == null || p.v == null) return false;
-  return a === "same" ? p.m === p.v : p.m !== p.v;
+  return a === "same" ? p.m === p.v : Math.abs(p.m - p.v) <= 1;
 }
 
 export interface Concordance {

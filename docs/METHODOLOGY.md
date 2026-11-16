@@ -29,3 +29,16 @@ $$ISF = 0.30 \cdot S_{\text{pendiente}} + 0.30 \cdot (100 - H_{\text{suelo}}) + 
   - *Pendiente $> 20^\circ$ + Alta carga vegetal (NDVI Sentinel-2):* Fajas cortafuegos en pie de ladera y manejo de combustible en interfaz urbano-forestal.
   - *Humedad SAOCOM/IoT $< 15\%$ + Ráfagas $> 35\text{ km/h}$:* Prohibición total de quemas y despliegue preventivo de brigadistas.
 - **Activación del International Charter:** Cuando un foco armonizado supera el percentil 90 histórico en zonas de pendiente crítica y alta nubosidad, se recomienda activar el **Charter** para programar pasadas de emergencia de **SAOCOM** (radar todo-tiempo) y **Sentinel-2** (mapeo de severidad dNBR a 10 m).
+## Series "Armonizada" (concordancia de prioridad) y "Combinación" — nov-2026
+
+**Escala de prioridad por sensor** (`etl/priority_scale.py`): cada detección recibe Bajo/Medio/Alto/Extremo dentro de la escala propia de su sensor, con IP = 0,5·P(FRP/km²) + 0,5·P(ΔT 4–11 µm, día/noche) y cortes fijos P50/P80/P95 del período de referencia (MODIS 2000–2024, VIIRS S-NPP 2012–2024). Los focos con VIIRS I4 saturado reciben el contraste máximo.
+
+**Celda concordante** (`priority_scale.cell_priority`): celda-día de 0,01° detectada por MODIS y por VIIRS (plataformas de la serie) en la que el nivel máximo de cada sensor es igual o difiere en un nivel: `|MODIS − VIIRS| ≤ 1`.
+
+| Serie | Qué cuenta | Período |
+|---|---|---|
+| **Armonizada** | celdas concordantes | nov-2012 → hoy (antes no existe VIIRS para comparar) |
+| **Combinación** | Σ peso (1 si MODIS, α si solo VIIRS) — la armonización por conteo de las secciones anteriores | nov-2012 → hoy |
+| **MODIS** | celdas con detección MODIS | nov-2000 → hoy |
+
+Concordancia con los datos reales (Córdoba + Patagonia): 4.014 celdas concordantes de 4.964 vistas por ambos sensores (81 %); mismo nivel 36 %; kappa ponderado 0,33 (0,39 para Aqua y VIIRS en la misma pasada). La serie Armonizada cuenta del orden de la mitad de las celdas que ve MODIS, por lo que no empalma con la serie MODIS anterior a 2012: para 2000–2012 se usa la serie MODIS. Línea base de las series que requieren VIIRS: 2013–2024.

@@ -26,7 +26,7 @@ export default function CharterPanel({
         <h3 className="mb-1.5 text-sm font-semibold text-slate-100">Cómo se evalúa</h3>
         <p>
           El semáforo recomienda activar el International Charter (Space &amp; Major Disasters) cuando se cumplen los tres
-          criterios: la actividad del mes supera el percentil 90 histórico (2001–2020), el terreno tiene pendiente crítica
+          criterios: la actividad del mes supera el percentil 90 histórico (2013–2024, serie Armonizada), el terreno tiene pendiente crítica
           (SRTM) y la nubosidad (MODIS) limita la observación óptica. Con dos criterios queda en pre-alerta.
         </p>
         <p className="mt-2">

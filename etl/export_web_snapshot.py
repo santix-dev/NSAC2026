@@ -27,6 +27,7 @@ HOTSPOT_COLS = [
     "grid_cell_id", "region", "acq_date", "lat", "lon", "harmonized_weight", "raw_detections_count",
     "sensor_source", "max_frp", "thermal_type", "slope_deg", "soil_moisture_pct", "cloud_cover_pct",
     "wind_speed_kmh", "wind_direction_deg", "ndvi_pre_fire", "wind_max_kmh", "env_source",
+    "modis_priority", "viirs_priority", "concordant",
 ]
 
 

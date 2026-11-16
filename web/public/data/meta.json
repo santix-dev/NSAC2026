@@ -6,7 +6,7 @@
     "2026-10-31"
   ],
   "rows": {
-    "hotspots.csv": 27778,
+    "hotspots.csv": 27788,
     "region_month_env.csv": 644,
     "env_grid_clim.csv": 23808,
     "raw_detections.csv": 105742
@@ -123,5 +123,9 @@
         "saturated_share_pct": 12.74
       }
     }
+  },
+  "series": {
+    "harmonized": "celdas concordantes MODIS–VIIRS (|Δprioridad| ≤ 1), desde nov-2012",
+    "combined": "MODIS + VIIRS con peso α, desde nov-2012"
   }
 }

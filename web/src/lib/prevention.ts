@@ -82,11 +82,11 @@ export function buildPreventionActions(c: AreaConditions): PreventionAction[] {
     {
       id: "early-warning",
       title: "Alerta temprana por anomalía térmica",
-      detail: "La actividad del mes supera el P75 histórico (2001–2020): reforzar vigilancia satelital diaria y comunicación comunitaria.",
+      detail: "La actividad del mes supera el P75 histórico (2013–2024, serie Armonizada): reforzar vigilancia satelital diaria y comunicación comunitaria.",
       severity: "warning",
       triggered: c.monthEvents > c.p75 && c.monthEvents > 0,
-      evidence: `${f(c.monthEvents, 1)} eventos vs P75 ${f(c.p75, 1)} (anomalía ${c.anomalyPct >= 0 ? "+" : ""}${f(c.anomalyPct)} %)`,
-      sources: ["NASA FIRMS (MODIS + VIIRS armonizado)"],
+      evidence: `${f(c.monthEvents)} celdas concordantes vs P75 ${f(c.p75, 1)} (anomalía ${c.anomalyPct >= 0 ? "+" : ""}${f(c.anomalyPct)} %)`,
+      sources: ["NASA FIRMS (MODIS + VIIRS, celdas concordantes)"],
     },
     {
       id: "radar",

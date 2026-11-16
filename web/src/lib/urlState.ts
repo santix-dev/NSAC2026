@@ -32,7 +32,7 @@ export function readUrlState(): UrlState {
   const s = p.get("s") as Section | null;
   if (s && SECTIONS.includes(s)) out.section = s;
   const m = p.get("serie");
-  if (m === "raw" || m === "harmonized" || m === "modis" || m === "viirs") out.mode = m;
+  if (m === "raw" || m === "harmonized" || m === "combined" || m === "modis" || m === "viirs") out.mode = m;
   return out;
 }
 

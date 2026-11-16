@@ -132,6 +132,10 @@ OUTPUT_COLUMNS = [
     *ENV_COLUMNS,
     "wind_max_kmh",
     "env_source",
+    # Prioridad por sensor y concordancia (priority_scale.cell_priority)
+    "modis_priority",
+    "viirs_priority",
+    "concordant",
 ]
 
 REQUIRED_INPUT_COLUMNS = {"latitude", "longitude", "acq_date", "confidence"}
@@ -705,6 +709,16 @@ def run_pipeline(
     cells = stage4_transfer_calibration(cells, stats, harmonization)              # aplica alpha / alpha_N20
     print("▶ Etapa 5: variables ambientales por celda/mes")
     cells = stage5_environment(cells, aux_dir, stats)
+    if stats.raw_detections is not None and "priority_level" in stats.raw_detections:
+        import priority_scale
+
+        print("▶ Etapa 6: prioridad por sensor y concordancia MODIS–VIIRS por celda")
+        cells = priority_scale.cell_priority(cells, stats.raw_detections)
+    for c in ("modis_priority", "viirs_priority"):
+        if c not in cells:
+            cells[c] = pd.NA
+    if "concordant" not in cells:
+        cells["concordant"] = False
 
     out = cells.sort_values(["region", "acq_date", "grid_cell_id"])[OUTPUT_COLUMNS].copy()
     out["acq_date"] = out["acq_date"].dt.strftime("%Y-%m-%d")

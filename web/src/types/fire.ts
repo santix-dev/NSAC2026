@@ -27,7 +27,8 @@ export type Palette = "viridis" | "ylorrd";
  * Serie que se muestra: armonizada (α), cada sensor por separado (celdas-día con detección de
  * ese sensor, la unidad con la que se calibra α) o cruda (detecciones sumadas de ambos).
  */
-export type SeriesMode = "harmonized" | "modis" | "viirs" | "raw";
+/** harmonized = celdas concordantes MODIS–VIIRS (desde nov-2012) · combined = MODIS + VIIRS con peso α (desde nov-2012) */
+export type SeriesMode = "harmonized" | "combined" | "modis" | "viirs" | "raw";
 
 /** Fila de harmonized_hotspots (celda 0.01° × día) — ver etl/harmonize.py */
 export interface HotspotRecord {
@@ -50,6 +51,10 @@ export interface HotspotRecord {
   /** Viento máximo diario a 10 m (NASA POWER WS10M_MAX). null si no se cargó. */
   wind_max_kmh: number | null;
   env_source: EnvSource | null;
+  /** Prioridad máxima de cada sensor en la celda-día y concordancia (|MODIS − VIIRS| ≤ 1) */
+  modis_priority?: number | null;
+  viirs_priority?: number | null;
+  concordant?: boolean | string | null;
 }
 
 /** Promedios reales sobre toda una región de estudio para un mes (tabla region_month_env). */
@@ -101,6 +106,8 @@ export interface CalendarCell {
   modis_cells: number | null;
   viirs_cells: number | null;
   both_cells: number | null;
+  /** Celdas-día vistas por ambos sensores con prioridad igual o a ±1 nivel (serie Armonizada); null si la base aún no lo tiene */
+  concordant_cells?: number | null;
 }
 
 export interface CalendarResult {

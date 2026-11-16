@@ -14,7 +14,7 @@ export interface Snapshot {
 
 const STRING_COLS = new Set([
   "grid_cell_id", "region", "acq_date", "sensor_source", "thermal_type", "env_source", "cell_id",
-  "acq_time", "sensor", "platform", "confidence", "in_calendar",
+  "acq_time", "sensor", "platform", "confidence", "in_calendar", "concordant",
 ]);
 
 function parseCsv<T>(text: string): T[] {

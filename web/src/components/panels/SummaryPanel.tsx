@@ -17,6 +17,7 @@ interface Props {
   conditions: AreaConditions | null;
   kpi: {
     total: number;
+    both?: number | null;
     rawTotal: number;
     modis: number | null;
     viirs: number | null;
@@ -79,6 +80,7 @@ export default function SummaryPanel(p: Props) {
         selectedYear={p.selectedYear}
         month={p.month}
         total={p.kpi.total}
+        both={p.kpi.both ?? null}
         rawTotal={p.kpi.rawTotal}
         modis={p.kpi.modis}
         viirs={p.kpi.viirs}

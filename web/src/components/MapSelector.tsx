@@ -103,6 +103,8 @@ const LAYER_DEFS: { key: keyof MapLayers; label: string; hint: string; Icon: typ
 
 export default function MapSelector(props: Props) {
   const { layers, onToggleLayer, wind } = props;
+  /** Leyenda armonizada: columnas de un solo sensor solo cuando no se filtra por concordancia */
+  const single = false;
   const [layersOpen, setLayersOpen] = useState(false);
   const ref = useRef<HTMLElement>(null);
   // Panel de capas abierto solo si el mapa es ancho (escritorio); en mapas angostos tapa el contexto.
@@ -309,7 +311,11 @@ export default function MapSelector(props: Props) {
               <SeriesToggle mode={props.mode} onChange={props.onModeChange} compact />
               <p className="mt-0.5 text-[10px] text-slate-500">
                 {props.mode === "harmonized"
-                  ? "Mapa: celdas de 1 km armonizadas (MODIS + VIIRS con peso α)."
+                  ? props.harmPriority?.agree === "same"
+                    ? "Mapa: celdas de 1 km vistas por MODIS y VIIRS con la misma prioridad."
+                    : "Mapa: celdas de 1 km vistas por MODIS y VIIRS con prioridad igual o a un nivel."
+                  : props.mode === "combined"
+                    ? "Mapa: todas las celdas de 1 km, MODIS + VIIRS con peso α (desde nov-2012)."
                   : props.rawInfo?.loading
                     ? "Cargando detecciones originales…"
                     : props.rawInfo && !props.rawInfo.available
@@ -321,7 +327,7 @@ export default function MapSelector(props: Props) {
                           : "Mapa: todas las detecciones originales, sin armonizar."}
                 {props.rawInfo?.truncated ? " Se muestran las primeras 15.000; elegí un mes para ver todo." : ""}
               </p>
-              {props.mode === "harmonized" && (
+              {props.mode === "combined" && (
                 <div className="mt-1 flex flex-wrap gap-x-2.5 gap-y-0.5 text-[10.5px] text-slate-300">
                   {(
                     [
@@ -817,21 +823,25 @@ export default function MapSelector(props: Props) {
               <thead>
                 <tr className="text-[9.5px] text-slate-500">
                   <th className="text-left font-normal">Escala</th>
-                  <th className="font-normal">Solo MODIS</th>
-                  <th className="font-normal">Solo VIIRS</th>
-                  <th className="font-normal">Ambos</th>
+                  {single && <th className="font-normal">Solo MODIS</th>}
+                  {single && <th className="font-normal">Solo VIIRS</th>}
+                  <th className="font-normal">{single ? "Ambos" : "MODIS + VIIRS"}</th>
                 </tr>
               </thead>
               <tbody>
                 {([4, 3, 2, 1] as const).map((l) => (
                   <tr key={l}>
                     <td style={{ color: PRIORITY_COLORS[l] }}>{PRIORITY_LABEL[l]}</td>
-                    <td className="text-center">
-                      <span className="inline-block h-3 w-3 rounded-full border border-slate-900" style={{ background: PRIORITY_COLORS[l] }} />
-                    </td>
-                    <td className="text-center">
-                      <span className="inline-block h-3 w-3 rounded-full" style={{ border: `2.5px solid ${PRIORITY_COLORS[l]}` }} />
-                    </td>
+                    {single && (
+                      <td className="text-center">
+                        <span className="inline-block h-3 w-3 rounded-full border border-slate-900" style={{ background: PRIORITY_COLORS[l] }} />
+                      </td>
+                    )}
+                    {single && (
+                      <td className="text-center">
+                        <span className="inline-block h-3 w-3 rounded-full" style={{ border: `2.5px solid ${PRIORITY_COLORS[l]}` }} />
+                      </td>
+                    )}
                     <td className="text-center">
                       <span
                         className="inline-block h-3.5 w-3.5 rounded-full"
@@ -843,7 +853,9 @@ export default function MapSelector(props: Props) {
               </tbody>
             </table>
             <p className="max-w-[12rem] text-[9.5px] leading-tight text-slate-500">
-              Solo MODIS = círculo relleno · Solo VIIRS = anillo · Ambos = relleno MODIS + anillo VIIRS (mismo color = coinciden).
+              {single
+                ? "Solo MODIS = círculo relleno · Solo VIIRS = anillo · Ambos = relleno MODIS + anillo VIIRS (mismo color = coinciden)."
+                : "Relleno = MODIS · anillo = VIIRS. Solo se muestran celdas donde ambos coinciden o difieren en un nivel."}{" "}
               Cada sensor usa su propia escala.
             </p>
           </div>
@@ -922,9 +934,8 @@ function HarmPriorityControls({ hp }: { hp: NonNullable<Props["harmPriority"]> }
           className="rounded border border-slate-700 bg-slate-900 px-1 py-0.5 text-[10.5px] text-slate-200"
           aria-label="Concordancia entre sensores"
         >
-          <option value="all">Todas las celdas</option>
-          <option value="same">Ambos, misma prioridad</option>
-          <option value="diff">Ambos, prioridad distinta</option>
+          <option value="near">Ambos sensores · igual o ±1 nivel</option>
+          <option value="same">Ambos sensores · mismo nivel</option>
         </select>
       </div>
       {hp.loading ? (

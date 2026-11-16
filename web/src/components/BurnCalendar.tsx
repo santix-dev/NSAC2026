@@ -5,7 +5,7 @@ import { CalendarDays, Cloud, Mountain } from "lucide-react";
 import type { CalendarCell, Palette, SeriesMode } from "@/types/fire";
 import { gradientCss, paletteColor, textOn } from "@/lib/colors";
 import { MONTHS_LONG, MONTHS_SHORT, YEARS } from "@/lib/regions";
-import { cellValue, formatNumber, hasSensorSeries, hasViirs, SERIES_INFO } from "@/lib/stats";
+import { cellValue, formatNumber, hasSensorSeries, hasViirs, needsViirs, SERIES_INFO } from "@/lib/stats";
 import SeriesToggle from "./SeriesToggle";
 
 export const CLOUD_FLAG_PCT = 60;
@@ -86,7 +86,7 @@ export default function BurnCalendar(props: Props) {
         </label>
         <p className="text-[10.5px] leading-snug text-slate-500">
           {SERIES_INFO[mode].desc}
-          {mode === "harmonized" ? ` α = ${props.alpha?.toFixed(3) ?? "—"}.` : ""}{" "}
+          {mode === "combined" ? ` α = ${props.alpha?.toFixed(3) ?? "—"}.` : ""}{" "}
           Tocá una celda para ver ese mes en el mapa.
         </p>
       </div>
@@ -114,7 +114,7 @@ export default function BurnCalendar(props: Props) {
                     <button
                       type="button"
                       onClick={() => props.onSelectYear(year)}
-                      title={`${year}: ${formatNumber(total, mode === "harmonized" ? 1 : 0)} en el año`}
+                      title={`${year}: ${formatNumber(total, mode === "combined" ? 1 : 0)} en el año`}
                       className={`w-full rounded px-0.5 text-left font-mono text-[9.5px] leading-[13px] ${
                         sel ? "bg-orange-500/20 text-orange-300" : "text-slate-500 hover:text-slate-100"
                       }`}
@@ -125,7 +125,7 @@ export default function BurnCalendar(props: Props) {
                   </td>
                   {row.map((c) => {
                     const v = cellValue(c, mode);
-                    if (!c.has_coverage || (mode === "viirs" && !hasViirs(year, c.month))) {
+                    if (!c.has_coverage || (needsViirs(mode) && !hasViirs(year, c.month))) {
                       return (
                         <td key={c.month} className="h-[13px] rounded-[2px] bg-[repeating-linear-gradient(45deg,#0f172a,#0f172a_2px,#1e293b_2px,#1e293b_4px)]" title={c.has_coverage ? "Sin VIIRS (empieza en nov-2012)" : "Sin cobertura de datos"} />
                       );
@@ -142,7 +142,7 @@ export default function BurnCalendar(props: Props) {
                             isSel ? "outline outline-2 outline-white" : sel ? "outline outline-1 outline-orange-400/80" : ""
                           }`}
                           style={{ background: bg }}
-                          title={`${MONTHS_LONG[c.month - 1]} ${year}: ${formatNumber(v, mode === "harmonized" ? 1 : 0)} ${
+                          title={`${MONTHS_LONG[c.month - 1]} ${year}: ${formatNumber(v, mode === "combined" ? 1 : 0)} ${
                             SERIES_INFO[mode].unit
                           }${c.modis_cells != null ? ` (MODIS ${c.modis_cells} · VIIRS ${c.viirs_cells} · ambos ${c.both_cells} celdas-día)` : ""} · ${c.active_cells} celdas-día · nubosidad ${c.avg_cloud_cover?.toFixed(0) ?? "—"} %${
                             c.cloud_origin === "region" ? " (promedio regional MODIS)" : ""

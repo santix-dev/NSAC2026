@@ -179,6 +179,12 @@ export default function MethodologyModal({ open, onClose, alpha, dataSource, liv
         </p>
 
         <H>1. Armonización MODIS (1 km) + VIIRS (375 m)</H>
+        <p className="mb-1.5 rounded-md border border-orange-800/50 bg-orange-950/30 px-2.5 py-1.5">
+          <b>Series del calendario.</b> <b>Armonizada</b>: celdas de 1 km detectadas por MODIS y VIIRS el mismo día cuya
+          prioridad (escala propia de cada sensor, sección 1b) es igual o difiere en un nivel; empieza en nov-2012 porque
+          antes no existe VIIRS para comparar. <b>Combinación</b>: la armonización por conteo descrita abajo (todas las
+          celdas, peso α para las solo-VIIRS), mostrada desde nov-2012. Para 2000–2012 se usa la serie <b>MODIS</b>.
+        </p>
         <ol className="list-decimal space-y-1 pl-5">
           <li>
             <b>Calidad radiométrica:</b> MODIS <code>confidence ≥ 30</code>; VIIRS <code>confidence ∈ {"{n, h}"}</code>.
@@ -211,7 +217,7 @@ export default function MethodologyModal({ open, onClose, alpha, dataSource, liv
           </li>
         </ol>
         <p className="mt-2 text-slate-400">
-          Calendario: línea base = mediana mensual P50 2001–2020; anomalía = (E − P50)/(P50 + 1)·100; mes crítico &gt; P75.
+          Calendario: línea base = mediana mensual P50 2001–2020 (MODIS, Cruda) o 2013–2024 (Armonizada, Combinación, VIIRS); anomalía = (E − P50)/(P50 + 1)·100; mes crítico &gt; P75.
         </p>
 
         <H>1b. Prioridad de atención por foco (escala propia de cada sensor)</H>
