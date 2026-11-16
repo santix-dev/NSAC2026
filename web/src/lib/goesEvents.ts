@@ -4,6 +4,7 @@
  * (columna de humo, 500 m), seleccionadas porque muestran el fuego o el humo de ESE incendio.
  * Se sirven como archivos estáticos desde /goes/<evento>/.
  */
+import { uiLocale } from "@/lib/i18n/translator";
 export type SceneProduct = "swir" | "natural";
 
 export const SCENE_PRODUCTS: Record<SceneProduct, { label: string; hint: string }> = {
@@ -62,7 +63,7 @@ export function stageUrl(ev: FireEvent, st: FireStage, p: SceneProduct): string 
 }
 
 export function fmtDay(d: string): string {
-  return new Date(`${d}T12:00:00Z`).toLocaleDateString("es-AR", { day: "numeric", month: "short", year: "numeric" });
+  return new Date(`${d}T12:00:00Z`).toLocaleDateString(uiLocale(), { day: "numeric", month: "short", year: "numeric" });
 }
 
 export interface FireEvent {
@@ -113,7 +114,7 @@ export function eventsNear(events: FireEvent[], center: [number, number]): FireE
 
 export function sceneLabel(s: FireScene): string {
   const d = new Date(s.time);
-  const day = d.toLocaleDateString("es-AR", { timeZone: "America/Argentina/Buenos_Aires", day: "numeric", month: "short", year: "numeric" });
+  const day = d.toLocaleDateString(uiLocale(), { timeZone: "America/Argentina/Buenos_Aires", day: "numeric", month: "short", year: "numeric" });
   const what = s.hot_px && s.hot_px > 0 ? ` · fuego visible` : s.sensor.startsWith("MODIS") ? " · humo" : "";
   return `${day} · ${s.sensor} (${s.resolution})${what}`;
 }

@@ -37,6 +37,7 @@ import type { MapViewProps } from "./MapView";
 import type { Agreement, CellPriority, Concordance } from "@/lib/cellPriority";
 import { HARM_SOURCE_COLORS, PRIORITY_COLORS, PRIORITY_LABEL, RAW_COLORS, RISK_COLORS } from "@/lib/colors";
 import { compassLabel } from "@/lib/spread";
+import { uiLocale } from "@/lib/i18n/translator";
 
 const MapView = dynamic(() => import("./MapView"), {
   ssr: false,
@@ -302,7 +303,7 @@ export default function MapSelector(props: Props) {
           <p className="truncate text-sm font-semibold text-slate-100">{props.headline}</p>
           <p className="flex items-center gap-1.5 text-[11px] text-slate-400">
             {props.loading && <Loader2 className="h-3 w-3 animate-spin" aria-hidden />}
-            {props.scenarioLabel} · {props.hotspotCount.toLocaleString("es-AR")} {props.countUnit ?? "celdas-día"}
+            {props.scenarioLabel} · {props.hotspotCount.toLocaleString(uiLocale())} {props.countUnit ?? "celdas-día"}
             {props.truncated && " (límite 10.000)"}
           </p>
           {props.spreadSummary && layers.spread && <p className="text-[11px] text-slate-500">{props.spreadSummary}</p>}
@@ -345,7 +346,7 @@ export default function MapSelector(props: Props) {
                         style={{ accentColor: HARM_SOURCE_COLORS[k] }}
                       />
                       <span className="inline-block h-2 w-2 rounded-full" style={{ background: HARM_SOURCE_COLORS[k] }} />
-                      {l} <span className="font-mono text-slate-500">{props.harmCounts[k].toLocaleString("es-AR")}</span>
+                      {l} <span className="font-mono text-slate-500">{props.harmCounts[k].toLocaleString(uiLocale())}</span>
                     </label>
                   ))}
                 </div>
@@ -525,7 +526,7 @@ export default function MapSelector(props: Props) {
                       <span className="block text-[9.5px] text-slate-400">
                         {k === "severity"
                           ? timeline.severity
-                            ? `${timeline.severity.burned_ha.toLocaleString("es-AR")} ha`
+                            ? `${timeline.severity.burned_ha.toLocaleString(uiLocale())} ha`
                             : "—"
                           : st
                             ? fmtDay(st.day)
@@ -543,7 +544,7 @@ export default function MapSelector(props: Props) {
                     {timeline.severity.classes.map((c) => (
                       <span key={c.name} className="flex items-center gap-1 text-[10.5px] text-slate-300">
                         <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ background: c.color }} />
-                        {c.name} <span className="font-mono text-slate-400">{c.ha.toLocaleString("es-AR")} ha</span>
+                        {c.name} <span className="font-mono text-slate-400">{c.ha.toLocaleString(uiLocale())} ha</span>
                       </span>
                     ))}
                   </div>
@@ -652,7 +653,7 @@ export default function MapSelector(props: Props) {
           </div>
           <p className="mt-1 text-[10px] text-slate-500">
             {SCENE_PRODUCTS[sceneProduct].hint}.{" "}
-            {scene.hot_px ? `${scene.hot_px.toLocaleString("es-AR")} píxeles de fuego activo · ` : ""}
+            {scene.hot_px ? `${scene.hot_px.toLocaleString(uiLocale())} píxeles de fuego activo · ` : ""}
             {scene.detections ? `${scene.detections} detecciones FIRMS ese día · ` : ""}nubes {Math.round(scene.cloud * 100)} % ·{" "}
             {scenes.length} imágenes elegidas por mostrar fuego o humo (Earth Engine).
           </p>
@@ -943,7 +944,7 @@ function HarmPriorityControls({ hp }: { hp: NonNullable<Props["harmPriority"]> }
       ) : c && c.n > 0 ? (
         <div>
           <button type="button" onClick={() => setOpen((o) => !o)} className="text-left text-slate-300 hover:text-slate-100">
-            Concordancia en {c.n.toLocaleString("es-AR")} celdas vistas por ambos: <b>{c.exactPct.toFixed(0)} %</b> mismo nivel ·{" "}
+            Concordancia en {c.n.toLocaleString(uiLocale())} celdas vistas por ambos: <b>{c.exactPct.toFixed(0)} %</b> mismo nivel ·{" "}
             {c.within1Pct.toFixed(0)} % a ±1 · kappa {c.kappa != null ? c.kappa.toFixed(2) : "—"} {open ? "▴" : "▾"}
           </button>
           {open && (

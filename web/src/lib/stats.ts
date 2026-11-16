@@ -1,5 +1,6 @@
 import type { CalendarCell, MonthlyBaseline, SeriesMode } from "@/types/fire";
 import { BASELINE_END, BASELINE_START } from "./regions";
+import { uiLocale } from "@/lib/i18n/translator";
 
 /** Cuantil con interpolación lineal (equivalente a numpy.percentile por defecto). */
 export function quantile(values: number[], q: number): number {
@@ -74,7 +75,7 @@ export function anomalyPct(value: number, p50: number): number {
 }
 
 export function formatNumber(v: number, digits = 0): string {
-  return v.toLocaleString("es-AR", { maximumFractionDigits: digits, minimumFractionDigits: digits });
+  return v.toLocaleString(uiLocale(), { maximumFractionDigits: digits, minimumFractionDigits: digits });
 }
 
 export function formatSigned(v: number, digits = 0): string {

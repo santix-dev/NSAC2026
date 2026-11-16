@@ -4,6 +4,7 @@
  * horarios existen (DescribeDomains) y se arma la secuencia para la animación.
  * Son mosaicos de imagen, como el mapa base: no pasan por la base de datos ni se armonizan.
  */
+import { uiLocale } from "@/lib/i18n/translator";
 export type GoesProduct = "GeoColor" | "FireTemp";
 
 export const GOES_PRODUCTS: Record<GoesProduct, { layer: string; label: string; hint: string }> = {
@@ -128,7 +129,7 @@ export async function fetchGoesTimes(product: GoesProduct, hours = 6, everyMin =
 }
 
 export function goesLocalLabel(t: string): string {
-  return new Date(t).toLocaleString("es-AR", {
+  return new Date(t).toLocaleString(uiLocale(), {
     timeZone: "America/Argentina/Buenos_Aires",
     day: "2-digit",
     month: "2-digit",

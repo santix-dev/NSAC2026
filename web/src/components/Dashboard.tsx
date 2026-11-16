@@ -50,6 +50,7 @@ import SummaryPanel from "./panels/SummaryPanel";
 import RiskPanel from "./panels/RiskPanel";
 import CharterPanel from "./panels/CharterPanel";
 import DataPanel from "./panels/DataPanel";
+import { uiLocale } from "@/lib/i18n/translator";
 
 const DEFAULT_YEAR = 2025;
 /** Cono de avance: velocidad de propagación ≈ 6 % de la velocidad del viento durante 6 h (regla empírica). */
@@ -543,7 +544,7 @@ export default function Dashboard() {
         const name = (region?.key ?? "area").toLowerCase();
         downloadText(`pyrosync_${name}_${startYear}-${endYear}.csv`, hotspotsToCsv(res.rows));
         setNotice(
-          `${res.rows.length.toLocaleString("es-AR")} celdas-día exportadas` +
+          `${res.rows.length.toLocaleString(uiLocale())} celdas-día exportadas` +
             (res.truncated ? " (límite de 10.000 filas; acotá el rango de años)." : "."),
         );
       } finally {

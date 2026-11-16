@@ -5,6 +5,7 @@
  */
 import type { BBox } from "@/types/fire";
 import type { LiveFire } from "@/app/api/firms-live/route";
+import { uiLocale } from "@/lib/i18n/translator";
 
 export type { LiveFire };
 
@@ -44,7 +45,7 @@ export function ageLabel(h: number): string {
 
 /** Hora local de Argentina (UTC−3) para los popups. */
 export function localTime(iso: string): string {
-  return new Date(iso).toLocaleString("es-AR", {
+  return new Date(iso).toLocaleString(uiLocale(), {
     timeZone: "America/Argentina/Buenos_Aires",
     day: "2-digit",
     month: "2-digit",

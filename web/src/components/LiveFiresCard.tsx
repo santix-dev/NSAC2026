@@ -2,6 +2,7 @@
 
 import { Satellite, WifiOff } from "lucide-react";
 import { ageHours, ageLabel, localTime, summarizeLive, type LiveFiresResult } from "@/lib/firmsLive";
+import { uiLocale } from "@/lib/i18n/translator";
 
 /** Resumen de focos en tiempo casi real (FIRMS NRT) dentro del área visible. */
 export default function LiveFiresCard({ live, onShowMap }: { live: LiveFiresResult | null; onShowMap?: () => void }) {
@@ -45,11 +46,11 @@ export default function LiveFiresCard({ live, onShowMap }: { live: LiveFiresResu
         <>
           <div className="mt-2 grid grid-cols-3 gap-2 text-center">
             <div className="rounded-lg bg-slate-950 p-2">
-              <p className="font-mono text-lg text-rose-300">{s.last24.toLocaleString("es-AR")}</p>
+              <p className="font-mono text-lg text-rose-300">{s.last24.toLocaleString(uiLocale())}</p>
               <p className="text-[10px] text-slate-500">últimas 24 h</p>
             </div>
             <div className="rounded-lg bg-slate-950 p-2">
-              <p className="font-mono text-lg text-slate-100">{s.total.toLocaleString("es-AR")}</p>
+              <p className="font-mono text-lg text-slate-100">{s.total.toLocaleString(uiLocale())}</p>
               <p className="text-[10px] text-slate-500">en {live.days * 24} h</p>
             </div>
             <div className="rounded-lg bg-slate-950 p-2">

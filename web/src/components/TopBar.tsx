@@ -18,6 +18,7 @@ import type { BBox, DataSource, Region } from "@/types/fire";
 import { FIRST_YEAR, LAST_YEAR, MONTHS_LONG, YEARS } from "@/lib/regions";
 import { CustomBBoxForm } from "./AreaForms";
 import BrandLogo from "./BrandLogo";
+import LanguageSwitch from "./LanguageSwitch";
 
 interface Props {
   regions: Region[];
@@ -53,7 +54,9 @@ export default function TopBar(p: Props) {
   const [copied, setCopied] = useState(false);
   const share = async () => {
     try {
-      await navigator.clipboard.writeText(window.location.href);
+      const url = new URL(window.location.href);
+      if (document.documentElement.lang === "en") url.searchParams.set("lang", "en");
+      await navigator.clipboard.writeText(url.toString());
       setCopied(true);
       setTimeout(() => setCopied(false), 1800);
     } catch {
@@ -104,8 +107,11 @@ export default function TopBar(p: Props) {
             }
           >
             <Database className="h-3.5 w-3.5" aria-hidden />
-            {p.dataSource === "supabase" ? "Datos en vivo" : p.dataSource === "snapshot" ? "Copia de datos reales" : "Cargando…"}
+            <span className="hidden 2xl:inline">
+              {p.dataSource === "supabase" ? "Datos en vivo" : p.dataSource === "snapshot" ? "Copia de datos reales" : "Cargando…"}
+            </span>
           </span>
+          <LanguageSwitch />
           <button
             type="button"
             onClick={share}

@@ -31,6 +31,7 @@ import { ageHours, ageLabel, localTime, type LiveFire } from "@/lib/firmsLive";
 import type { RawDetection } from "@/types/fire";
 import { priorityOf, type CellPriority } from "@/lib/cellPriority";
 import { GOES_MAX_NATIVE_ZOOM, goesTileUrl, type GoesProduct } from "@/lib/goes";
+import { uiLocale } from "@/lib/i18n/translator";
 
 export interface GoesOverlay {
   product: GoesProduct;
@@ -309,7 +310,7 @@ export default function MapView({ bbox, hotspots, spread, susceptibility, iot, w
             layer.bindTooltip(String(p.name ?? "Área protegida"), { sticky: true });
             layer.bindPopup(
               `<strong>${p.name}</strong><br/><span style="color:#94a3b8">${p.designation ?? ""}</span><br/>` +
-                `Superficie ≈ ${Number(p.area_km2 ?? 0).toLocaleString("es-AR")} km² · ${p.operator ?? ""}<br/>` +
+                `Superficie ≈ ${Number(p.area_km2 ?? 0).toLocaleString(uiLocale())} km² · ${p.operator ?? ""}<br/>` +
                 `<span style="color:#64748b;font-size:10px">${p.source ?? ""}</span>`,
             );
           }}
@@ -579,7 +580,7 @@ export default function MapView({ bbox, hotspots, spread, susceptibility, iot, w
               <Coords lat={station.lat} lon={station.lon} />
               <div style={{ color: "#fbbf24", fontSize: 10, marginBottom: 4 }}>
                 Meteomatics (modelo mix) ·{" "}
-                {new Date(reading.timestamp).toLocaleTimeString("es-AR")}
+                {new Date(reading.timestamp).toLocaleTimeString(uiLocale())}
               </div>
               <Row k="Temperatura" v={fmt(reading.temperature_c, 1, " °C")} />
               <Row k="Humedad relativa" v={fmt(reading.relative_humidity_pct, 0, " %")} />
