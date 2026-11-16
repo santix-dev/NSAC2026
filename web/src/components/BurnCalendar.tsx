@@ -62,7 +62,7 @@ export default function BurnCalendar(props: Props) {
       <div className="space-y-2 border-b border-slate-800 px-3 py-2.5">
         <div className="flex items-center justify-between gap-2">
           <h2 className="flex items-center gap-1.5 text-sm font-semibold text-slate-100">
-            <CalendarDays className="h-4 w-4 text-orange-400" aria-hidden /> Calendario de quemas
+            <CalendarDays className="h-4 w-4 text-orange-400" aria-hidden /> Calendario de focos
           </h2>
           <div className="flex rounded-md border border-slate-800 bg-slate-950 p-0.5" role="group" aria-label="Paleta">
             <button type="button" className={seg(palette === "viridis")} aria-pressed={palette === "viridis"} onClick={() => props.onPaletteChange("viridis")}>

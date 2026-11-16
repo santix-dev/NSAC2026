@@ -95,7 +95,7 @@ export const EN_PHRASES: [string, string][] = [
   ["detecciones originales", "original detections"],
 
   // ---------------------------------------------------------------- calendario
-  ["Calendario de quemas", "Burn calendar"],
+  ["Calendario de focos", "Hot spot calendar"],
   ["Ocultar fuentes fijas (volcanes / industria)", "Hide fixed sources (volcanoes / industry)"],
   ["Tocá una celda para ver ese mes en el mapa.", "Tap a cell to see that month on the map."],
   ["Sin VIIRS (empieza en nov-2012)", "No VIIRS (starts in Nov 2012)"],

@@ -85,7 +85,7 @@ export interface EnvGridCell {
   wind_max_kmh: number | null;
 }
 
-/** Celda del Calendario de Actividad de Quemas (año × mes) */
+/** Celda del Calendario de focos (año × mes) */
 export interface CalendarCell {
   year: number;
   month: number; // 1..12
